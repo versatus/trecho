@@ -180,6 +180,7 @@ impl From<usize> for Register {
             29 => Register::X29,
             30 => Register::X30,
             31 => Register::X31,
+            _ => panic!("Accessing an Invalid Register")
         }
     }
 }

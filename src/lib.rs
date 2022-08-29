@@ -3,12 +3,14 @@ pub mod instructions;
 pub mod soft;
 pub mod vm;
 pub mod extensions;
+pub mod encoding;
+pub mod encoding_types;
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::register::{Register, RegisterAbi, HardWiredZero};
-    use crate::instructions::OpCodeType;
+    use crate::encoding::OpCodeType;
 
     #[test]
     fn test_match_register() {
