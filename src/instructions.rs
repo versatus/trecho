@@ -37,27 +37,27 @@ pub enum Instruction {
     // greater than equal unsigned
     Bgeu { rd: Register, rs1: Register, rs2: Register, imm: i32 },
     // load bit
-    Lb {},
+    Lb { rd: Register, rs1: Register, imm: i32 },
     // load halfword
-    Lh {},
+    Lh { rd: Register, rs1: Register, imm: i32 },
     // load bit unsigned
-    Lbu {},
+    Lbu { rd: Register, rs1: Register, imm: i32 },
     // load halfword unsigned
-    Lhu {},
+    Lhu { rd: Register, rs1: Register, imm: i32 },
     // save bit
-    Sb {},
+    Sb { rs1: Register, imm: i32 },
     // save halfword
-    Sh {},
+    Sh { rs1: Register, rs2: Register, imm: i32 },
     // save word
-    Sw {},
+    Sw { rs1: Register, rs2: Register, imm: i32 },
     // add integer
-    Addi {},
-    Slti {},
-    Sltiu {},
-    Xori {},
-    Ori {},
-    Andi {},
-    Slli {},
+    Addi { rd: Register, rs1: Register, imm: i32 },
+    Slti { rd: Register, rs1: Register, imm: i32 },
+    Sltiu { rd: Register, rs1: Register, imm: i32 },
+    Xori { rd: Register, rs1: Register, imm: i32 },
+    Ori { rd: Register, rs1: Register, imm: i32 },
+    Andi { rd: Register, rs1: Register, imm: i32 },
+    Slli { rd: Register, rs1: Register, imm: i32 },
     Srli {},
     Srai {},
     Add {},
