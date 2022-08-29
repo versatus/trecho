@@ -1,4 +1,4 @@
-
+#![allow(unused, unused_mut, dead_code)]
 // The basic register addresses
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Register {
@@ -140,6 +140,85 @@ impl From<Register> for RegisterAbi {
             Register::X29 => return RegisterAbi::T4(Temporary),
             Register::X30 => return RegisterAbi::T5(Temporary),
             Register::X31 => return RegisterAbi::T6(Temporary),
+        }
+    }
+}
+
+impl From<usize> for Register {
+    fn from(i: usize) -> Register {
+        assert!(i < 32);
+        match i {
+            0 => Register::X0,
+            1 => Register::X1,
+            2 => Register::X2,
+            3 => Register::X3,
+            4 => Register::X4,
+            5 => Register::X5,
+            6 => Register::X6,
+            7 => Register::X7,
+            8 => Register::X8,
+            9 => Register::X9,
+            10 => Register::X10,
+            11 => Register::X11,
+            12 => Register::X12,
+            13 => Register::X13,
+            14 => Register::X14,
+            15 => Register::X15,
+            16 => Register::X16,
+            17 => Register::X17,
+            18 => Register::X18,
+            19 => Register::X19,
+            20 => Register::X20,
+            21 => Register::X21,
+            22 => Register::X22,
+            23 => Register::X23,
+            24 => Register::X24,
+            25 => Register::X25,
+            26 => Register::X26,
+            27 => Register::X27,
+            28 => Register::X28,
+            29 => Register::X29,
+            30 => Register::X30,
+            31 => Register::X31,
+        }
+    }
+}
+
+impl From<Register> for usize {
+    fn from(reg: Register) -> usize {
+        match reg {
+            Register::X0 => 0,
+            Register::X1 => 1,
+            Register::X2 => 2,
+            Register::X3 => 3,
+            Register::X4 => 4,
+            Register::X5 => 5,
+            Register::X6 => 6,
+            Register::X7 => 7,
+            Register::X8 => 8,
+            Register::X9 => 9,
+            Register::X10 => 10,
+            Register::X11 => 11,
+            Register::X12 => 12,
+            Register::X13 => 13,
+            Register::X14 => 14,
+            Register::X15 => 15,
+            Register::X16 => 16,
+            Register::X17 => 17,
+            Register::X18 => 18,
+            Register::X19 => 19,
+            Register::X20 => 20,
+            Register::X21 => 21,
+            Register::X22 => 22,
+            Register::X23 => 23,
+            Register::X24 => 24,
+            Register::X25 => 25,
+            Register::X26 => 26,
+            Register::X27 => 27,
+            Register::X28 => 28,
+            Register::X29 => 29,
+            Register::X30 => 30,
+            Register::X31 => 31,
         }
     }
 }
