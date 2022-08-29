@@ -2,9 +2,8 @@
 use crate::extensions::{Ext, I64, I32};
 use std::collections::HashMap;
 use crate::register::Register;
-use crate::encoding::{OpCodeType, EncodingTable};
+use crate::encoding::{OpCodeType, EncodingTable, Decoder, Unpacked};
 use crate::encoding_types::{OpCode, Inst};
-use crate::decoding::Decoder;
 
 // Enum with all instruction variants. Need all instructions for all extensions
 // allow encoding table, based on extension to determine whether or not the
@@ -224,20 +223,27 @@ pub enum Instruction {
 
 impl From<Inst> for Instruction {
     fn from(inst: Inst) -> Instruction {
-        Instruction::decode(inst)
+        Instruction::Undefined
     }
 }
 
 impl Decoder for Instruction {
-    fn decode_i64(inst: Inst, enc_table: EncodingTable<I64>) -> Instruction {
-        Instruction::Undefined
-    }
-
-    fn decode_i32(inst: Inst, enc_table: EncodingTable<I32>) -> Instruction {
-        Instruction::Undefined
-    }
+    type Return = Self;
 
     fn opcode(inst: Inst) -> OpCode {
-        inst & 0b1111111
+        (inst & 0b1111111) as u8
+    }
+
+    fn unpack(inst: Inst) -> Unpacked {
+        inst.into()
+    }
+
+    fn decode_i64(inst: Inst, enc_table: EncodingTable<I64>) -> Self::Return {
+        let opcode_type = enc_table.get(Instruction::opcode(inst));
+        Instruction::Undefined
+    }
+
+    fn decode_i32(inst: Inst, enc_table: EncodingTable<I32>) -> Self::Return {
+        Instruction::Undefined
     }
 }

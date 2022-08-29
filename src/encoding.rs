@@ -1,6 +1,6 @@
 #![allow(unused, unused_mut, dead_code)]
 use crate::extensions::{I64, I32, Ext};
-use crate::encoding_types::{OpCode, Inst};
+use crate::encoding_types::*;
 
 // S struct for fast OpCode lookups
 #[derive(Clone, Debug)]
@@ -17,6 +17,7 @@ pub enum OpCodeType {
     B,
     U,
     J,
+    R4,
     Invalid,
 }
 
@@ -49,7 +50,8 @@ impl From<OpCodeType> for OpCode {
             OpCodeType::B => 3,
             OpCodeType::U => 4,
             OpCodeType::J => 5,
-            OpCodeType::Invalid => 6,
+            OpCodeType::R4 => 6,
+            OpCodeType::Invalid => 7,
         }
     }
 }
@@ -336,3 +338,188 @@ pub const I32_TABLE: [OpCodeType; 128] = [
     /*0b1111110*/ OpCodeType::Invalid,
     /*0b1111111*/ OpCodeType::Invalid
 ];
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct Unpacked {
+    pub opcode: OpCode,
+    pub imm: Option<Imm>,
+    pub uimm: Option<Uimm>,
+    pub rd: Option<Rd>,
+    pub rs1: Option<Rs1>,
+    pub rs2: Option<Rs2>,
+    pub rs3: Option<Rs3>,
+    pub rm: Option<Rm>,
+    pub func2: Option<Func2>,
+    pub func3: Option<Func3>,
+    pub func7: Option<Func7>,
+    pub shamt: Option<Shamt>,
+    pub succ: Option<Succ>,
+    pub pred: Option<Pred>,
+    pub fm: Option<Fm>,
+    pub csr: Option<Csr>,
+    pub aq: Option<Aq>,
+    pub rl: Option<Rl>,
+}
+
+impl Default for Unpacked {
+    fn default() -> Unpacked {
+        Unpacked {
+            opcode: 0,
+            imm: None,
+            uimm: None,
+            rs1: None, 
+            rs2: None,
+            rs3: None,
+            rd: None,
+            rm: None,
+            func2: None,
+            func3: None,
+            func7: None,
+            shamt: None,
+            fm: None,
+            pred: None,
+            succ: None,
+            csr: None,
+            aq: None,
+            rl: None,
+        }
+    }
+}
+
+impl From<Inst> for Unpacked {
+    fn from(inst: Inst) -> Unpacked {
+        // Get the opcode
+        let opcode = (inst & 0b1111111) as u8;
+        
+        // Get the opcode type from the opcode so that
+        // we can match on it and adjust the operands
+        // correctly.
+        let opcode_type = OpCodeType::from(opcode);
+
+        // Create Base Imm Types
+        let imm = ((inst >> 20) & 0b1111_1111_1111) as i32;
+        let imm_3112 = (inst & 0xfffff000) as i32;
+        let imm_4 = ((inst >> 7) & 0b11111) as i32;
+        let imm_4111 = ((inst >> 7) & 0b11111) as i32;
+        let imm_12105 = ((inst >> 25) & 0b1111111) as i32;
+        let imm_115 = ((inst >> 25) & 0b1111111) as i32;
+        let uimm = (inst >> 15) & 0b11111;
+
+        // Merge immediates -> Sign Extend in Match Arm that
+        // matches OpCodeType that requires sign extension
+        // on Immediates.
+        let imm_12 = ((imm_12105 & 0b1000000) >> 6) as i32;
+        let imm_105 = (imm_12105 & 0b0111111) as i32;
+        let imm_41 = ((imm_4111 & 0b11110) >> 1) as i32;
+        let imm_11 = (imm_4111 & 0b00001) as i32;
+
+        // Get register usizes
+        let rs1 = ((inst >> 15) & 0b11111) as usize;
+        let rs2 = ((inst >> 20) & 0b11111) as usize;
+        let rs3 = ((inst >> 27) & 0b11111) as usize;
+        let rd = ((inst >> 7) & 0b11111) as usize;
+        let rm = ((inst >> 12) & 0b111) as usize;
+        
+        // get funct types
+        let func2 = ((inst >> 25) & 0b11) as u32;
+        let func3 = ((inst >> 12) & 0b111) as u32;
+        let func7 = ((inst >> 25) & 0b1111111) as u32;
+
+        // get shift amounts
+        let shamt = ((inst >> 20) & 0b11111) as u32;
+        
+        // get csr
+        let csr = ((inst >> 20) & 0b1111_1111_1111) as u32;
+
+        //TODO: Convert the next 5 to i8 and sign extend
+        // get succ, pred and fm (and sign extend)
+        let fm = ((inst >> 27) & 0b11111) as u8;
+        let pred = ((inst >> 24) & 0b111) as u8;
+        let succ = ((inst >> 20) & 0b11) as u8;
+
+        // get aq & rl
+        let aq = ((inst >> 26) & 0b1) as u8;
+        let rl = ((inst >> 25) & 0b1) as u8;
+
+        // Add all match arms for opcode_types,
+        // if sign extension required, add sign extension and conversions.
+        match opcode_type {
+            OpCodeType::R => {
+                let mut unpacked = Unpacked::default();
+                unpacked.opcode = opcode;
+                unpacked.func7 = Some(func7);
+                unpacked.rs2 = Some(rs2);
+                unpacked.rs1 = Some(rs1);
+                unpacked.func3 = Some(func3);
+                unpacked.rd = Some(rd);
+                return unpacked
+            },
+            OpCodeType::I => {
+                let mut unpacked = Unpacked::default();
+                unpacked.opcode = opcode;
+                unpacked.imm = Some(imm);
+                unpacked.rs1 = Some(rs1);
+                unpacked.func3 = Some(func3);
+                unpacked.rd = Some(rd);
+                return unpacked
+            }
+            OpCodeType::S => { 
+                let mut unpacked = Unpacked::default();
+                let imm = (imm_115 << 5) | imm_4;
+                let imm = ((imm as i32) << 20) >> 20;
+                unpacked.opcode = opcode;
+                unpacked.imm = Some(imm);
+                unpacked.rs1 = Some(rs1);
+                unpacked.rs2 = Some(rs2);
+                return unpacked
+            },
+            OpCodeType::B => {
+                let mut unpacked = Unpacked::default();
+                let imm = (imm_12 << 12) | (imm_11 << 11) | (imm_105 << 5) | (imm_41 << 1);
+                let imm = ((imm as i32) << 19) >> 19; 
+                unpacked.opcode = opcode;
+                unpacked.imm = Some(imm);
+                unpacked.rs1 = Some(rs1);
+                unpacked.rs2 = Some(rs2);
+                return unpacked
+            },
+            OpCodeType::U => {
+                let mut unpacked = Unpacked::default();
+                unpacked.opcode = opcode;
+                unpacked.imm = Some(imm_3112);
+                unpacked.rd = Some(rd);
+                return unpacked
+            },
+            OpCodeType::J => {
+                let mut unpacked = Unpacked::default();
+                let imm = ((inst & 0xfffff000) >> 12) as i32;
+                
+                // Create pieces of immediate;
+                let imm20 = ((imm >> 19) & 1) as i32;
+                let imm101 = ((imm >> 0) & 0b1111111111) as i32;
+                let imm11 = ((imm >> 8) & 1) as i32;
+                let imm1912 = ((imm >> 0) & 0b11111111) as i32;
+                // Combine immediate
+                let imm = (imm20 << 20) | (imm1912 << 12) | (imm11 << 11) | (imm101 << 1);
+                
+                // Sign extend immediate
+                let imm = ((imm as i32) << 11) >> 11;
+
+                unpacked.opcode = opcode;
+                unpacked.rd = Some(rd);
+                unpacked.imm = Some(imm);
+                return unpacked
+            },
+            OpCodeType::R4 => Unpacked::default(),
+            OpCodeType::Invalid => Unpacked::default()
+        }
+    }
+}
+
+pub trait Decoder {
+    type Return;
+    fn opcode(inst: Inst) -> OpCode;
+    fn unpack(inst: Inst) -> Unpacked;
+    fn decode_i64(inst: Inst, enc_table: EncodingTable<I64>) -> Self::Return;
+    fn decode_i32(inst: Inst, enc_table: EncodingTable<I32>) -> Self::Return;
+}
