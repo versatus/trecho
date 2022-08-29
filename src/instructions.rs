@@ -4,6 +4,7 @@ use std::collections::HashMap;
 use crate::register::Register;
 use crate::encoding::{OpCodeType, EncodingTable};
 use crate::encoding_types::{OpCode, Inst};
+use crate::decoding::Decoder;
 
 // Enum with all instruction variants. Need all instructions for all extensions
 // allow encoding table, based on extension to determine whether or not the
@@ -219,4 +220,24 @@ pub enum Instruction {
     FcvtLUQ { rd: Register, rs1: Register, rm: u32 },
     FcvtQL { rd: Register, rs1: Register, rm: u32 },
     FcvtQLU { rd: Register, rs1: Register, rm: u32 },
+}
+
+impl From<Inst> for Instruction {
+    fn from(inst: Inst) -> Instruction {
+        Instruction::decode(inst)
+    }
+}
+
+impl Decoder for Instruction {
+    fn decode_i64(inst: Inst, enc_table: EncodingTable<I64>) -> Instruction {
+        Instruction::Undefined
+    }
+
+    fn decode_i32(inst: Inst, enc_table: EncodingTable<I32>) -> Instruction {
+        Instruction::Undefined
+    }
+
+    fn opcode(inst: Inst) -> OpCode {
+        inst & 0b1111111
+    }
 }
