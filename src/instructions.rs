@@ -85,7 +85,7 @@ pub enum Instruction {
     Sllw { rd: Register, rs1: Register, rs2: Register },
     Srlw { rd: Register, rs1: Register, rs2: Register },
     Sraw { rd: Register, rs1: Register, rs2: Register },
-    FenceI { rd: Register, rs1: Register imm: i32 },
+    FenceI { rd: Register, rs1: Register, imm: i32 },
     Csrrw { rd: Register, rs1: Register, csr: i32 },
     Csrrs { rd: Register, rs1: Register, csr: i32 },
     Csrrc { rd: Register, rs1: Register, csr: i32 },
@@ -165,7 +165,7 @@ pub enum Instruction {
     FaddD { rd: Register, rs1: Register, rs2: Register, rm: u32 },
     FsubD { rd: Register, rs1: Register, rs2: Register, rm: u32 },
     FdivD { rd: Register, rs1: Register, rs2: Register, rm: u32 },
-    FsqrtD { rd: Register, rs1: Register, rm: u32 } 
+    FsqrtD { rd: Register, rs1: Register, rm: u32 },
     FsgnjD { rd: Register, rs1: Register, rs2: Register },
     FsgnjnD { rd: Register, rs1: Register, rs2: Register },
     FsgnjxD { rd: Register, rs1: Register, rs2: Register },
