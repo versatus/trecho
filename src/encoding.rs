@@ -452,6 +452,10 @@ impl From<Inst> for Unpacked {
                 unpacked.rs1 = Some(rs1);
                 unpacked.func3 = Some(func3);
                 unpacked.rd = Some(rd);
+                unpacked.imm = Some(imm);
+                unpacked.fm = Some(fm);
+                unpacked.pred = Some(pred);
+                unpacked.succ = Some(succ);
                 return unpacked
             },
             OpCodeType::I => {
@@ -461,6 +465,8 @@ impl From<Inst> for Unpacked {
                 unpacked.rs1 = Some(rs1);
                 unpacked.func3 = Some(func3);
                 unpacked.rd = Some(rd);
+                unpacked.func7 = Some(func7);
+                unpacked.shamt = Some(shamt);
                 return unpacked
             }
             OpCodeType::S => { 
