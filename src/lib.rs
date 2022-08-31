@@ -105,20 +105,264 @@ mod tests {
         println!("{:?}", unpacked);
     }
 
-    // #[test]
-    // fn test_unpack_random_r4_type_bites() {
-    //     let bits: Inst = 0b1100_1100_1100_1100_1100_1100_1011_0111 as u32;
-    //     let unpacked: Unpacked = bits.into();
-    //     assert!(unpacked.imm.is_some());
-    //     assert!(unpacked.rd.is_some());
-    //     assert_eq!(unpacked.opcode, 55);
-    // }
+    // TODO: Add test cases for each `Instruction` struct variant type with a fixed u32 inst to test conversion.
+    #[test]
+    fn test_convert_lui_bits_into_instruction() {
+        unimplemented!()
+    }
+    
+    #[test]
+    fn test_convert_auipc_bits_into_instruction() {
+        unimplemented!()
+    }
 
-    // #[test]
-    // fn test_unpack_random_r_type_bits_opcode_into_instructions() {
-    //     let bits: Inst = 0b1100_1100_1100_1100_1100_1100_1011_0011 as u32;
-    //     let unpacked: Unpacked = bits.into();
-    //     println!("{:?}", unpacked);
-    //     assert!(true);
-    // }
+    #[test]
+    fn test_convert_jal_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_jalr_bits_into_instruction() {
+        unimplemented!()    
+    }
+
+    #[test]
+    fn test_convert_beq_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_bne_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_blt_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_bge_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_bltu_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_bgeu_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_lb_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_lh_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_lw_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_lbu_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_lhu_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_sb_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_sh_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_sw_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_addi_bits_into_instruction() {
+        unimplemented!()   
+    }
+
+    #[test]
+    fn test_convert_slti_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_sltiu_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_xori_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_ori_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_andi_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_slli_bits_into_instruction() {
+        unimplemented!()
+    }
+    
+    #[test]
+    fn test_convert_srli_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_srai_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_add_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_sub_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_sll_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_slt_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_sltu_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_xor_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_srl_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_sra_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_or_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_and_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_fence_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_ecall_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_ebreak_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_lwu_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_ld_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_sd_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_addiw_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_slliw_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_srliw_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_sraiw_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_addw_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_subw_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_sllw_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_srlw_bits_into_instruction() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn test_convert_sraw_bits_into_instruction() {
+        unimplemented!()
+    }
 }
