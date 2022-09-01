@@ -77,20 +77,6 @@ pub enum Instruction {
     Fence { rd: Register, rs1: Register, fm: u32, pred: u32, succ: u32, func3: u32 },
     ECall,
     EBreak,
-<<<<<<< HEAD
-    Lwu { rd: Register, rs1: Register, imm: i32 },
-    Ld { rd: Register, rs1: Register, imm: i32 },
-    Sd { rs1: Register, rs2: Register, imm: i32 },
-    Addiw { rd: Register, rs1: Register, imm: i32 },
-    Slliw { rd: Register, rs1: Register, shamt: i32 },
-    Srliw { rd: Register, rs1: Register, shamt: i32 },
-    Sraiw { rd: Register, rs1: Register, shamt: i32 },
-    Addw { rd: Register, rs1: Register, rs2: Register },
-    Subw { rd: Register, rs1: Register, rs2: Register },
-    Sllw { rd: Register, rs1: Register, rs2: Register },
-    Srlw { rd: Register, rs1: Register, rs2: Register },
-    Sraw { rd: Register, rs1: Register, rs2: Register },
-=======
     Lwu { rd: Register, rs1: Register, imm: i32, func3: u32 },
     Ld { rd: Register, rs1: Register, imm: i32, func3: u32 },
     Sd { rs1: Register, rs2: Register, imm: i32, func3: u32 },
@@ -103,7 +89,6 @@ pub enum Instruction {
     Sllw { rd: Register, rs1: Register, rs2: Register, func3: u32, func7: u32 },
     Srlw { rd: Register, rs1: Register, rs2: Register, func3: u32, func7: u32 },
     Sraw { rd: Register, rs1: Register, rs2: Register, func3: u32, func7: u32 },
->>>>>>> feat-decode-base-instructions
     FenceI { rd: Register, rs1: Register, imm: i32 },
     Csrrw { rd: Register, rs1: Register, csr: i32 },
     Csrrs { rd: Register, rs1: Register, csr: i32 },
