@@ -10,7 +10,7 @@ pub mod encoding_types;
 mod tests {
     use super::*;
     use crate::register::{Register, RegisterAbi, HardWiredZero};
-    use crate::encoding::{OpCodeType, Unpacked, Decoder};
+    use crate::encoding::{OpCodeType, Unpacked, InstructionDecoder};
     use crate::instructions::Instruction;
     use crate::encoding_types::*;
 

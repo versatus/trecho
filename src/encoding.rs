@@ -4,7 +4,7 @@ use crate::encoding_types::*;
 
 // S struct for fast OpCode lookups
 #[derive(Clone, Debug)]
-pub struct EncodingTable<E: Ext> {
+pub struct EncodingTable<E: Ext + ?Sized> {
     pub table: [OpCodeType; 128],
     ext: E,
 }
@@ -21,7 +21,7 @@ pub enum OpCodeType {
     Invalid,
 }
 
-impl<E: Ext> EncodingTable<E> {
+impl<E: Ext + ?Sized> EncodingTable<E> {
     pub fn get(&self, opcode: OpCode) -> OpCodeType {
         self.table[opcode as usize]
     }
@@ -525,10 +525,9 @@ impl From<Inst> for Unpacked {
     }
 }
 
-pub trait Decoder {
+pub trait InstructionDecoder {
     type Return;
     fn opcode(inst: Inst) -> OpCode;
     fn unpack(inst: Inst) -> Unpacked;
-    fn decode_i64(inst: Inst, enc_table: EncodingTable<I64>) -> Self::Return;
-    fn decode_i32(inst: Inst, enc_table: EncodingTable<I32>) -> Self::Return;
+    fn decode(inst: Inst, enc_table: &EncodingTable<dyn Ext>) -> Self::Return;
 }

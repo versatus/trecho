@@ -2,8 +2,10 @@
 use crate::extensions::{Ext, I64, I32};
 use std::collections::HashMap;
 use crate::register::Register;
-use crate::encoding::{OpCodeType, EncodingTable, Decoder, Unpacked};
+use crate::encoding::{OpCodeType, EncodingTable, InstructionDecoder, Unpacked};
 use crate::encoding_types::{OpCode, Inst};
+
+pub const SEVEN_BIT_MASK: u32 = 0b1111111 as u32;
 
 // Enum with all instruction variants. Need all instructions for all extensions
 // allow encoding table, based on extension to determine whether or not the
@@ -751,28 +753,23 @@ impl From<Inst> for Instruction {
     }
 }
 
-impl Decoder for Instruction {
+impl InstructionDecoder for Instruction {
     type Return = Self;
 
     fn opcode(inst: Inst) -> OpCode {
-        (inst & 0b1111111) as u8
+        (inst & SEVEN_BIT_MASK) as u8
     }
 
     fn unpack(inst: Inst) -> Unpacked {
         inst.into()
     }
 
-    fn decode_i64(inst: Inst, enc_table: EncodingTable<I64>) -> Self::Return {
+    fn decode(inst: Inst, enc_table: &EncodingTable<dyn Ext>) -> Self::Return {
         let opcode_type = enc_table.get(Instruction::opcode(inst));
         if let OpCodeType::Invalid = opcode_type {
             return Instruction::Undefined
         }
 
         inst.into()
-
-    }
-
-    fn decode_i32(inst: Inst, enc_table: EncodingTable<I32>) -> Self::Return {
-        Instruction::Undefined
     }
 }
