@@ -12,7 +12,7 @@ use crate::encoding_types::{OpCode, Inst};
 // When we implement decoding, based on the Extension set of the type of machine
 // We will know which OpCodes are Invalid, because they will return an Invalid
 // variant of the OpCodeType.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Instruction {
     // Invalid instruction, undefined
     Undefined,
@@ -23,7 +23,7 @@ pub enum Instruction {
     // jump and link
     Jal { rd: Register, imm: i32 },
     // jump and link register
-    Jalr { rd: Register, rs1: Register, rs2: Register, imm: i32, func3: u32 },
+    Jalr { rd: Register, rs1: Register, imm: i32 },
     // equal
     Beq { rd: Register, rs1: Register, rs2: Register, imm: i32, func3: u32 },
     // not equal
@@ -240,17 +240,15 @@ impl From<Inst> for Instruction {
                 return Instruction::Jalr { 
                     rd: unpacked.rd.unwrap().into(), 
                     rs1: unpacked.rs1.unwrap().into(),
-                    rs2: unpacked.rs2.unwrap().into(), 
                     imm: unpacked.imm.unwrap(), 
-                    func3: unpacked.func3.unwrap() 
                 }
             },
             0b1100011 => {
                 let func3 = unpacked.func3.unwrap();
                 match func3 {
                     0b000 => { 
-                        return Instruction::Beq { 
-                            rd: unpacked.rd.unwrap().into(), 
+                        return Instruction::Beq {
+                            rd: unpacked.rd.unwrap().into(),
                             rs1: unpacked.rs1.unwrap().into(), 
                             rs2: unpacked.rs2.unwrap().into(), 
                             imm: unpacked.imm.unwrap(), 

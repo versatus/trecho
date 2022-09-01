@@ -105,7 +105,7 @@ pub const I64_TABLE: [OpCodeType; 128] = [
     /*0b0011000*/ OpCodeType::Invalid,      // decimal: 24    hex: 0x18
     /*0b0011001*/ OpCodeType::Invalid,      // decimal: 25    hex: 0x19  
     /*0b0011010*/ OpCodeType::Invalid,      // decimal: 26    hex: 0x1a
-    /*0b0011011*/ OpCodeType::Invalid,      // decimal: 27    hex: 0x1b
+    /*0b0011011*/ OpCodeType::I,      // decimal: 27    hex: 0x1b
     /*0b0011100*/ OpCodeType::Invalid,      // decimal: 28    hex: 0x1c
     /*0b0011101*/ OpCodeType::Invalid,      // decimal: 29    hex: 0x1d
     /*0b0011110*/ OpCodeType::Invalid,      // decimal: 30    hex: 0x1e
@@ -137,7 +137,7 @@ pub const I64_TABLE: [OpCodeType; 128] = [
     /*0b0111000*/ OpCodeType::Invalid,      // decimal: 56    hex: 0x38
     /*0b0111001*/ OpCodeType::Invalid,      // decimal: 57    hex: 0x39
     /*0b0111010*/ OpCodeType::Invalid,      // decimal: 58    hex: 0x3a
-    /*0b0111011*/ OpCodeType::Invalid,      // decimal: 59    hex: 0x3b
+    /*0b0111011*/ OpCodeType::R,            // decimal: 59    hex: 0x3b
     /*0b0111100*/ OpCodeType::Invalid,      // decimal: 60    hex: 0x3c
     /*0b0111101*/ OpCodeType::Invalid,      // decimal: 61    hex: 0x3d
     /*0b0111110*/ OpCodeType::Invalid,      // decimal: 62    hex: 0x3e
@@ -236,7 +236,7 @@ pub const I32_TABLE: [OpCodeType; 128] = [
     /*0b0011000*/ OpCodeType::Invalid,
     /*0b0011001*/ OpCodeType::Invalid,
     /*0b0011010*/ OpCodeType::Invalid,
-    /*0b0011011*/ OpCodeType::I,
+    /*0b0011011*/ OpCodeType::Invalid,
     /*0b0011100*/ OpCodeType::Invalid,
     /*0b0011101*/ OpCodeType::Invalid,
     /*0b0011110*/ OpCodeType::Invalid,
@@ -268,7 +268,7 @@ pub const I32_TABLE: [OpCodeType; 128] = [
     /*0b0111000*/ OpCodeType::Invalid,
     /*0b0111001*/ OpCodeType::Invalid,
     /*0b0111010*/ OpCodeType::Invalid,
-    /*0b0111011*/ OpCodeType::R,
+    /*0b0111011*/ OpCodeType::Invalid,
     /*0b0111100*/ OpCodeType::Invalid,
     /*0b0111101*/ OpCodeType::Invalid,
     /*0b0111110*/ OpCodeType::Invalid,
@@ -477,6 +477,7 @@ impl From<Inst> for Unpacked {
                 unpacked.imm = Some(imm);
                 unpacked.rs1 = Some(rs1);
                 unpacked.rs2 = Some(rs2);
+                unpacked.func3 = Some(func3);
                 return unpacked
             },
             OpCodeType::B => {
@@ -484,6 +485,8 @@ impl From<Inst> for Unpacked {
                 let imm = (imm_12 << 12) | (imm_11 << 11) | (imm_105 << 5) | (imm_41 << 1);
                 let imm = ((imm as i32) << 19) >> 19; 
                 unpacked.opcode = opcode;
+                unpacked.rd = Some(rd);
+                unpacked.func3 = Some(func3);
                 unpacked.imm = Some(imm);
                 unpacked.rs1 = Some(rs1);
                 unpacked.rs2 = Some(rs2);
