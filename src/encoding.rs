@@ -429,7 +429,7 @@ impl From<Inst> for Unpacked {
         let shamt = ((inst >> 20) & 0b11111) as u32;
         
         // get csr
-        let csr = ((inst >> 20) & 0b1111_1111_1111) as u32;
+        let csr = ((inst >> 20) & 0b1111_1111_1111) as i32;
 
         //TODO: Convert the next 5 to i8 and sign extend
         // get succ, pred and fm (and sign extend)
@@ -456,6 +456,8 @@ impl From<Inst> for Unpacked {
                 unpacked.fm = Some(fm);
                 unpacked.pred = Some(pred);
                 unpacked.succ = Some(succ);
+                unpacked.csr = Some(csr);
+                unpacked.uimm = Some(uimm);
                 return unpacked
             },
             OpCodeType::I => {

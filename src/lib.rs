@@ -896,4 +896,76 @@ mod tests {
             }
         );
     }
+
+    #[test]
+    fn test_convert_valid_fence_i_bits_into_instruction() {
+        let bits: Inst = 0b0000_0000_1100_1010_1001_0101_1000_1111 as u32;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FenceI {
+                rd: Register::X11,
+                rs1: Register::X21,
+                imm: 12,
+                func3: 1
+            }
+        );
+    }
+
+    #[test]
+    fn test_convert_valid_csrrw_bits_into_instruction() {}    
+
+    #[test]    
+    fn test_convert_valid_csrrs_bits_into_instruction() {}
+
+    #[test]
+    fn test_convert_valid_csrrc_bits_into_instruction() {}
+
+    #[test]    
+    fn test_convert_valid_csrrwi_bits_into_instruction() {}
+
+    #[test]
+    fn test_convert_valid_csrrsi_bits_into_instruction() {}
+
+    #[test]
+    fn test_convert_valid_csrrci_bits_into_instruction() {}
+    
+    #[test]
+    fn test_convert_valid_mul_bits_into_instruction() {}
+    
+    #[test]
+    fn test_convert_valid_mulh_bits_into_instruction() {}
+    
+    #[test]
+    fn test_convert_valid_mulhsu_bits_into_instruction() {}
+    
+    #[test]
+    fn test_convert_valid_mulhu_bits_into_instruction() {}
+    
+    #[test]
+    fn test_convert_valid_div_bits_into_instruction() {}
+    
+    #[test]
+    fn test_convert_valid_divu_bits_into_instruction() {}
+    
+    #[test]
+    fn test_convert_valid_rem_bits_into_instruction() {}
+    
+    #[test]
+    fn test_convert_valid_remu_bits_into_instruction() {}
+    
+    #[test]
+    fn test_convert_valid_mulw_bits_into_instruction() {}
+    
+    #[test]
+    fn test_convert_valid_divw_bits_into_instruction() {}
+    
+    #[test]
+    fn test_convert_valid_divuw_bits_into_instruction() {}
+    
+    #[test]
+    fn test_convert_valid_remw_bits_into_instruction() {}
+    
+    #[test]
+    fn test_convert_valid_remuw_bits_into_instruction() {}
 }

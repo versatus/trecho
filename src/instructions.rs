@@ -367,96 +367,134 @@ pub enum Instruction {
         rd: Register,
         rs1: Register,
         imm: i32,
+        func3: u32,
     },
     Csrrw {
         rd: Register,
         rs1: Register,
         csr: i32,
+        func3: u32,
     },
     Csrrs {
         rd: Register,
         rs1: Register,
         csr: i32,
+        func3: u32,
     },
     Csrrc {
         rd: Register,
         rs1: Register,
         csr: i32,
+        func3: u32,
     },
     Csrrwi {
         rd: Register,
-        rs1: Register,
+        uimm: u32,
         csr: i32,
+        func3: u32,
     },
     Csrrsi {
         rd: Register,
-        rs1: Register,
+        uimm: u32,
         csr: i32,
+        func3: u32,
     },
     Csrrci {
         rd: Register,
-        rs1: Register,
+        uimm: u32,
         csr: i32,
+        func3: u32,
     },
     Mul {
         rd: Register,
         rs1: Register,
         rs2: Register,
+        func3: u32,
+        func7: u32,
     },
     Mulh {
         rd: Register,
         rs1: Register,
         rs2: Register,
+        func3: u32,
+        func7: u32,        
     },
     Mulhsu {
         rd: Register,
         rs1: Register,
         rs2: Register,
+        func3: u32,
+        func7: u32,        
+    },
+    Mulhu {
+        rd: Register,
+        rs1: Register,
+        rs2: Register,
+        func3: u32,
+        func7: u32,        
     },
     Div {
         rd: Register,
         rs1: Register,
         rs2: Register,
+        func3: u32,
+        func7: u32,        
     },
     Divu {
         rd: Register,
         rs1: Register,
         rs2: Register,
+        func3: u32,
+        func7: u32,        
     },
     Rem {
         rd: Register,
         rs1: Register,
         rs2: Register,
+        func3: u32,
+        func7: u32, 
     },
     Remu {
         rd: Register,
         rs1: Register,
         rs2: Register,
+        func3: u32,
+        func7: u32,         
     },
     Mulw {
         rd: Register,
         rs1: Register,
         rs2: Register,
+        func3: u32,
+        func7: u32,         
     },
     Divw {
         rd: Register,
         rs1: Register,
         rs2: Register,
+        func3: u32,
+        func7: u32,         
     },
     Divuw {
         rd: Register,
         rs1: Register,
         rs2: Register,
+        func3: u32,
+        func7: u32,         
     },
     Remw {
         rd: Register,
         rs1: Register,
         rs2: Register,
+        func3: u32,
+        func7: u32,         
     },
     RemuW {
         rd: Register,
         rs1: Register,
         rs2: Register,
+        func3: u32,
+        func7: u32,         
     },
     LrW {
         rd: Register,
@@ -1406,137 +1444,284 @@ impl From<Inst> for Instruction {
                                 func7: func7,
                             }
                         }
+                        0b0000001 => {
+                            return Instruction::Mul {
+                                rd: unpacked.rd.unwrap().into(),
+                                rs1: unpacked.rs1.unwrap().into(),
+                                rs2: unpacked.rs2.unwrap().into(),
+                                func3: func3,
+                                func7: func7
+                            }
+                        }
                         _ => return Instruction::Undefined,
                     },
                     0b001 => {
-                        if func7 != 0b0000000 {
-                            return Instruction::Undefined;
+                        match func7 {
+                            0b0000000 => {
+                                return Instruction::Sll {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                    func3: func3,
+                                    func7: func7,
+                                }
+                            },
+                            0b0000001 => {
+                                return Instruction::Mulh {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                    func3: func3,
+                                    func7: func7,
+                                }
+                            }
+                            _ => { return Instruction::Undefined }        
                         }
-
-                        return Instruction::Sll {
-                            rd: unpacked.rd.unwrap().into(),
-                            rs1: unpacked.rs1.unwrap().into(),
-                            rs2: unpacked.rs2.unwrap().into(),
-                            func3: func3,
-                            func7: func7,
-                        };
                     }
                     0b010 => {
-                        if func7 != 0b0000000 {
-                            return Instruction::Undefined;
+                        match func7 {
+                            0b0000000 => {
+                                return Instruction::Slt {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                    func3: func3,
+                                    func7: func7,
+                                };
+                            },
+                            0b0000001 => {
+                                return Instruction::Mulhsu {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                    func3: func3,
+                                    func7: func7,
+                                }
+                            }
+                            _ => { return Instruction::Undefined }
                         }
-
-                        return Instruction::Slt {
-                            rd: unpacked.rd.unwrap().into(),
-                            rs1: unpacked.rs1.unwrap().into(),
-                            rs2: unpacked.rs2.unwrap().into(),
-                            func3: func3,
-                            func7: func7,
-                        };
                     }
                     0b011 => {
-                        if func7 != 0b0000000 {
-                            return Instruction::Undefined;
-                        }
-
-                        return Instruction::Sltu {
-                            rd: unpacked.rd.unwrap().into(),
-                            rs1: unpacked.rs1.unwrap().into(),
-                            rs2: unpacked.rs2.unwrap().into(),
-                            func3: func3,
-                            func7: func7,
-                        };
-                    }
+                        match func7 {
+                            0b0000000 => {
+                                return Instruction::Sltu {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                    func3: func3,
+                                    func7: func7,
+                                };
+                            },
+                            0b0000001 => {
+                                return Instruction::Mulhu {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                    func3: func3,
+                                    func7: func7,
+                                }
+                            }
+                            _ => { return Instruction::Undefined }
+                        }  
+                    },
                     0b100 => {
-                        if func7 != 0b0000000 {
-                            return Instruction::Undefined;
+                        match func7 { 
+                            0b0000000 => {
+                                return Instruction::Xor {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                    func3: func3,
+                                    func7: func7,
+                                };
+                            },
+                            0b0000001 => {
+                                return Instruction::Div {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                    func3: func3,
+                                    func7: func7,                                    
+                                };
+                            },
+                            _ => { return Instruction::Undefined }
                         }
-
-                        return Instruction::Xor {
-                            rd: unpacked.rd.unwrap().into(),
-                            rs1: unpacked.rs1.unwrap().into(),
-                            rs2: unpacked.rs2.unwrap().into(),
-                            func3: func3,
-                            func7: func7,
-                        };
                     }
-                    0b101 => match func7 {
-                        0b0000000 => {
-                            return Instruction::Srl {
-                                rd: unpacked.rd.unwrap().into(),
-                                rs1: unpacked.rs1.unwrap().into(),
-                                rs2: unpacked.rs2.unwrap().into(),
-                                func3: func3,
-                                func7: func7,
+                    0b101 => {
+                        match func7 {
+                            0b0000000 => {
+                                return Instruction::Srl {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                    func3: func3,
+                                    func7: func7,
+                                }
+                            },
+                            0b0100000 => {
+                                return Instruction::Sra {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                    func3: func3,
+                                    func7: func7,
+                                }
+                            },
+                            0b0000001 => {
+                                return Instruction::Divu {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                    func3: func3,
+                                    func7: func7,                                    
+                                }
                             }
+                            _ => return Instruction::Undefined,
                         }
-                        0b0100000 => {
-                            return Instruction::Sra {
-                                rd: unpacked.rd.unwrap().into(),
-                                rs1: unpacked.rs1.unwrap().into(),
-                                rs2: unpacked.rs2.unwrap().into(),
-                                func3: func3,
-                                func7: func7,
-                            }
-                        }
-                        _ => return Instruction::Undefined,
                     },
                     0b110 => {
-                        if func7 != 0b0000000 {
-                            return Instruction::Undefined;
+                        match func7 {
+                            0b0000000 => {
+                                return Instruction::Or {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                    func3: func3,
+                                    func7: func7,
+                                };
+                            },
+                            0b0000001 => {
+                                return Instruction::Rem {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                    func3: func3,
+                                    func7: func7,                                    
+                                }
+                            },
+                            _ => { return Instruction::Undefined }
                         }
-
-                        return Instruction::Or {
-                            rd: unpacked.rd.unwrap().into(),
-                            rs1: unpacked.rs1.unwrap().into(),
-                            rs2: unpacked.rs2.unwrap().into(),
-                            func3: func3,
-                            func7: func7,
-                        };
                     }
                     0b111 => {
-                        if func7 != 0b0000000 {
-                            return Instruction::Undefined;
+                        match func7 {
+                            0b0000000 => {
+                                return Instruction::And {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                    func3: func3,
+                                    func7: func7,
+                                };
+                            },
+                            0b0000001 => {
+                                return Instruction::Remu {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                    func3: func3,
+                                    func7: func7,                                    
+                                }
+                            },
+                            _ => { return Instruction::Undefined }
                         }
-
-                        return Instruction::And {
-                            rd: unpacked.rd.unwrap().into(),
-                            rs1: unpacked.rs1.unwrap().into(),
-                            rs2: unpacked.rs2.unwrap().into(),
-                            func3: func3,
-                            func7: func7,
-                        };
                     }
                     _ => return Instruction::Undefined,
                 }
             }
             0b0001111 => {
-                return Instruction::Fence {
-                    rd: unpacked.rd.unwrap().into(),
-                    rs1: unpacked.rs1.unwrap().into(),
-                    fm: unpacked.fm.unwrap().into(),
-                    pred: unpacked.pred.unwrap().into(),
-                    succ: unpacked.succ.unwrap().into(),
-                    func3: unpacked.func3.unwrap(),
+                let func3 = unpacked.func3.unwrap();
+                match func3 {
+                    0b000 => {
+                        return Instruction::Fence {
+                            rd: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rs1.unwrap().into(),
+                            fm: unpacked.fm.unwrap().into(),
+                            pred: unpacked.pred.unwrap().into(),
+                            succ: unpacked.succ.unwrap().into(),
+                            func3: func3,
+                        }
+                    }
+                    0b001 => {
+                        return Instruction::FenceI {
+                            rd: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rs1.unwrap().into(),
+                            imm: unpacked.imm.unwrap(),
+                            func3: func3,
+                        }
+                    }
+                    _ => { return Instruction::Undefined }
                 }
             }
             0b1110011 => {
                 let func3 = unpacked.func3.unwrap();
                 let imm = unpacked.imm.unwrap();
-                match imm {
-                    0b000000000000 => {
-                        assert!(func3 == 0b000);
-                        assert!(unpacked.rs1.unwrap() == 0b00000);
-                        assert!(unpacked.rd.unwrap() == 0b00000);
-                        return Instruction::ECall;
-                    }
-                    0b000000000001 => {
-                        assert!(func3 == 0b000);
-                        assert!(unpacked.rs1.unwrap() == 0b00000);
-                        assert!(unpacked.rd.unwrap() == 0b00000);
-                        return Instruction::EBreak;
-                    }
-                    _ => return Instruction::Undefined,
+                match func3 {
+                    0b000 => {
+                        match imm {
+                            0b000000000000 => {
+                                assert!(func3 == 0b000);
+                                assert!(unpacked.rs1.unwrap() == 0b00000);
+                                assert!(unpacked.rd.unwrap() == 0b00000);
+                                return Instruction::ECall;
+                            }
+                            0b000000000001 => {
+                                assert!(func3 == 0b000);
+                                assert!(unpacked.rs1.unwrap() == 0b00000);
+                                assert!(unpacked.rd.unwrap() == 0b00000);
+                                return Instruction::EBreak;
+                            }
+                            _ => return Instruction::Undefined,
+                        }
+                    },
+                    0b001 => {
+                        return Instruction::Csrrw {
+                            rd: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rd.unwrap().into(),
+                            csr: unpacked.csr.unwrap(),
+                            func3: func3,
+                        }
+                    },
+                    0b010 => {
+                        return Instruction::Csrrs {
+                            rd: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rd.unwrap().into(),
+                            csr: unpacked.csr.unwrap(),
+                            func3: func3,                            
+                        }
+                    },
+                    0b011 => {
+                        return Instruction::Csrrc {
+                            rd: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rd.unwrap().into(),
+                            csr: unpacked.csr.unwrap(),
+                            func3: func3,                            
+                        }
+                    },
+                    0b101 => {
+                        return Instruction::Csrrwi {
+                            rd: unpacked.rd.unwrap().into(),
+                            uimm: unpacked.uimm.unwrap(),
+                            csr: unpacked.csr.unwrap(),
+                            func3: func3,
+                        }
+                    },
+                    0b110 => {
+                        return Instruction::Csrrsi {
+                            rd: unpacked.rd.unwrap().into(),
+                            uimm: unpacked.uimm.unwrap(),
+                            csr: unpacked.csr.unwrap(),
+                            func3: func3,                            
+                        }
+                    },
+                    0b111 => {
+                        return Instruction::Csrrci {
+                            rd: unpacked.rd.unwrap().into(),
+                            uimm: unpacked.uimm.unwrap(),
+                            csr: unpacked.csr.unwrap(),
+                            func3: func3,                            
+                        }
+                    },
+                    _ => { return Instruction::Undefined }
                 }
             }
             0b0011011 => {
@@ -1614,9 +1799,31 @@ impl From<Inst> for Instruction {
                                 func3: func3,
                                 func7: func7,
                             }
+                        },
+                        0b0000001 => {
+                            return Instruction::Mulw {
+                                rd: unpacked.rd.unwrap().into(),
+                                rs1: unpacked.rs1.unwrap().into(),
+                                rs2: unpacked.rs2.unwrap().into(),
+                                func3: func3,
+                                func7: func7,                                
+                            }
                         }
                         _ => return Instruction::Undefined,
                     },
+                    0b100 => {
+                        if func7 != 0b0000001 {
+                            return Instruction::Undefined
+                        }
+
+                        return Instruction::Divw {
+                            rd: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rs1.unwrap().into(),
+                            rs2: unpacked.rs2.unwrap().into(),
+                            func3: func3,
+                            func7: func7,                               
+                        }
+                    }
                     0b001 => {
                         if func7 != 0b0000000 {
                             return Instruction::Undefined;
@@ -1649,8 +1856,43 @@ impl From<Inst> for Instruction {
                                     func3: func3,
                                     func7: func7,
                                 }
+                            },
+                            0b0000001 => {
+                                return Instruction::Divuw {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                    func3: func3,
+                                    func7: func7,                                    
+                                }
                             }
                             _ => return Instruction::Undefined,
+                        }
+                    },
+                    0b110 => {
+                        if func7 != 0b0000001 {
+                            return Instruction::Undefined
+                        }
+                        
+                        return Instruction::Remw {
+                            rd: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rs1.unwrap().into(),
+                            rs2: unpacked.rs2.unwrap().into(),
+                            func3: func3,
+                            func7: func7,                               
+                        }
+                    },
+                    0b111 => {
+                        if func7 != 0b0000001 {
+                            return Instruction::Undefined
+                        }
+
+                        return Instruction::RemuW {
+                            rd: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rs1.unwrap().into(),
+                            rs2: unpacked.rs2.unwrap().into(),
+                            func3: func3,
+                            func7: func7,                            
                         }
                     }
                     _ => return Instruction::Undefined,
