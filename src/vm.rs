@@ -1,8 +1,8 @@
 #![allow(unused, unused_mut, dead_code)]
 use crate::soft::SoftThread;
-use crate::extensions::{I32, I64, Ext};
+use crate::extensions::{Extension};
 
-pub struct Machine<E: Ext> {
+pub struct Machine {
     pub cores: Vec<SoftThread>,
-    ext: E,
+    ext: Extension,
 }

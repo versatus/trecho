@@ -223,3 +223,9 @@ impl From<Register> for usize {
         }
     }
 }
+
+impl Default for Register {
+    fn default() -> Register {
+        return Register::X0;
+    }
+}

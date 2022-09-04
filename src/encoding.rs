@@ -1,12 +1,13 @@
 #![allow(unused, unused_mut, dead_code)]
-use crate::extensions::{I64, I32, Ext};
+use crate::extensions::{Base, Extension};
 use crate::encoding_types::*;
 
 // S struct for fast OpCode lookups
 #[derive(Clone, Debug)]
-pub struct EncodingTable<E: Ext + ?Sized> {
-    pub table: [OpCodeType; 128],
-    ext: E,
+pub struct EncodingTable {
+    table: [OpCodeType; 128],
+    ext: Extension,
+    base: Base,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -21,9 +22,17 @@ pub enum OpCodeType {
     Invalid,
 }
 
-impl<E: Ext + ?Sized> EncodingTable<E> {
-    pub fn get(&self, opcode: OpCode) -> OpCodeType {
+impl EncodingTable {
+    pub fn get_opcode_type(&self, opcode: OpCode) -> OpCodeType {
         self.table[opcode as usize]
+    }
+
+    pub fn get_ext(&self) -> Extension {
+        self.ext
+    }
+
+    pub fn get_base(&self) -> Base {
+        self.base
     }
 }
 
@@ -36,8 +45,8 @@ impl From<Inst> for OpCodeType {
 
 impl From<OpCode> for OpCodeType {
     fn from(opcode: OpCode) -> OpCodeType {
-        let table = EncodingTable::<I64>::default();
-        table.get(opcode)
+        let table = EncodingTable::default();
+        table.get_opcode_type(opcode)
     }
 }
 
@@ -56,28 +65,19 @@ impl From<OpCodeType> for OpCode {
     }
 }
 
-impl Default for EncodingTable<I64> {
-    fn default() -> EncodingTable<I64> {
-        let table: [OpCodeType; 128] = I64_TABLE;
+impl Default for EncodingTable {
+    fn default() -> EncodingTable {
+        let table: [OpCodeType; 128] = TYPE_TABLE;
         EncodingTable {
             table,
-            ext: I64
-        }
-    }
-}
-
-impl Default for EncodingTable<I32> {
-    fn default() -> EncodingTable<I32> {
-        let table: [OpCodeType; 128] = I32_TABLE;
-        EncodingTable {
-            table,
-            ext: I32
+            ext: Extension::G64,
+            base: Base::I64
         }
     }
 }
 
 // Full Encoding Table for I64
-pub const I64_TABLE: [OpCodeType; 128] = [
+pub const TYPE_TABLE: [OpCodeType; 128] = [
     /*0b0000000*/ OpCodeType::Invalid,      // decimal: 0     hex: 0x00
     /*0b0000001*/ OpCodeType::Invalid,      // decimal: 1     hex: 0x01
     /*0b0000010*/ OpCodeType::Invalid,      // decimal: 2     hex: 0x02
@@ -105,7 +105,7 @@ pub const I64_TABLE: [OpCodeType; 128] = [
     /*0b0011000*/ OpCodeType::Invalid,      // decimal: 24    hex: 0x18
     /*0b0011001*/ OpCodeType::Invalid,      // decimal: 25    hex: 0x19  
     /*0b0011010*/ OpCodeType::Invalid,      // decimal: 26    hex: 0x1a
-    /*0b0011011*/ OpCodeType::I,      // decimal: 27    hex: 0x1b
+    /*0b0011011*/ OpCodeType::I,            // decimal: 27    hex: 0x1b
     /*0b0011100*/ OpCodeType::Invalid,      // decimal: 28    hex: 0x1c
     /*0b0011101*/ OpCodeType::Invalid,      // decimal: 29    hex: 0x1d
     /*0b0011110*/ OpCodeType::Invalid,      // decimal: 30    hex: 0x1e
@@ -206,137 +206,6 @@ pub const I64_TABLE: [OpCodeType; 128] = [
     /*0b1111101*/ OpCodeType::Invalid,      // decimal: 125   hex: 0x7c
     /*0b1111110*/ OpCodeType::Invalid,      // decimal: 126   hex: 0x7d
     /*0b1111111*/ OpCodeType::Invalid       // decimal: 127   hex: 0x7e
-];
-
-pub const I32_TABLE: [OpCodeType; 128] = [
-    /*0b0000000*/ OpCodeType::Invalid,
-    /*0b0000001*/ OpCodeType::Invalid,
-    /*0b0000010*/ OpCodeType::Invalid,
-    /*0b0000011*/ OpCodeType::I,
-    /*0b0000100*/ OpCodeType::Invalid,
-    /*0b0000101*/ OpCodeType::Invalid,
-    /*0b0000110*/ OpCodeType::Invalid,
-    /*0b0000111*/ OpCodeType::Invalid,
-    /*0b0001000*/ OpCodeType::Invalid,
-    /*0b0001001*/ OpCodeType::Invalid,
-    /*0b0001010*/ OpCodeType::Invalid,
-    /*0b0001011*/ OpCodeType::Invalid,
-    /*0b0001100*/ OpCodeType::Invalid,
-    /*0b0001101*/ OpCodeType::Invalid,
-    /*0b0001110*/ OpCodeType::Invalid,
-    /*0b0001111*/ OpCodeType::R,
-    /*0b0010000*/ OpCodeType::Invalid,
-    /*0b0010001*/ OpCodeType::Invalid,
-    /*0b0010010*/ OpCodeType::Invalid,
-    /*0b0010011*/ OpCodeType::I,
-    /*0b0010100*/ OpCodeType::Invalid,
-    /*0b0010101*/ OpCodeType::Invalid,
-    /*0b0010110*/ OpCodeType::Invalid,
-    /*0b0010111*/ OpCodeType::U,
-    /*0b0011000*/ OpCodeType::Invalid,
-    /*0b0011001*/ OpCodeType::Invalid,
-    /*0b0011010*/ OpCodeType::Invalid,
-    /*0b0011011*/ OpCodeType::Invalid,
-    /*0b0011100*/ OpCodeType::Invalid,
-    /*0b0011101*/ OpCodeType::Invalid,
-    /*0b0011110*/ OpCodeType::Invalid,
-    /*0b0011111*/ OpCodeType::Invalid,
-    /*0b0100000*/ OpCodeType::Invalid,
-    /*0b0100001*/ OpCodeType::Invalid,
-    /*0b0100010*/ OpCodeType::Invalid,
-    /*0b0100011*/ OpCodeType::S,
-    /*0b0100100*/ OpCodeType::Invalid,
-    /*0b0100101*/ OpCodeType::Invalid,
-    /*0b0100110*/ OpCodeType::Invalid,
-    /*0b0100111*/ OpCodeType::Invalid,
-    /*0b0101000*/ OpCodeType::Invalid,
-    /*0b0101001*/ OpCodeType::Invalid,
-    /*0b0101010*/ OpCodeType::Invalid,
-    /*0b0101011*/ OpCodeType::Invalid,
-    /*0b0101100*/ OpCodeType::Invalid,
-    /*0b0101101*/ OpCodeType::Invalid,
-    /*0b0101110*/ OpCodeType::Invalid,
-    /*0b0101111*/ OpCodeType::Invalid,
-    /*0b0110000*/ OpCodeType::Invalid,
-    /*0b0110001*/ OpCodeType::Invalid,
-    /*0b0110010*/ OpCodeType::Invalid,
-    /*0b0110011*/ OpCodeType::R,
-    /*0b0110100*/ OpCodeType::Invalid,
-    /*0b0110101*/ OpCodeType::Invalid,
-    /*0b0110110*/ OpCodeType::Invalid,
-    /*0b0110111*/ OpCodeType::U,
-    /*0b0111000*/ OpCodeType::Invalid,
-    /*0b0111001*/ OpCodeType::Invalid,
-    /*0b0111010*/ OpCodeType::Invalid,
-    /*0b0111011*/ OpCodeType::Invalid,
-    /*0b0111100*/ OpCodeType::Invalid,
-    /*0b0111101*/ OpCodeType::Invalid,
-    /*0b0111110*/ OpCodeType::Invalid,
-    /*0b0111111*/ OpCodeType::Invalid,
-    /*0b1000000*/ OpCodeType::Invalid,
-    /*0b1000001*/ OpCodeType::Invalid,
-    /*0b1000010*/ OpCodeType::Invalid,
-    /*0b1000011*/ OpCodeType::Invalid,
-    /*0b1000100*/ OpCodeType::Invalid,
-    /*0b1000101*/ OpCodeType::Invalid,
-    /*0b1000110*/ OpCodeType::Invalid,
-    /*0b1000111*/ OpCodeType::Invalid,
-    /*0b1001000*/ OpCodeType::Invalid,
-    /*0b1001001*/ OpCodeType::Invalid,
-    /*0b1001010*/ OpCodeType::Invalid,
-    /*0b1001011*/ OpCodeType::Invalid,
-    /*0b1001100*/ OpCodeType::Invalid,
-    /*0b1001101*/ OpCodeType::Invalid,
-    /*0b1001110*/ OpCodeType::Invalid,
-    /*0b1001111*/ OpCodeType::Invalid,
-    /*0b1010000*/ OpCodeType::Invalid,
-    /*0b1010001*/ OpCodeType::Invalid,
-    /*0b1010010*/ OpCodeType::Invalid,
-    /*0b1010011*/ OpCodeType::Invalid,
-    /*0b1010100*/ OpCodeType::Invalid,
-    /*0b1010101*/ OpCodeType::Invalid,
-    /*0b1010110*/ OpCodeType::Invalid,
-    /*0b1010111*/ OpCodeType::Invalid,
-    /*0b1011000*/ OpCodeType::Invalid,
-    /*0b1011001*/ OpCodeType::Invalid,
-    /*0b1011010*/ OpCodeType::Invalid,
-    /*0b1011011*/ OpCodeType::Invalid,
-    /*0b1011100*/ OpCodeType::Invalid,
-    /*0b1011101*/ OpCodeType::Invalid,
-    /*0b1011110*/ OpCodeType::Invalid,
-    /*0b1011111*/ OpCodeType::Invalid,
-    /*0b1100000*/ OpCodeType::Invalid,
-    /*0b1100001*/ OpCodeType::Invalid,
-    /*0b1100010*/ OpCodeType::Invalid,
-    /*0b1100011*/ OpCodeType::B,
-    /*0b1100100*/ OpCodeType::Invalid,
-    /*0b1100101*/ OpCodeType::Invalid,
-    /*0b1100110*/ OpCodeType::Invalid,
-    /*0b1100111*/ OpCodeType::I,
-    /*0b1101000*/ OpCodeType::Invalid,
-    /*0b1101001*/ OpCodeType::Invalid,
-    /*0b1101010*/ OpCodeType::Invalid,
-    /*0b1101011*/ OpCodeType::Invalid,
-    /*0b1101100*/ OpCodeType::Invalid,
-    /*0b1101101*/ OpCodeType::Invalid,
-    /*0b1101110*/ OpCodeType::Invalid,
-    /*0b1101111*/ OpCodeType::J,
-    /*0b1110000*/ OpCodeType::Invalid,
-    /*0b1110001*/ OpCodeType::Invalid,
-    /*0b1110010*/ OpCodeType::Invalid,
-    /*0b1110011*/ OpCodeType::R,
-    /*0b1110100*/ OpCodeType::Invalid,
-    /*0b1110101*/ OpCodeType::Invalid,
-    /*0b1110110*/ OpCodeType::Invalid,
-    /*0b1110111*/ OpCodeType::Invalid,
-    /*0b1111000*/ OpCodeType::Invalid,
-    /*0b1111001*/ OpCodeType::Invalid,
-    /*0b1111010*/ OpCodeType::Invalid,
-    /*0b1111011*/ OpCodeType::Invalid,
-    /*0b1111100*/ OpCodeType::Invalid,
-    /*0b1111101*/ OpCodeType::Invalid,
-    /*0b1111110*/ OpCodeType::Invalid,
-    /*0b1111111*/ OpCodeType::Invalid
 ];
 
 #[derive(Clone, Debug, PartialEq)]
@@ -532,5 +401,5 @@ pub trait InstructionDecoder {
     type Input: Into<u32>;
     fn opcode(inst: Self::Input) -> OpCode;
     fn unpack(inst: Self::Input) -> Unpacked;
-    fn decode(inst: Self::Input, enc_table: &EncodingTable<dyn Ext>) -> Self::Return;
+    fn decode(inst: Self::Input, enc_table: &EncodingTable) -> Self::Return;
 }
