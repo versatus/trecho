@@ -70,7 +70,7 @@ impl Default for EncodingTable {
         let table: [OpCodeType; 128] = TYPE_TABLE;
         EncodingTable {
             table,
-            ext: Extension::G64,
+            ext: Extension::G,
             base: Base::I64
         }
     }

@@ -20,28 +20,28 @@ pub const SEVEN_BIT_MASK: u32 = 0b1111111 as u32;
 pub enum Instruction {
     #[strum(props(Base = "None", Ext = "None"))]
     Undefined,
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     Lui {
         rd: Register,
         imm: i32,
     },
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     Auipc {
         rd: Register,
         imm: i32,
     },
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     Jal {
         rd: Register,
         imm: i32,
     },
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     Jalr {
         rd: Register,
         rs1: Register,
         imm: i32,
     },
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     Beq {
         rd: Register,
         rs1: Register,
@@ -49,7 +49,7 @@ pub enum Instruction {
         imm: i32,
         func3: u32,
     },
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     Bne {
         rd: Register,
         rs1: Register,
@@ -57,7 +57,7 @@ pub enum Instruction {
         imm: i32,
         func3: u32,
     },
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     Blt {
         rd: Register,
         rs1: Register,
@@ -65,7 +65,7 @@ pub enum Instruction {
         imm: i32,
         func3: u32,
     },
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     Bge {
         rd: Register,
         rs1: Register,
@@ -73,7 +73,7 @@ pub enum Instruction {
         imm: i32,
         func3: u32,
     },
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     Bltu {
         rd: Register,
         rs1: Register,
@@ -81,7 +81,7 @@ pub enum Instruction {
         imm: i32,
         func3: u32,
     },
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     Bgeu {
         rd: Register,
         rs1: Register,
@@ -89,105 +89,105 @@ pub enum Instruction {
         imm: i32,
         func3: u32,
     },
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     Lb {
         rd: Register,
         rs1: Register,
         imm: i32,
         func3: u32,
     },
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     Lh {
         rd: Register,
         rs1: Register,
         imm: i32,
         func3: u32,
     },
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     Lw {
         rd: Register,
         rs1: Register,
         imm: i32,
         func3: u32,
     },
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     Lbu {
         rd: Register,
         rs1: Register,
         imm: i32,
         func3: u32,
     },
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     Lhu {
         rd: Register,
         rs1: Register,
         imm: i32,
         func3: u32,
     },
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     Sb {
         rs1: Register,
         rs2: Register,
         imm: i32,
         func3: u32,
     },
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     Sh {
         rs1: Register,
         rs2: Register,
         imm: i32,
         func3: u32,
     },
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     Sw {
         rs1: Register,
         rs2: Register,
         imm: i32,
         func3: u32,
     },
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     Addi {
         rd: Register,
         rs1: Register,
         imm: i32,
         func3: u32,
     },
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     Slti {
         rd: Register,
         rs1: Register,
         imm: i32,
         func3: u32,
     },
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     Sltiu {
         rd: Register,
         rs1: Register,
         imm: i32,
         func3: u32,
     },
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     Xori {
         rd: Register,
         rs1: Register,
         imm: i32,
         func3: u32,
     },
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     Ori {
         rd: Register,
         rs1: Register,
         imm: i32,
         func3: u32,
     },
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     Andi {
         rd: Register,
         rs1: Register,
         imm: i32,
         func3: u32,
     },
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     Slli {
         rd: Register,
         rs1: Register,
@@ -195,7 +195,7 @@ pub enum Instruction {
         func3: u32,
         func7: u32,
     },
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     Srli {
         rd: Register,
         rs1: Register,
@@ -203,7 +203,7 @@ pub enum Instruction {
         func3: u32,
         func7: u32,
     },
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     Srai {
         rd: Register,
         rs1: Register,
@@ -211,7 +211,7 @@ pub enum Instruction {
         func3: u32,
         func7: u32,
     },
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     Add {
         rd: Register,
         rs1: Register,
@@ -219,7 +219,7 @@ pub enum Instruction {
         func3: u32,
         func7: u32,
     },
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     Sub {
         rd: Register,
         rs1: Register,
@@ -227,7 +227,7 @@ pub enum Instruction {
         func3: u32,
         func7: u32,
     },
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     Sll {
         rd: Register,
         rs1: Register,
@@ -235,7 +235,7 @@ pub enum Instruction {
         func3: u32,
         func7: u32,
     },
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     Slt {
         rd: Register,
         rs1: Register,
@@ -243,7 +243,7 @@ pub enum Instruction {
         func3: u32,
         func7: u32,
     },
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     Sltu {
         rd: Register,
         rs1: Register,
@@ -251,7 +251,7 @@ pub enum Instruction {
         func3: u32,
         func7: u32,
     },
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     Xor {
         rd: Register,
         rs1: Register,
@@ -259,7 +259,7 @@ pub enum Instruction {
         func3: u32,
         func7: u32,
     },
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     Srl {
         rd: Register,
         rs1: Register,
@@ -267,7 +267,7 @@ pub enum Instruction {
         func3: u32,
         func7: u32,
     },
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     Sra {
         rd: Register,
         rs1: Register,
@@ -275,7 +275,7 @@ pub enum Instruction {
         func3: u32,
         func7: u32,
     },
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     Or {
         rd: Register,
         rs1: Register,
@@ -283,7 +283,7 @@ pub enum Instruction {
         func3: u32,
         func7: u32,
     },
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     And {
         rd: Register,
         rs1: Register,
@@ -291,7 +291,7 @@ pub enum Instruction {
         func3: u32,
         func7: u32,
     },
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     Fence {
         rd: Register,
         rs1: Register,
@@ -300,39 +300,39 @@ pub enum Instruction {
         succ: u32,
         func3: u32,
     },
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     ECall,
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     EBreak,
-    #[strum(props(Base = "I64", Ext = "I64"))]
+    #[strum(props(Base = "64", Ext = "I"))]
     Lwu {
         rd: Register,
         rs1: Register,
         imm: i32,
         func3: u32,
     },
-    #[strum(props(Base = "I64", Ext = "I64"))]
+    #[strum(props(Base = "64", Ext = "I"))]
     Ld {
         rd: Register,
         rs1: Register,
         imm: i32,
         func3: u32,
     },
-    #[strum(props(Base = "I64", Ext = "I64"))]
+    #[strum(props(Base = "64", Ext = "I"))]
     Sd {
         rs1: Register,
         rs2: Register,
         imm: i32,
         func3: u32,
     },
-    #[strum(props(Base = "I64", Ext = "I64"))]
+    #[strum(props(Base = "64", Ext = "I"))]
     Addiw {
         rd: Register,
         rs1: Register,
         imm: i32,
         func3: u32,
     },
-    #[strum(props(Base = "I64", Ext = "I64"))]
+    #[strum(props(Base = "64", Ext = "I"))]
     Slliw {
         rd: Register,
         rs1: Register,
@@ -340,7 +340,7 @@ pub enum Instruction {
         func3: u32,
         func7: u32,
     },
-    #[strum(props(Base = "I64", Ext = "I64"))]
+    #[strum(props(Base = "64", Ext = "I"))]
     Srliw {
         rd: Register,
         rs1: Register,
@@ -348,7 +348,7 @@ pub enum Instruction {
         func3: u32,
         func7: u32,
     },
-    #[strum(props(Base = "I64", Ext = "I64"))]
+    #[strum(props(Base = "64", Ext = "I"))]
     Sraiw {
         rd: Register,
         rs1: Register,
@@ -356,7 +356,7 @@ pub enum Instruction {
         func3: u32,
         func7: u32,
     },
-    #[strum(props(Base = "I64", Ext = "I64"))]
+    #[strum(props(Base = "64", Ext = "I"))]
     Addw {
         rd: Register,
         rs1: Register,
@@ -364,7 +364,7 @@ pub enum Instruction {
         func3: u32,
         func7: u32,
     },
-    #[strum(props(Base = "I64", Ext = "I64"))]
+    #[strum(props(Base = "64", Ext = "I"))]
     Subw {
         rd: Register,
         rs1: Register,
@@ -372,7 +372,7 @@ pub enum Instruction {
         func3: u32,
         func7: u32,
     },
-    #[strum(props(Base = "I64", Ext = "I64"))]
+    #[strum(props(Base = "64", Ext = "I"))]
     Sllw {
         rd: Register,
         rs1: Register,
@@ -380,7 +380,7 @@ pub enum Instruction {
         func3: u32,
         func7: u32,
     },
-    #[strum(props(Base = "I64", Ext = "I64"))]
+    #[strum(props(Base = "64", Ext = "I"))]
     Srlw {
         rd: Register,
         rs1: Register,
@@ -388,7 +388,7 @@ pub enum Instruction {
         func3: u32,
         func7: u32,
     },
-    #[strum(props(Base = "I64", Ext = "I64"))]
+    #[strum(props(Base = "64", Ext = "I"))]
     Sraw {
         rd: Register,
         rs1: Register,
@@ -396,56 +396,56 @@ pub enum Instruction {
         func3: u32,
         func7: u32,
     },
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     FenceI {
         rd: Register,
         rs1: Register,
         imm: i32,
         func3: u32,
     },
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     Csrrw {
         rd: Register,
         rs1: Register,
         csr: i32,
         func3: u32,
     },
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     Csrrs {
         rd: Register,
         rs1: Register,
         csr: i32,
         func3: u32,
     },
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     Csrrc {
         rd: Register,
         rs1: Register,
         csr: i32,
         func3: u32,
     },
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     Csrrwi {
         rd: Register,
         uimm: u32,
         csr: i32,
         func3: u32,
     },
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     Csrrsi {
         rd: Register,
         uimm: u32,
         csr: i32,
         func3: u32,
     },
-    #[strum(props(Base = "I32", Ext = "I32"))]
+    #[strum(props(Base = "32", Ext = "I"))]
     Csrrci {
         rd: Register,
         uimm: u32,
         csr: i32,
         func3: u32,
     },
-    #[strum(props(Base = "I32", Ext = "M32"))]
+    #[strum(props(Base = "32", Ext = "M"))]
     Mul {
         rd: Register,
         rs1: Register,
@@ -453,7 +453,7 @@ pub enum Instruction {
         func3: u32,
         func7: u32,
     },
-    #[strum(props(Base = "I32", Ext = "M32"))]
+    #[strum(props(Base = "32", Ext = "M"))]
     Mulh {
         rd: Register,
         rs1: Register,
@@ -461,7 +461,7 @@ pub enum Instruction {
         func3: u32,
         func7: u32,        
     },
-    #[strum(props(Base = "I32", Ext = "M32"))]
+    #[strum(props(Base = "32", Ext = "M"))]
     Mulhsu {
         rd: Register,
         rs1: Register,
@@ -469,7 +469,7 @@ pub enum Instruction {
         func3: u32,
         func7: u32,        
     },
-    #[strum(props(Base = "I32", Ext = "M32"))]
+    #[strum(props(Base = "32", Ext = "M"))]
     Mulhu {
         rd: Register,
         rs1: Register,
@@ -477,7 +477,7 @@ pub enum Instruction {
         func3: u32,
         func7: u32,        
     },
-    #[strum(props(Base = "I32", Ext = "M32"))]
+    #[strum(props(Base = "32", Ext = "M"))]
     Div {
         rd: Register,
         rs1: Register,
@@ -485,7 +485,7 @@ pub enum Instruction {
         func3: u32,
         func7: u32,        
     },
-    #[strum(props(Base = "I32", Ext = "M32"))]
+    #[strum(props(Base = "32", Ext = "M"))]
     Divu {
         rd: Register,
         rs1: Register,
@@ -493,7 +493,7 @@ pub enum Instruction {
         func3: u32,
         func7: u32,        
     },
-    #[strum(props(Base = "I32", Ext = "M32"))]
+    #[strum(props(Base = "32", Ext = "M"))]
     Rem {
         rd: Register,
         rs1: Register,
@@ -501,7 +501,7 @@ pub enum Instruction {
         func3: u32,
         func7: u32, 
     },
-    #[strum(props(Base = "I32", Ext = "M32"))]
+    #[strum(props(Base = "32", Ext = "M"))]
     Remu {
         rd: Register,
         rs1: Register,
@@ -509,7 +509,7 @@ pub enum Instruction {
         func3: u32,
         func7: u32,         
     },
-    #[strum(props(Base = "I64", Ext = "M64"))]
+    #[strum(props(Base = "64", Ext = "M"))]
     Mulw {
         rd: Register,
         rs1: Register,
@@ -517,7 +517,7 @@ pub enum Instruction {
         func3: u32,
         func7: u32,         
     },
-    #[strum(props(Base = "I64", Ext = "M64"))]
+    #[strum(props(Base = "64", Ext = "M"))]
     Divw {
         rd: Register,
         rs1: Register,
@@ -525,7 +525,7 @@ pub enum Instruction {
         func3: u32,
         func7: u32,         
     },
-    #[strum(props(Base = "I64", Ext = "M64"))]
+    #[strum(props(Base = "64", Ext = "M"))]
     Divuw {
         rd: Register,
         rs1: Register,
@@ -533,7 +533,7 @@ pub enum Instruction {
         func3: u32,
         func7: u32,         
     },
-    #[strum(props(Base = "I64", Ext = "M64"))]
+    #[strum(props(Base = "64", Ext = "M"))]
     Remw {
         rd: Register,
         rs1: Register,
@@ -541,7 +541,7 @@ pub enum Instruction {
         func3: u32,
         func7: u32,         
     },
-    #[strum(props(Base = "I64", Ext = "M64"))]
+    #[strum(props(Base = "64", Ext = "M"))]
     RemuW {
         rd: Register,
         rs1: Register,
@@ -549,14 +549,14 @@ pub enum Instruction {
         func3: u32,
         func7: u32,         
     },
-    #[strum(props(Base = "I32", Ext = "A32"))]
+    #[strum(props(Base = "32", Ext = "A"))]
     LrW {
         rd: Register,
         rs1: Register,
         aq: i32,
         rl: i32,
     },
-    #[strum(props(Base = "I32", Ext = "A32"))]
+    #[strum(props(Base = "32", Ext = "A"))]
     ScW {
         rd: Register,
         rs1: Register,
@@ -564,7 +564,7 @@ pub enum Instruction {
         aq: i32,
         rl: i32,
     },
-    #[strum(props(Base = "I32", Ext = "A32"))]
+    #[strum(props(Base = "32", Ext = "A"))]
     AmoswapW {
         rd: Register,
         rs1: Register,
@@ -572,7 +572,7 @@ pub enum Instruction {
         aq: i32,
         rl: i32,
     },
-    #[strum(props(Base = "I32", Ext = "A32"))]
+    #[strum(props(Base = "32", Ext = "A"))]
     AmoaddW {
         rd: Register,
         rs1: Register,
@@ -580,7 +580,7 @@ pub enum Instruction {
         aq: i32,
         rl: i32,
     },
-    #[strum(props(Base = "I32", Ext = "A32"))]
+    #[strum(props(Base = "32", Ext = "A"))]
     AmoxorW {
         rd: Register,
         rs1: Register,
@@ -588,7 +588,7 @@ pub enum Instruction {
         aq: i32,
         rl: i32,
     },
-    #[strum(props(Base = "I32", Ext = "A32"))]
+    #[strum(props(Base = "32", Ext = "A"))]
     AmoandW {
         rd: Register,
         rs1: Register,
@@ -596,7 +596,7 @@ pub enum Instruction {
         aq: i32,
         rl: i32,
     },
-    #[strum(props(Base = "I32", Ext = "A32"))]
+    #[strum(props(Base = "32", Ext = "A"))]
     AmoorW {
         rd: Register,
         rs1: Register,
@@ -604,7 +604,7 @@ pub enum Instruction {
         aq: i32,
         rl: i32,
     },
-    #[strum(props(Base = "I32", Ext = "A32"))]
+    #[strum(props(Base = "32", Ext = "A"))]
     AmominW {
         rd: Register,
         rs1: Register,
@@ -612,7 +612,7 @@ pub enum Instruction {
         aq: i32,
         rl: i32,
     },
-    #[strum(props(Base = "I32", Ext = "A32"))]
+    #[strum(props(Base = "32", Ext = "A"))]
     Amomax {
         rd: Register,
         rs1: Register,
@@ -620,7 +620,7 @@ pub enum Instruction {
         aq: i32,
         rl: i32,
     },
-    #[strum(props(Base = "I32", Ext = "A32"))]
+    #[strum(props(Base = "32", Ext = "A"))]
     AmominuW {
         rd: Register,
         rs1: Register,
@@ -628,7 +628,7 @@ pub enum Instruction {
         aq: i32,
         rl: i32,
     },
-    #[strum(props(Base = "I32", Ext = "A32"))]
+    #[strum(props(Base = "32", Ext = "A"))]
     AmomaxuW {
         rd: Register,
         rs1: Register,
@@ -636,14 +636,14 @@ pub enum Instruction {
         aq: i32,
         rl: i32,
     },
-    #[strum(props(Base = "I64", Ext = "A64"))]
+    #[strum(props(Base = "64", Ext = "A"))]
     LrD {
         rd: Register,
         rs1: Register,
         aq: i32,
         rl: i32,
     },
-    #[strum(props(Base = "I64", Ext = "A64"))]
+    #[strum(props(Base = "64", Ext = "A"))]
     ScD {
         rd: Register,
         rs1: Register,
@@ -651,7 +651,7 @@ pub enum Instruction {
         aq: i32,
         rl: i32,
     },
-    #[strum(props(Base = "I64", Ext = "A64"))]
+    #[strum(props(Base = "64", Ext = "A"))]
     AmoswapD {
         rd: Register,
         rs1: Register,
@@ -659,7 +659,7 @@ pub enum Instruction {
         aq: i32,
         rl: i32,
     },
-    #[strum(props(Base = "I64", Ext = "A64"))]
+    #[strum(props(Base = "64", Ext = "A"))]
     AmoaddD {
         rd: Register,
         rs1: Register,
@@ -667,7 +667,7 @@ pub enum Instruction {
         aq: i32,
         rl: i32,
     },
-    #[strum(props(Base = "I64", Ext = "A64"))]
+    #[strum(props(Base = "64", Ext = "A"))]
     AmoxorD {
         rd: Register,
         rs1: Register,
@@ -675,7 +675,7 @@ pub enum Instruction {
         aq: i32,
         rl: i32,
     },
-    #[strum(props(Base = "I64", Ext = "A64"))]
+    #[strum(props(Base = "64", Ext = "A"))]
     AmoandD {
         rd: Register,
         rs1: Register,
@@ -683,7 +683,7 @@ pub enum Instruction {
         aq: i32,
         rl: i32,
     },
-    #[strum(props(Base = "I64", Ext = "A64"))]
+    #[strum(props(Base = "64", Ext = "A"))]
     AmoorD {
         rd: Register,
         rs1: Register,
@@ -691,7 +691,7 @@ pub enum Instruction {
         aq: i32,
         rl: i32,
     },
-    #[strum(props(Base = "I64", Ext = "A64"))]
+    #[strum(props(Base = "64", Ext = "A"))]
     AmominD {
         rd: Register,
         rs1: Register,
@@ -699,7 +699,7 @@ pub enum Instruction {
         aq: i32,
         rl: i32,
     },
-    #[strum(props(Base = "I64", Ext = "A64"))]
+    #[strum(props(Base = "64", Ext = "A"))]
     AmomaxD {
         rd: Register,
         rs1: Register,
@@ -707,7 +707,7 @@ pub enum Instruction {
         aq: i32,
         rl: i32,
     },
-    #[strum(props(Base = "I64", Ext = "A64"))]
+    #[strum(props(Base = "64", Ext = "A"))]
     AmominuD {
         rd: Register,
         rs1: Register,
@@ -715,7 +715,7 @@ pub enum Instruction {
         aq: i32,
         rl: i32,
     },
-    #[strum(props(Base = "I64", Ext = "A64"))]
+    #[strum(props(Base = "64", Ext = "A"))]
     AmomaxuD {
         rd: Register,
         rs1: Register,
@@ -723,20 +723,20 @@ pub enum Instruction {
         aq: i32,
         rl: i32,
     },
-    #[strum(props(Base = "I32", Ext = "F32"))]
+    #[strum(props(Base = "32", Ext = "F"))]
     Flw {
         rd: Register,
         rs1: Register,
         imm: i32,
     },
-    #[strum(props(Base = "I32", Ext = "F32"))]
+    #[strum(props(Base = "32", Ext = "F"))]
     Fsw {
         rd: Register,
         rs1: Register,
         rs2: Register,
         imm: i32,
     },
-    #[strum(props(Base = "I32", Ext = "F32"))]
+    #[strum(props(Base = "32", Ext = "F"))]
     FmaddS {
         rd: Register,
         rs1: Register,
@@ -744,7 +744,7 @@ pub enum Instruction {
         rs3: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I32", Ext = "F32"))]
+    #[strum(props(Base = "32", Ext = "F"))]
     FmsubS {
         rd: Register,
         rs1: Register,
@@ -752,7 +752,7 @@ pub enum Instruction {
         rs3: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I32", Ext = "F32"))]
+    #[strum(props(Base = "32", Ext = "F"))]
     FnmsubS {
         rd: Register,
         rs1: Register,
@@ -760,7 +760,7 @@ pub enum Instruction {
         rs3: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I32", Ext = "F32"))]
+    #[strum(props(Base = "32", Ext = "F"))]
     FnmaddS {
         rd: Register,
         rs1: Register,
@@ -768,542 +768,542 @@ pub enum Instruction {
         rs3: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I32", Ext = "F32"))]
+    #[strum(props(Base = "32", Ext = "F"))]
     FaddS {
         rd: Register,
         rs1: Register,
         rs2: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I32", Ext = "F32"))]
+    #[strum(props(Base = "32", Ext = "F"))]
     FsubS {
         rd: Register,
         rs1: Register,
         rs2: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I32", Ext = "F32"))]
+    #[strum(props(Base = "32", Ext = "F"))]
     FmulS {
         rd: Register,
         rs1: Register,
         rs2: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I32", Ext = "F32"))]
+    #[strum(props(Base = "32", Ext = "F"))]
     FdivS {
         rd: Register,
         rs1: Register,
         rs2: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I32", Ext = "F32"))]
+    #[strum(props(Base = "32", Ext = "F"))]
     FsqrtS {
         rd: Register,
         rs1: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I32", Ext = "F32"))]
+    #[strum(props(Base = "32", Ext = "F"))]
     FsgnjS {
         rd: Register,
         rs1: Register,
         rs2: Register,
     },
-    #[strum(props(Base = "I32", Ext = "F32"))]
+    #[strum(props(Base = "32", Ext = "F"))]
     FsgnjnS {
         rd: Register,
         rs1: Register,
         rs2: Register,
     },
-    #[strum(props(Base = "I32", Ext = "F32"))]
+    #[strum(props(Base = "32", Ext = "F"))]
     FsgnjxS {
         rd: Register,
         rs1: Register,
         rs2: Register,
     },
-    #[strum(props(Base = "I32", Ext = "F32"))]
+    #[strum(props(Base = "32", Ext = "F"))]
     FminS {
         rd: Register,
         rs1: Register,
         rs2: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I32", Ext = "F32"))]
+    #[strum(props(Base = "32", Ext = "F"))]
     FmaxS {
         rd: Register,
         rs1: Register,
         rs2: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I32", Ext = "F32"))]
+    #[strum(props(Base = "32", Ext = "F"))]
     FcvtWS {
         rd: Register,
         rs1: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I32", Ext = "F32"))]
+    #[strum(props(Base = "32", Ext = "F"))]
     FctvWUS {
         rd: Register,
         rs1: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I32", Ext = "F32"))]
+    #[strum(props(Base = "32", Ext = "F"))]
     FmvXW {
         rd: Register,
         rs1: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I32", Ext = "F32"))]
+    #[strum(props(Base = "32", Ext = "F"))]
     FeqS {
         rd: Register,
         rs1: Register,
         rs2: Register,
     },
-    #[strum(props(Base = "I32", Ext = "F32"))]
+    #[strum(props(Base = "32", Ext = "F"))]
     FltS {
         rd: Register,
         rs1: Register,
         rs2: Register,
     },
-    #[strum(props(Base = "I32", Ext = "F32"))]
+    #[strum(props(Base = "32", Ext = "F"))]
     FleS {
         rd: Register,
         rs1: Register,
         rs2: Register,
     },
-    #[strum(props(Base = "I32", Ext = "F32"))]
+    #[strum(props(Base = "32", Ext = "F"))]
     FclassS {
         rd: Register,
         rs1: Register,
     },
-    #[strum(props(Base = "I32", Ext = "F32"))]
+    #[strum(props(Base = "32", Ext = "F"))]
     FcvtSW {
         rd: Register,
         rs1: Register,
     },
-    #[strum(props(Base = "I32", Ext = "F32"))]
+    #[strum(props(Base = "32", Ext = "F"))]
     FcvtSWU {
         rd: Register,
         rs1: Register,
     },
-    #[strum(props(Base = "I32", Ext = "F32"))]
+    #[strum(props(Base = "32", Ext = "F"))]
     FmvWX {
         rd: Register,
         rs1: Register,
     },
-    #[strum(props(Base = "I64", Ext = "F64"))]
+    #[strum(props(Base = "64", Ext = "F"))]
     FcvtLS {
         rd: Register,
         rs1: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I64", Ext = "F64"))]
+    #[strum(props(Base = "64", Ext = "F"))]
     FcvtLUS {
         rd: Register,
         rs1: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I64", Ext = "F64"))]
+    #[strum(props(Base = "64", Ext = "F"))]
     FcvtSL {
         rd: Register,
         rs1: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I64", Ext = "F64"))]
+    #[strum(props(Base = "64", Ext = "F"))]
     FcvtSLU {
         rd: Register,
         rs1: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I32", Ext = "D32"))]
+    #[strum(props(Base = "32", Ext = "D"))]
     Fld {
         rd: Register,
         rs1: Register,
         imm: i32,
     },
-    #[strum(props(Base = "I32", Ext = "D32"))]
+    #[strum(props(Base = "32", Ext = "D"))]
     Fsd {
         rs1: Register,
         rs2: Register,
         imm: i32,
     },
-    #[strum(props(Base = "I32", Ext = "D32"))]
+    #[strum(props(Base = "32", Ext = "D"))]
     FmaddD {
         rd: Register,
         rs1: Register,
         rs2: Register,
         rs3: Register,
     },
-    #[strum(props(Base = "I32", Ext = "D32"))]
+    #[strum(props(Base = "32", Ext = "D"))]
     FmsubD {
         rd: Register,
         rs1: Register,
         rs2: Register,
         rs3: Register,
     },
-    #[strum(props(Base = "I32", Ext = "D32"))]
+    #[strum(props(Base = "32", Ext = "D"))]
     FnmsubD {
         rd: Register,
         rs1: Register,
         rs2: Register,
         rs3: Register,
     },
-    #[strum(props(Base = "I32", Ext = "D32"))]
+    #[strum(props(Base = "32", Ext = "D"))]
     FnmaddD {
         rd: Register,
         rs1: Register,
         rs2: Register,
         rs3: Register,
     },
-    #[strum(props(Base = "I32", Ext = "D32"))]
+    #[strum(props(Base = "32", Ext = "D"))]
     FaddD {
         rd: Register,
         rs1: Register,
         rs2: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I32", Ext = "D32"))]
+    #[strum(props(Base = "32", Ext = "D"))]
     FsubD {
         rd: Register,
         rs1: Register,
         rs2: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I32", Ext = "D32"))]
+    #[strum(props(Base = "32", Ext = "D"))]
     FdivD {
         rd: Register,
         rs1: Register,
         rs2: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I32", Ext = "D32"))]
+    #[strum(props(Base = "32", Ext = "D"))]
     FsqrtD {
         rd: Register,
         rs1: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I32", Ext = "D32"))]
+    #[strum(props(Base = "32", Ext = "D"))]
     FsgnjD {
         rd: Register,
         rs1: Register,
         rs2: Register,
     },
-    #[strum(props(Base = "I32", Ext = "D32"))]
+    #[strum(props(Base = "32", Ext = "D"))]
     FsgnjnD {
         rd: Register,
         rs1: Register,
         rs2: Register,
     },
-    #[strum(props(Base = "I32", Ext = "D32"))]
+    #[strum(props(Base = "32", Ext = "D"))]
     FsgnjxD {
         rd: Register,
         rs1: Register,
         rs2: Register,
     },
-    #[strum(props(Base = "I32", Ext = "D32"))]
+    #[strum(props(Base = "32", Ext = "D"))]
     FminD {
         rd: Register,
         rs1: Register,
         rs2: Register,
     },
-    #[strum(props(Base = "I32", Ext = "D32"))]
+    #[strum(props(Base = "32", Ext = "D"))]
     FmaxD {
         rd: Register,
         rs1: Register,
         rs2: Register,
     },
-    #[strum(props(Base = "I32", Ext = "D32"))]
+    #[strum(props(Base = "32", Ext = "D"))]
     FcvtSD {
         rd: Register,
         rs1: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I32", Ext = "D32"))]
+    #[strum(props(Base = "32", Ext = "D"))]
     FcvtDS {
         rd: Register,
         rs1: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I32", Ext = "D32"))]
+    #[strum(props(Base = "32", Ext = "D"))]
     FeqD {
         rd: Register,
         rs1: Register,
         rs2: Register,
     },
-    #[strum(props(Base = "I32", Ext = "D32"))]
+    #[strum(props(Base = "32", Ext = "D"))]
     FltD {
         rd: Register,
         rs1: Register,
         rs2: Register,
     },
-    #[strum(props(Base = "I32", Ext = "D32"))]
+    #[strum(props(Base = "32", Ext = "D"))]
     FleD {
         rd: Register,
         rs1: Register,
         rs2: Register,
     },
-    #[strum(props(Base = "I32", Ext = "D32"))]
+    #[strum(props(Base = "32", Ext = "D"))]
     FclassD {
         rd: Register,
         rs1: Register,
     },
-    #[strum(props(Base = "I32", Ext = "D32"))]
+    #[strum(props(Base = "32", Ext = "D"))]
     FcvtWD {
         rd: Register,
         rs1: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I32", Ext = "D32"))]
+    #[strum(props(Base = "32", Ext = "D"))]
     FcvtWUD {
         rd: Register,
         rs1: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I32", Ext = "D32"))]
+    #[strum(props(Base = "32", Ext = "D"))]
     FcvtDW {
         rd: Register,
         rs1: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I32", Ext = "D32"))]
+    #[strum(props(Base = "32", Ext = "D"))]
     FcvtDWU {
         rd: Register,
         rs1: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I64", Ext = "D64"))]
+    #[strum(props(Base = "64", Ext = "D"))]
     FcvtLD {
         rd: Register,
         rs1: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I64", Ext = "D64"))]
+    #[strum(props(Base = "64", Ext = "D"))]
     FcvtLUD {
         rd: Register,
         rs1: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I64", Ext = "D64"))]
+    #[strum(props(Base = "64", Ext = "D"))]
     FmvXD {
         rd: Register,
         rs1: Register,
     },
-    #[strum(props(Base = "I64", Ext = "D64"))]
+    #[strum(props(Base = "64", Ext = "D"))]
     FcvtDL {
         rd: Register,
         rs1: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I64", Ext = "D64"))]
+    #[strum(props(Base = "64", Ext = "D"))]
     FcvtDLU {
         rd: Register,
         rs1: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I64", Ext = "D64"))]
+    #[strum(props(Base = "64", Ext = "D"))]
     FmvDX {
         rd: Register,
         rs1: Register,
     },
-    #[strum(props(Base = "I32", Ext = "Q32"))]
+    #[strum(props(Base = "32", Ext = "Q"))]
     Flq {
         rd: Register,
         rs1: Register,
         imm: i32,
     },
-    #[strum(props(Base = "I32", Ext = "Q32"))]
+    #[strum(props(Base = "32", Ext = "Q"))]
     Fsq {
         rd: Register,
         rs1: Register,
         rs2: Register,
         imm: i32,
     },
-    #[strum(props(Base = "I32", Ext = "Q32"))]
+    #[strum(props(Base = "32", Ext = "Q"))]
     FmaddQ {
         rd: Register,
         rs1: Register,
         rs2: Register,
         rs3: Register,
     },
-    #[strum(props(Base = "I32", Ext = "Q32"))]
+    #[strum(props(Base = "32", Ext = "Q"))]
     FmsubQ {
         rd: Register,
         rs1: Register,
         rs2: Register,
         rs3: Register,
     },
-    #[strum(props(Base = "I32", Ext = "Q32"))]
+    #[strum(props(Base = "32", Ext = "Q"))]
     FnmsubQ {
         rd: Register,
         rs1: Register,
         rs2: Register,
         rs3: Register,
     },
-    #[strum(props(Base = "I32", Ext = "Q32"))]
+    #[strum(props(Base = "32", Ext = "Q"))]
     FnmaddQ {
         rd: Register,
         rs1: Register,
         rs2: Register,
         rs3: Register,
     },
-    #[strum(props(Base = "I32", Ext = "Q32"))]
+    #[strum(props(Base = "32", Ext = "Q"))]
     FaddQ {
         rd: Register,
         rs1: Register,
         rs2: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I32", Ext = "Q32"))]
+    #[strum(props(Base = "32", Ext = "Q"))]
     FsubQ {
         rd: Register,
         rs1: Register,
         rs2: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I32", Ext = "Q32"))]
+    #[strum(props(Base = "32", Ext = "Q"))]
     FmulQ {
         rd: Register,
         rs1: Register,
         rs2: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I32", Ext = "Q32"))]
+    #[strum(props(Base = "32", Ext = "Q"))]
     FdivQ {
         rd: Register,
         rs1: Register,
         rs2: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I32", Ext = "Q32"))]
+    #[strum(props(Base = "32", Ext = "Q"))]
     FsqrtQ {
         rd: Register,
         rs1: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I32", Ext = "Q32"))]
+    #[strum(props(Base = "32", Ext = "Q"))]
     FsgnjQ {
         rd: Register,
         rs1: Register,
         rs2: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I32", Ext = "Q32"))]
+    #[strum(props(Base = "32", Ext = "Q"))]
     FsgnjnQ {
         rd: Register,
         rs1: Register,
         rs2: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I32", Ext = "Q32"))]
+    #[strum(props(Base = "32", Ext = "Q"))]
     FsgnjxQ {
         rd: Register,
         rs1: Register,
         rs2: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I32", Ext = "Q32"))]
+    #[strum(props(Base = "32", Ext = "Q"))]
     FminQ {
         rd: Register,
         rs1: Register,
         rs2: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I32", Ext = "Q32"))]
+    #[strum(props(Base = "32", Ext = "Q"))]
     FmaxQ {
         rd: Register,
         rs1: Register,
         rs2: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I32", Ext = "Q32"))]
+    #[strum(props(Base = "32", Ext = "Q"))]
     FcvtSQ {
         rd: Register,
         rs1: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I32", Ext = "Q32"))]
+    #[strum(props(Base = "32", Ext = "Q"))]
     FcvtQS {
         rd: Register,
         rs1: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I32", Ext = "Q32"))]
+    #[strum(props(Base = "32", Ext = "Q"))]
     FcvtDQ {
         rd: Register,
         rs1: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I32", Ext = "Q32"))]
+    #[strum(props(Base = "32", Ext = "Q"))]
     FcvtQD {
         rd: Register,
         rs1: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I32", Ext = "Q32"))]
+    #[strum(props(Base = "32", Ext = "Q"))]
     FeqQ {
         rd: Register,
         rs1: Register,
         rs2: Register,
     },
-    #[strum(props(Base = "I32", Ext = "Q32"))]
+    #[strum(props(Base = "32", Ext = "Q"))]
     FltQ {
         rd: Register,
         rs1: Register,
         rs2: Register,
     },
-    #[strum(props(Base = "I32", Ext = "Q32"))]
+    #[strum(props(Base = "32", Ext = "Q"))]
     FleQ {
         rd: Register,
         rs1: Register,
         rs2: Register,
     },
-    #[strum(props(Base = "I32", Ext = "Q32"))]
+    #[strum(props(Base = "32", Ext = "Q"))]
     FclassQ {
         rd: Register,
         rs1: Register,
     },
-    #[strum(props(Base = "I32", Ext = "Q32"))]
+    #[strum(props(Base = "32", Ext = "Q"))]
     FcvtWQ {
         rd: Register,
         rs1: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I32", Ext = "Q32"))]
+    #[strum(props(Base = "32", Ext = "Q"))]
     FcvtWUQ {
         rd: Register,
         rs1: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I32", Ext = "Q32"))]
+    #[strum(props(Base = "32", Ext = "Q"))]
     FcvtQW {
         rd: Register,
         rs1: Register,
         rm: u32,
     },
-    #[strum(props(Base = "I32", Ext = "Q32"))]
+    #[strum(props(Base = "32", Ext = "Q"))]
     FcvtQWU {
         rd: Register,
         rs1: Register,
         rm: u32,
     },
-    #[strum(props(Base = "Q64", Ext = "Q64"))]
+    #[strum(props(Base = "64", Ext = "Q"))]
     FcvtLQ {
         rd: Register,
         rs1: Register,
         rm: u32,
     },
-    #[strum(props(Base = "Q64", Ext = "Q64"))]
+    #[strum(props(Base = "64", Ext = "Q"))]
     FcvtLUQ {
         rd: Register,
         rs1: Register,
         rm: u32,
     },
-    #[strum(props(Base = "Q64", Ext = "Q64"))]
+    #[strum(props(Base = "64", Ext = "Q"))]
     FcvtQL {
         rd: Register,
         rs1: Register,
         rm: u32,
     },
-    #[strum(props(Base = "Q64", Ext = "Q64"))]
+    #[strum(props(Base = "64", Ext = "Q"))]
     FcvtQLU {
         rd: Register,
         rs1: Register,
@@ -1844,7 +1844,7 @@ impl From<Inst> for Instruction {
                     0b001 => {
                         return Instruction::Csrrw {
                             rd: unpacked.rd.unwrap().into(),
-                            rs1: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rs1.unwrap().into(),
                             csr: unpacked.csr.unwrap(),
                             func3: func3,
                         }
@@ -1852,7 +1852,7 @@ impl From<Inst> for Instruction {
                     0b010 => {
                         return Instruction::Csrrs {
                             rd: unpacked.rd.unwrap().into(),
-                            rs1: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rs1.unwrap().into(),
                             csr: unpacked.csr.unwrap(),
                             func3: func3,                            
                         }
@@ -1860,7 +1860,7 @@ impl From<Inst> for Instruction {
                     0b011 => {
                         return Instruction::Csrrc {
                             rd: unpacked.rd.unwrap().into(),
-                            rs1: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rs1.unwrap().into(),
                             csr: unpacked.csr.unwrap(),
                             func3: func3,                            
                         }
@@ -2089,21 +2089,103 @@ impl InstructionDecoder for Instruction {
             return Instruction::Undefined;
         }
 
-        let g64 = Extension::G64;
-        let ext: &'static str = enc_table.get_ext().into();
-        let base: &'static str = enc_table.get_base().into();
         let instruction: Instruction = inst.into();
-        let instruction_base = instruction.get_str("Base").unwrap();
-        let instruction_ext = instruction.get_str("Ext").unwrap();
+        let instruction_base: Base = instruction.get_str("Base").unwrap().into();
+        let instruction_ext: Extension = instruction.get_str("Ext").unwrap().into();
 
-        if ext == g64.into_str() {
-            return instruction
+        match enc_table.get_base() {
+            Base::I32 => {
+                match instruction_base {
+                    Base::I32 => {
+                        match enc_table.get_ext() {
+                            Extension::I => {
+                                match instruction_ext {
+                                    Extension::I => return instruction,
+                                    _ => return Instruction::Undefined
+                                }
+                            }
+                            Extension::M => {
+                                match instruction_ext {
+                                    Extension::I => return instruction,
+                                    Extension::M => return instruction,
+                                    _ => return Instruction::Undefined
+                                }
+                            }
+                            Extension::A => {
+                                match instruction_ext {
+                                    Extension::I => return instruction,
+                                    Extension::A => return instruction,
+                                    _ => return Instruction::Undefined
+                                }
+                            }
+                            Extension::F => {
+                                match instruction_ext {
+                                    Extension::I => return instruction,
+                                    Extension::F => return instruction,
+                                    _ => return Instruction::Undefined
+                                }
+                            }
+                            Extension::D => {
+                                match instruction_ext {
+                                    Extension::I => return instruction,
+                                    Extension::F => return instruction,
+                                    Extension::D => return instruction,
+                                    _ => return Instruction::Undefined
+                                }
+                            }
+                            Extension::G => {
+                                return instruction
+                            }
+                        }
+                    }
+                    Base::I64 => {
+                        return Instruction::Undefined
+                    }
+                }
+
+            }
+            Base::I64 => {
+                match enc_table.get_ext() {
+                    Extension::I => {
+                        match instruction_ext {
+                            Extension::I => return instruction,
+                            _ => return Instruction::Undefined
+                        }
+                    }
+                    Extension::M => {
+                        match instruction_ext {
+                            Extension::I => return instruction,
+                            Extension::M => return instruction,
+                            _ => return Instruction::Undefined
+                        }
+                    }
+                    Extension::A => {
+                        match instruction_ext {
+                            Extension::I => return instruction,
+                            Extension::A => return instruction,
+                            _ => return Instruction::Undefined
+                        }
+                    }
+                    Extension::F => {
+                        match instruction_ext {
+                            Extension::I => return instruction,
+                            Extension::F => return instruction,
+                            _ => return Instruction::Undefined
+                        }
+                    }
+                    Extension::D => {
+                        match instruction_ext {
+                            Extension::I => return instruction,
+                            Extension::F => return instruction,
+                            Extension::D => return instruction,
+                            _ => return Instruction::Undefined
+                        }
+                    }
+                    Extension::G => {
+                        return instruction
+                    }
+                }
+            }
         }
-
-        if instruction_base != base || instruction_ext != ext {
-            return Instruction::Undefined
-        }
-
-        instruction
     }
 }

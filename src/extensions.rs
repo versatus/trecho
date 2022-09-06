@@ -6,18 +6,12 @@ pub enum Base {
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Extension {
-    I32,
-    I64,
-    M32,
-    M64,
-    A32,
-    A64,
-    F32,
-    F64,
-    D32,
-    D64,
-    G32,
-    G64
+    I,
+    M,
+    A,
+    F,
+    D,
+    G,
 }
 
 impl From<Base> for &'static str {
@@ -29,21 +23,24 @@ impl From<Base> for &'static str {
     }
 }
 
+impl From<&Base> for &'static str {
+    fn from(base: &Base) -> &'static str {
+        match base {
+            Base::I32 => return "I32",
+            Base::I64 => return "I64"
+        }
+    }
+}
+
 impl From<Extension> for &'static str {
     fn from(ext: Extension) -> &'static str {
         match ext {
-            Extension::I32 => return "I32",
-            Extension::I64 => return "I64",
-            Extension::M32 => return "M32",
-            Extension::M64 => return "M64",
-            Extension::A32 => return "A32",
-            Extension::A64 => return "A64",
-            Extension::F32 => return "F32",
-            Extension::F64 => return "F64",
-            Extension::D32 => return "D32",
-            Extension::D64 => return "D64",
-            Extension::G32 => return "G32",
-            Extension::G64 => return "G64"
+            Extension::I => return "I",
+            Extension::M => return "M",
+            Extension::A => return "A",
+            Extension::F => return "F",
+            Extension::D => return "D",
+            Extension::G => return "G",
         }
     }
 }
@@ -51,23 +48,47 @@ impl From<Extension> for &'static str {
 impl From<&Extension> for &'static str {
     fn from(ext: &Extension) -> &'static str {
         match ext {
-            Extension::I32 => return "I32",
-            Extension::I64 => return "I64",
-            Extension::M32 => return "M32",
-            Extension::M64 => return "M64",
-            Extension::A32 => return "A32",
-            Extension::A64 => return "A64",
-            Extension::F32 => return "F32",
-            Extension::F64 => return "F64",
-            Extension::D32 => return "D32",
-            Extension::D64 => return "D64",
-            Extension::G32 => return "G32",
-            Extension::G64 => return "G64"
+            Extension::I => return "I",
+            Extension::M => return "M",
+            Extension::A => return "A",
+            Extension::F => return "F",
+            Extension::D => return "D",
+            Extension::G => return "G"
+        }
+    }
+}
+
+impl From<&'static str> for Base {
+    fn from(input: &'static str) -> Base {
+        match input {
+            "32" => Base::I32,
+            "64" => Base::I64,
+            _ => Base::I32
+        }
+    }
+}
+
+impl From<&'static str> for Extension {
+    fn from(input: &'static str) -> Extension {
+        match input {
+            "I" => return Extension::I,
+            "M" => return Extension::M,
+            "A" => return Extension::A,
+            "F" => return Extension::F,
+            "D" => return Extension::D,
+            "G" => return Extension::G,
+            _ => return Extension::I
         }
     }
 }
 
 impl Extension {
+    pub fn into_str(&self) -> &'static str {
+        self.into()
+    }
+}
+
+impl Base {
     pub fn into_str(&self) -> &'static str {
         self.into()
     }

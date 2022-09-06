@@ -913,59 +913,313 @@ mod tests {
     }
 
     #[test]
-    fn test_convert_valid_csrrw_bits_into_instruction() {}    
+    fn test_convert_valid_csrrw_bits_into_instruction() {
+        let bits: Inst = 0b1010_1010_1100_1110_1001_0110_1111_0011 as u32;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::Csrrw {
+                rd: Register::X13,
+                rs1: Register::X29,
+                csr: 2732,
+                func3: 1
+            }
+        );
+    }    
 
     #[test]    
-    fn test_convert_valid_csrrs_bits_into_instruction() {}
+    fn test_convert_valid_csrrs_bits_into_instruction() {
+        let bits: Inst = 0b1010_1010_1100_1010_1010_0101_1111_0011 as u32;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::Csrrs {
+                rd: Register::X11,
+                rs1: Register::X21,
+                csr: 2732,
+                func3: 2
+            }
+        );
+    }
 
     #[test]
-    fn test_convert_valid_csrrc_bits_into_instruction() {}
+    fn test_convert_valid_csrrc_bits_into_instruction() {
+        let bits: Inst = 0b1010_1010_1100_1010_1011_0101_1111_0011 as u32;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::Csrrc {
+                rd: Register::X11,
+                rs1: Register::X21,
+                csr: 2732,
+                func3: 3
+            }
+        );        
+    }
 
     #[test]    
-    fn test_convert_valid_csrrwi_bits_into_instruction() {}
+    fn test_convert_valid_csrrwi_bits_into_instruction() {
+        let bits: Inst = 0b1010_1010_1100_1010_1101_0101_1111_0011 as u32;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::Csrrwi {
+                rd: Register::X11,
+                uimm: 21,
+                csr: 2732,
+                func3: 5
+            }
+        );        
+    }
 
     #[test]
-    fn test_convert_valid_csrrsi_bits_into_instruction() {}
+    fn test_convert_valid_csrrsi_bits_into_instruction() {
+        let bits: Inst = 0b1010_1010_1100_1010_1110_0101_1111_0011 as u32;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::Csrrsi {
+                rd: Register::X11,
+                uimm: 21,
+                csr: 2732,
+                func3: 6
+            }
+        );
+    }
 
     #[test]
-    fn test_convert_valid_csrrci_bits_into_instruction() {}
+    fn test_convert_valid_csrrci_bits_into_instruction() {
+        let bits: Inst = 0b1010_1010_1100_1010_1111_0101_1111_0011 as u32;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::Csrrci {
+                rd: Register::X11,
+                uimm: 21,
+                csr: 2732,
+                func3: 7
+            }
+        );
+    }
     
     #[test]
-    fn test_convert_valid_mul_bits_into_instruction() {}
+    fn test_convert_valid_mul_bits_into_instruction() {
+        let bits: Inst = 0b0000_0010_1100_1010_1000_0101_1011_0011 as u32;
+        let instruction: Instruction = bits.into();
+        // println!("{:?}", instruction);
+        assert_eq!(
+            instruction,
+            Instruction::Mul {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X12,
+                func3: 0,
+                func7: 1
+            }
+        );        
+    }
     
     #[test]
-    fn test_convert_valid_mulh_bits_into_instruction() {}
+    fn test_convert_valid_mulh_bits_into_instruction() {
+        let bits: Inst = 0b0000_0010_1100_1010_1001_0101_1011_0011 as u32;
+        let instruction: Instruction = bits.into();
+        // println!("{:?}", instruction);
+        assert_eq!(
+            instruction,
+            Instruction::Mulh {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X12,
+                func3: 1,
+                func7: 1
+            }
+        );        
+    }
     
     #[test]
-    fn test_convert_valid_mulhsu_bits_into_instruction() {}
+    fn test_convert_valid_mulhsu_bits_into_instruction() {
+        let bits: Inst = 0b0000_0010_1100_1010_1010_0101_1011_0011 as u32;
+        let instruction: Instruction = bits.into();
+        // println!("{:?}", instruction);
+        assert_eq!(
+            instruction,
+            Instruction::Mulhsu {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X12,
+                func3: 2,
+                func7: 1
+            }
+        );        
+    }
     
     #[test]
-    fn test_convert_valid_mulhu_bits_into_instruction() {}
+    fn test_convert_valid_mulhu_bits_into_instruction() {
+        let bits: Inst = 0b0000_0010_1100_1010_1011_0101_1011_0011 as u32;
+        let instruction: Instruction = bits.into();
+        // println!("{:?}", instruction);
+        assert_eq!(
+            instruction,
+            Instruction::Mulhu {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X12,
+                func3: 3,
+                func7: 1
+            }
+        );        
+    }
     
     #[test]
-    fn test_convert_valid_div_bits_into_instruction() {}
+    fn test_convert_valid_div_bits_into_instruction() {
+        let bits: Inst = 0b0000_0010_1100_1010_1100_0101_1011_0011 as u32;
+        let instruction: Instruction = bits.into();
+        // println!("{:?}", instruction);
+        assert_eq!(
+            instruction,
+            Instruction::Div {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X12,
+                func3: 4,
+                func7: 1
+            }
+        );        
+    }
     
     #[test]
-    fn test_convert_valid_divu_bits_into_instruction() {}
+    fn test_convert_valid_divu_bits_into_instruction() {
+        let bits: Inst = 0b0000_0010_1100_1010_1101_0101_1011_0011 as u32;
+        let instruction: Instruction = bits.into();
+        // println!("{:?}", instruction);
+        assert_eq!(
+            instruction,
+            Instruction::Divu {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X12,
+                func3: 5,
+                func7: 1
+            }
+        );    
+    }
     
     #[test]
-    fn test_convert_valid_rem_bits_into_instruction() {}
+    fn test_convert_valid_rem_bits_into_instruction() {
+        let bits: Inst = 0b0000_0010_1100_1010_1110_0101_1011_0011 as u32;
+        let instruction: Instruction = bits.into();
+        // println!("{:?}", instruction);
+        assert_eq!(
+            instruction,
+            Instruction::Rem {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X12,
+                func3: 6,
+                func7: 1
+            }
+        );    
+    }
     
     #[test]
-    fn test_convert_valid_remu_bits_into_instruction() {}
+    fn test_convert_valid_remu_bits_into_instruction() {
+        let bits: Inst = 0b0000_0010_1100_1010_1111_0101_1011_0011 as u32;
+        let instruction: Instruction = bits.into();
+        // println!("{:?}", instruction);
+        assert_eq!(
+            instruction,
+            Instruction::Remu {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X12,
+                func3: 7,
+                func7: 1
+            }
+        );
+    }
     
     #[test]
-    fn test_convert_valid_mulw_bits_into_instruction() {}
+    fn test_convert_valid_mulw_bits_into_instruction() {
+        let bits: Inst = 0b0000_0010_1100_1010_1000_0101_1011_1011 as u32;
+        let instruction: Instruction = bits.into();
+        // println!("{:?}", instruction);
+        assert_eq!(
+            instruction,
+            Instruction::Mulw {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X12,
+                func3: 0,
+                func7: 1
+            }
+        );
+    }
     
     #[test]
-    fn test_convert_valid_divw_bits_into_instruction() {}
+    fn test_convert_valid_divw_bits_into_instruction() {
+        let bits: Inst = 0b0000_0010_1100_1010_1100_0101_1011_1011 as u32;
+        let instruction: Instruction = bits.into();
+        // println!("{:?}", instruction);
+        assert_eq!(
+            instruction,
+            Instruction::Divw {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X12,
+                func3: 4,
+                func7: 1
+            }
+        );
+    }
     
     #[test]
-    fn test_convert_valid_divuw_bits_into_instruction() {}
+    fn test_convert_valid_divuw_bits_into_instruction() {
+        let bits: Inst = 0b0000_0010_1100_1010_1101_0101_1011_1011 as u32;
+        let instruction: Instruction = bits.into();
+        // println!("{:?}", instruction);
+        assert_eq!(
+            instruction,
+            Instruction::Divuw {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X12,
+                func3: 5,
+                func7: 1
+            }
+        );
+    }
     
     #[test]
-    fn test_convert_valid_remw_bits_into_instruction() {}
+    fn test_convert_valid_remw_bits_into_instruction() {
+        let bits: Inst = 0b0000_0010_1100_1010_1110_0101_1011_1011 as u32;
+        let instruction: Instruction = bits.into();
+        // println!("{:?}", instruction);
+        assert_eq!(
+            instruction,
+            Instruction::Remw {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X12,
+                func3: 6,
+                func7: 1
+            }
+        );
+    }
     
     #[test]
-    fn test_convert_valid_remuw_bits_into_instruction() {}
+    fn test_convert_valid_remuw_bits_into_instruction() {
+        let bits: Inst = 0b0000_0010_1100_1010_1111_0101_1011_1011 as u32;
+        let instruction: Instruction = bits.into();
+        // println!("{:?}", instruction);
+        assert_eq!(
+            instruction,
+            Instruction::RemuW {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X12,
+                func3: 7,
+                func7: 1
+            }
+        );
+    }
 }
