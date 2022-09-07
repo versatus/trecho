@@ -1222,4 +1222,83 @@ mod tests {
             }
         );
     }
+
+    #[test]
+    fn test_convert_valid_lrw_bits_into_instruction() {
+        let bits: Inst = 0b0001_0100_0000_0101_0010_0110_0010_1111 as u32;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::LrW {
+                rd: Register::X12,
+                rs1: Register::X10,
+                aq: 1,
+                rl: 0
+            }
+        );        
+    }
+
+    #[test]
+    fn test_convert_valid_scw_bits_into_instruction() {}
+
+    #[test]
+    fn test_convert_valid_amoswapw_bits_into_instruction() {}
+
+    #[test]
+    fn test_convert_valid_amoaddw_bits_into_instruction() {}
+
+    #[test]
+    fn test_convert_valid_amoxorw_bits_into_instruction() {}
+
+    #[test]
+    fn test_convert_valid_amoandw_bits_into_instruction() {}
+
+    #[test]
+    fn test_convert_valid_amoorw_bits_into_instruction() {}
+
+    #[test]
+    fn test_convert_valid_amominw_bits_into_instruction() {}    
+
+    #[test]
+    fn test_convert_valid_amomaxw_bits_into_instruction() {}
+    
+    #[test]
+    fn test_convert_valid_amominuw_bits_into_instruction() {}
+
+    #[test]
+    fn test_convert_valid_amomaxuw_bits_into_instruction() {}
+
+    #[test]
+    fn test_convert_valid_lrd_bits_into_instruction() {}
+    
+    #[test]
+    fn test_convert_valid_scd_bits_into_instruction() {}
+
+    #[test]
+    fn test_convert_valid_amoswapd_bits_into_instruction() {}
+
+    #[test]
+    fn test_convert_valid_amoaddd_bits_into_instruction() {}
+
+    #[test]
+    fn test_convert_valid_amoxord_bits_into_instruction() {}    
+
+    #[test]
+    fn test_convert_valid_amoandd_bits_into_instruction() {}    
+    
+    #[test]
+    fn test_convert_valid_amoord_bits_into_instruction() {}    
+    
+    #[test]
+    fn test_convert_valid_amomind_bits_into_instruction() {}    
+    
+    #[test]
+    fn test_convert_valid_amomaxd_bits_into_instruction() {}    
+    
+    #[test]
+    fn test_convert_valid_amominud_bits_into_instruction() {}                        
+
+    #[test]
+    fn test_convert_valid_amomaxud_bits_into_instruction() {}                        
+
 }

@@ -85,7 +85,7 @@ pub const TYPE_TABLE: [OpCodeType; 128] = [
     /*0b0000100*/ OpCodeType::Invalid,      // decimal: 4     hex: 0x04
     /*0b0000101*/ OpCodeType::Invalid,      // decimal: 5     hex: 0x05
     /*0b0000110*/ OpCodeType::Invalid,      // decimal: 6     hex: 0x06
-    /*0b0000111*/ OpCodeType::Invalid,      // decimal: 7     hex: 0x07
+    /*0b0000111*/ OpCodeType::I,            // decimal: 7     hex: 0x07
     /*0b0001000*/ OpCodeType::Invalid,      // decimal: 8     hex: 0x08
     /*0b0001001*/ OpCodeType::Invalid,      // decimal: 9     hex: 0x09
     /*0b0001010*/ OpCodeType::Invalid,      // decimal: 10    hex: 0x0a
@@ -117,7 +117,7 @@ pub const TYPE_TABLE: [OpCodeType; 128] = [
     /*0b0100100*/ OpCodeType::Invalid,      // decimal: 36    hex: 0x24  
     /*0b0100101*/ OpCodeType::Invalid,      // decimal: 37    hex: 0x25
     /*0b0100110*/ OpCodeType::Invalid,      // decimal: 38    hex: 0x26
-    /*0b0100111*/ OpCodeType::Invalid,      // decimal: 39    hex: 0x27
+    /*0b0100111*/ OpCodeType::S,            // decimal: 39    hex: 0x27
     /*0b0101000*/ OpCodeType::Invalid,      // decimal: 40    hex: 0x28
     /*0b0101001*/ OpCodeType::Invalid,      // decimal: 41    hex: 0x29
     /*0b0101010*/ OpCodeType::Invalid,      // decimal: 42    hex: 0x2a
@@ -125,7 +125,7 @@ pub const TYPE_TABLE: [OpCodeType; 128] = [
     /*0b0101100*/ OpCodeType::Invalid,      // decimal: 44    hex: 0x2c
     /*0b0101101*/ OpCodeType::Invalid,      // decimal: 45    hex: 0x2d
     /*0b0101110*/ OpCodeType::Invalid,      // decimal: 46    hex: 0x2e
-    /*0b0101111*/ OpCodeType::Invalid,      // decimal: 47    hex: 0x2f
+    /*0b0101111*/ OpCodeType::R,            // decimal: 47    hex: 0x2f
     /*0b0110000*/ OpCodeType::Invalid,      // decimal: 48    hex: 0x30
     /*0b0110001*/ OpCodeType::Invalid,      // decimal: 49    hex: 0x31
     /*0b0110010*/ OpCodeType::Invalid,      // decimal: 50    hex: 0x32
@@ -145,23 +145,23 @@ pub const TYPE_TABLE: [OpCodeType; 128] = [
     /*0b1000000*/ OpCodeType::Invalid,      // decimal: 64    hex: 0x40
     /*0b1000001*/ OpCodeType::Invalid,      // decimal: 65    hex: 0x41
     /*0b1000010*/ OpCodeType::Invalid,      // decimal: 66    hex: 0x42
-    /*0b1000011*/ OpCodeType::Invalid,      // decimal: 67    hex: 0x43
+    /*0b1000011*/ OpCodeType::R4,           // decimal: 67    hex: 0x43
     /*0b1000100*/ OpCodeType::Invalid,      // decimal: 68    hex: 0x44
     /*0b1000101*/ OpCodeType::Invalid,      // decimal: 69    hex: 0x45
     /*0b1000110*/ OpCodeType::Invalid,      // decimal: 70    hex: 0x46
-    /*0b1000111*/ OpCodeType::Invalid,      // decimal: 71    hex: 0x47
+    /*0b1000111*/ OpCodeType::R4,      // decimal: 71    hex: 0x47
     /*0b1001000*/ OpCodeType::Invalid,      // decimal: 72    hex: 0x48
     /*0b1001001*/ OpCodeType::Invalid,      // decimal: 73    hex: 0x49
     /*0b1001010*/ OpCodeType::Invalid,      // decimal: 74    hex: 0x4a
-    /*0b1001011*/ OpCodeType::Invalid,      // decimal: 75    hex: 0x4b
+    /*0b1001011*/ OpCodeType::R4,      // decimal: 75    hex: 0x4b
     /*0b1001100*/ OpCodeType::Invalid,      // decimal: 76    hex: 0x4c
     /*0b1001101*/ OpCodeType::Invalid,      // decimal: 77    hex: 0x4d
     /*0b1001110*/ OpCodeType::Invalid,      // decimal: 78    hex: 0x4e
-    /*0b1001111*/ OpCodeType::Invalid,      // decimal: 79    hex: 0x4f
+    /*0b1001111*/ OpCodeType::R4,      // decimal: 79    hex: 0x4f
     /*0b1010000*/ OpCodeType::Invalid,      // decimal: 80    hex: 0x50
     /*0b1010001*/ OpCodeType::Invalid,      // decimal: 81    hex: 0x51
     /*0b1010010*/ OpCodeType::Invalid,      // decimal: 82    hex: 0x52
-    /*0b1010011*/ OpCodeType::Invalid,      // decimal: 83    hex: 0x53
+    /*0b1010011*/ OpCodeType::R,            // decimal: 83    hex: 0x53
     /*0b1010100*/ OpCodeType::Invalid,      // decimal: 84    hex: 0x54
     /*0b1010101*/ OpCodeType::Invalid,      // decimal: 85    hex: 0x55
     /*0b1010110*/ OpCodeType::Invalid,      // decimal: 86    hex: 0x56
@@ -319,6 +319,7 @@ impl From<Inst> for Unpacked {
                 unpacked.func7 = Some(func7);
                 unpacked.rs2 = Some(rs2);
                 unpacked.rs1 = Some(rs1);
+                unpacked.rs3 = Some(rs3);
                 unpacked.func3 = Some(func3);
                 unpacked.rd = Some(rd);
                 unpacked.imm = Some(imm);
@@ -327,6 +328,8 @@ impl From<Inst> for Unpacked {
                 unpacked.succ = Some(succ);
                 unpacked.csr = Some(csr);
                 unpacked.uimm = Some(uimm);
+                unpacked.aq = Some(aq);
+                unpacked.rl = Some(rl);
                 return unpacked
             },
             OpCodeType::I => {

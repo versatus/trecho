@@ -553,175 +553,175 @@ pub enum Instruction {
     LrW {
         rd: Register,
         rs1: Register,
-        aq: i32,
-        rl: i32,
+        aq: u8,
+        rl: u8,
     },
     #[strum(props(Base = "32", Ext = "A"))]
     ScW {
         rd: Register,
         rs1: Register,
         rs2: Register,
-        aq: i32,
-        rl: i32,
+        aq: u8,
+        rl: u8,
     },
     #[strum(props(Base = "32", Ext = "A"))]
     AmoswapW {
         rd: Register,
         rs1: Register,
         rs2: Register,
-        aq: i32,
-        rl: i32,
+        aq: u8,
+        rl: u8,
     },
     #[strum(props(Base = "32", Ext = "A"))]
     AmoaddW {
         rd: Register,
         rs1: Register,
         rs2: Register,
-        aq: i32,
-        rl: i32,
+        aq: u8,
+        rl: u8,
     },
     #[strum(props(Base = "32", Ext = "A"))]
     AmoxorW {
         rd: Register,
         rs1: Register,
         rs2: Register,
-        aq: i32,
-        rl: i32,
+        aq: u8,
+        rl: u8,
     },
     #[strum(props(Base = "32", Ext = "A"))]
     AmoandW {
         rd: Register,
         rs1: Register,
         rs2: Register,
-        aq: i32,
-        rl: i32,
+        aq: u8,
+        rl: u8,
     },
     #[strum(props(Base = "32", Ext = "A"))]
     AmoorW {
         rd: Register,
         rs1: Register,
         rs2: Register,
-        aq: i32,
-        rl: i32,
+        aq: u8,
+        rl: u8,
     },
     #[strum(props(Base = "32", Ext = "A"))]
     AmominW {
         rd: Register,
         rs1: Register,
         rs2: Register,
-        aq: i32,
-        rl: i32,
+        aq: u8,
+        rl: u8,
     },
     #[strum(props(Base = "32", Ext = "A"))]
-    Amomax {
+    AmomaxW {
         rd: Register,
         rs1: Register,
         rs2: Register,
-        aq: i32,
-        rl: i32,
+        aq: u8,
+        rl: u8,
     },
     #[strum(props(Base = "32", Ext = "A"))]
     AmominuW {
         rd: Register,
         rs1: Register,
         rs2: Register,
-        aq: i32,
-        rl: i32,
+        aq: u8,
+        rl: u8,
     },
     #[strum(props(Base = "32", Ext = "A"))]
     AmomaxuW {
         rd: Register,
         rs1: Register,
         rs2: Register,
-        aq: i32,
-        rl: i32,
+        aq: u8,
+        rl: u8,
     },
     #[strum(props(Base = "64", Ext = "A"))]
     LrD {
         rd: Register,
         rs1: Register,
-        aq: i32,
-        rl: i32,
+        aq: u8,
+        rl: u8,
     },
     #[strum(props(Base = "64", Ext = "A"))]
     ScD {
         rd: Register,
         rs1: Register,
         rs2: Register,
-        aq: i32,
-        rl: i32,
+        aq: u8,
+        rl: u8,
     },
     #[strum(props(Base = "64", Ext = "A"))]
     AmoswapD {
         rd: Register,
         rs1: Register,
         rs2: Register,
-        aq: i32,
-        rl: i32,
+        aq: u8,
+        rl: u8,
     },
     #[strum(props(Base = "64", Ext = "A"))]
     AmoaddD {
         rd: Register,
         rs1: Register,
         rs2: Register,
-        aq: i32,
-        rl: i32,
+        aq: u8,
+        rl: u8,
     },
     #[strum(props(Base = "64", Ext = "A"))]
     AmoxorD {
         rd: Register,
         rs1: Register,
         rs2: Register,
-        aq: i32,
-        rl: i32,
+        aq: u8,
+        rl: u8,
     },
     #[strum(props(Base = "64", Ext = "A"))]
     AmoandD {
         rd: Register,
         rs1: Register,
         rs2: Register,
-        aq: i32,
-        rl: i32,
+        aq: u8,
+        rl: u8,
     },
     #[strum(props(Base = "64", Ext = "A"))]
     AmoorD {
         rd: Register,
         rs1: Register,
         rs2: Register,
-        aq: i32,
-        rl: i32,
+        aq: u8,
+        rl: u8,
     },
     #[strum(props(Base = "64", Ext = "A"))]
     AmominD {
         rd: Register,
         rs1: Register,
         rs2: Register,
-        aq: i32,
-        rl: i32,
+        aq: u8,
+        rl: u8,
     },
     #[strum(props(Base = "64", Ext = "A"))]
     AmomaxD {
         rd: Register,
         rs1: Register,
         rs2: Register,
-        aq: i32,
-        rl: i32,
+        aq: u8,
+        rl: u8,
     },
     #[strum(props(Base = "64", Ext = "A"))]
     AmominuD {
         rd: Register,
         rs1: Register,
         rs2: Register,
-        aq: i32,
-        rl: i32,
+        aq: u8,
+        rl: u8,
     },
     #[strum(props(Base = "64", Ext = "A"))]
     AmomaxuD {
         rd: Register,
         rs1: Register,
         rs2: Register,
-        aq: i32,
-        rl: i32,
+        aq: u8,
+        rl: u8,
     },
     #[strum(props(Base = "32", Ext = "F"))]
     Flw {
@@ -825,14 +825,12 @@ pub enum Instruction {
         rd: Register,
         rs1: Register,
         rs2: Register,
-        rm: u32,
     },
     #[strum(props(Base = "32", Ext = "F"))]
     FmaxS {
         rd: Register,
         rs1: Register,
         rs2: Register,
-        rm: u32,
     },
     #[strum(props(Base = "32", Ext = "F"))]
     FcvtWS {
@@ -841,7 +839,7 @@ pub enum Instruction {
         rm: u32,
     },
     #[strum(props(Base = "32", Ext = "F"))]
-    FctvWUS {
+    FcvtWUS {
         rd: Register,
         rs1: Register,
         rm: u32,
@@ -850,7 +848,6 @@ pub enum Instruction {
     FmvXW {
         rd: Register,
         rs1: Register,
-        rm: u32,
     },
     #[strum(props(Base = "32", Ext = "F"))]
     FeqS {
@@ -879,11 +876,13 @@ pub enum Instruction {
     FcvtSW {
         rd: Register,
         rs1: Register,
+        rm: u32,
     },
     #[strum(props(Base = "32", Ext = "F"))]
     FcvtSWU {
         rd: Register,
         rs1: Register,
+        rm: u32,
     },
     #[strum(props(Base = "32", Ext = "F"))]
     FmvWX {
@@ -922,6 +921,7 @@ pub enum Instruction {
     },
     #[strum(props(Base = "32", Ext = "D"))]
     Fsd {
+        rd: Register,
         rs1: Register,
         rs2: Register,
         imm: i32,
@@ -932,6 +932,7 @@ pub enum Instruction {
         rs1: Register,
         rs2: Register,
         rs3: Register,
+        rm: u32
     },
     #[strum(props(Base = "32", Ext = "D"))]
     FmsubD {
@@ -939,6 +940,7 @@ pub enum Instruction {
         rs1: Register,
         rs2: Register,
         rs3: Register,
+        rm: u32,
     },
     #[strum(props(Base = "32", Ext = "D"))]
     FnmsubD {
@@ -946,6 +948,7 @@ pub enum Instruction {
         rs1: Register,
         rs2: Register,
         rs3: Register,
+        rm: u32
     },
     #[strum(props(Base = "32", Ext = "D"))]
     FnmaddD {
@@ -953,6 +956,7 @@ pub enum Instruction {
         rs1: Register,
         rs2: Register,
         rs3: Register,
+        rm: u32
     },
     #[strum(props(Base = "32", Ext = "D"))]
     FaddD {
@@ -963,6 +967,13 @@ pub enum Instruction {
     },
     #[strum(props(Base = "32", Ext = "D"))]
     FsubD {
+        rd: Register,
+        rs1: Register,
+        rs2: Register,
+        rm: u32,
+    },
+    #[strum(props(Base = "32", Ext = "D"))]
+    FmulD {
         rd: Register,
         rs1: Register,
         rs2: Register,
@@ -1123,6 +1134,7 @@ pub enum Instruction {
         rs1: Register,
         rs2: Register,
         rs3: Register,
+        rm: u32
     },
     #[strum(props(Base = "32", Ext = "Q"))]
     FmsubQ {
@@ -1130,6 +1142,7 @@ pub enum Instruction {
         rs1: Register,
         rs2: Register,
         rs3: Register,
+        rm: u32
     },
     #[strum(props(Base = "32", Ext = "Q"))]
     FnmsubQ {
@@ -1137,6 +1150,7 @@ pub enum Instruction {
         rs1: Register,
         rs2: Register,
         rs3: Register,
+        rm: u32
     },
     #[strum(props(Base = "32", Ext = "Q"))]
     FnmaddQ {
@@ -1144,6 +1158,7 @@ pub enum Instruction {
         rs1: Register,
         rs2: Register,
         rs3: Register,
+        rm: u32
     },
     #[strum(props(Base = "32", Ext = "Q"))]
     FaddQ {
@@ -1184,35 +1199,30 @@ pub enum Instruction {
         rd: Register,
         rs1: Register,
         rs2: Register,
-        rm: u32,
     },
     #[strum(props(Base = "32", Ext = "Q"))]
     FsgnjnQ {
         rd: Register,
         rs1: Register,
         rs2: Register,
-        rm: u32,
     },
     #[strum(props(Base = "32", Ext = "Q"))]
     FsgnjxQ {
         rd: Register,
         rs1: Register,
         rs2: Register,
-        rm: u32,
     },
     #[strum(props(Base = "32", Ext = "Q"))]
     FminQ {
         rd: Register,
         rs1: Register,
         rs2: Register,
-        rm: u32,
     },
     #[strum(props(Base = "32", Ext = "Q"))]
     FmaxQ {
         rd: Register,
         rs1: Register,
         rs2: Register,
-        rm: u32,
     },
     #[strum(props(Base = "32", Ext = "Q"))]
     FcvtSQ {
@@ -2066,6 +2076,1195 @@ impl From<Inst> for Instruction {
                     _ => return Instruction::Undefined,
                 }
             }
+            0b0101111 => {
+                let func3 = unpacked.func3.unwrap();
+                let func5 = unpacked.rs3.unwrap();
+                match func5 {
+                    0b00010 => {
+                        let rs2 = unpacked.rs2.unwrap();
+                        if rs2 != 0b00000 {
+                            return Instruction::Undefined
+                        }
+
+                        match func3 {
+                            0b010 => {
+                                return Instruction::LrW {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    aq: unpacked.aq.unwrap(),
+                                    rl: unpacked.rl.unwrap(),
+                                }
+                            },
+                            0b011 => {
+                                return Instruction::LrD {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    aq: unpacked.aq.unwrap(),
+                                    rl: unpacked.rl.unwrap(),
+                                }
+                            },
+                            _ => {
+                                return Instruction::Undefined
+                            }
+                        }
+                    },
+                    0b00011 => {
+                        match func3 {
+                            0b010 => {
+                                return Instruction::ScW {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                    aq: unpacked.aq.unwrap(),
+                                    rl: unpacked.rl.unwrap(),
+                                }
+                            },
+                            0b011 => {
+                                return Instruction::ScD {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                    aq: unpacked.aq.unwrap(),
+                                    rl: unpacked.rl.unwrap(),
+                                }
+                            },
+                            _ => { return Instruction::Undefined }
+                        }
+
+                    },
+                    0b00001 => {
+                        match func3 {
+                            0b010 => {
+                                return Instruction::AmoswapW {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                    aq: unpacked.aq.unwrap(),
+                                    rl: unpacked.rl.unwrap(),                            
+                                }
+                            },
+                            0b011 => {
+                                return Instruction::AmoswapD {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                    aq: unpacked.aq.unwrap(),
+                                    rl: unpacked.rl.unwrap(),                            
+                                }
+                            },
+                            _ => { return Instruction::Undefined }
+                        }
+                    },
+                    0b00000 => {
+                        match func3 {
+                            0b010 => {
+                                return Instruction::AmoaddW {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                    aq: unpacked.aq.unwrap(),
+                                    rl: unpacked.rl.unwrap(),                            
+                                }
+                            },
+                            0b011 => {
+                                return Instruction::AmoaddD {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                    aq: unpacked.aq.unwrap(),
+                                    rl: unpacked.rl.unwrap(),                            
+                                }
+                            },
+                            _ => { return Instruction::Undefined }
+                        }           
+                    },
+                    0b00100 => {
+                        match func3 {
+                            0b010 => {
+                                return Instruction::AmoxorW {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                    aq: unpacked.aq.unwrap(),
+                                    rl: unpacked.rl.unwrap(),                            
+                                }
+                            },
+                            0b011 => {
+                                return Instruction::AmoxorD {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                    aq: unpacked.aq.unwrap(),
+                                    rl: unpacked.rl.unwrap(),                            
+                                }
+                            },
+                            _ => { return Instruction::Undefined }
+                        }
+                    },
+                    0b01100 => {
+                        match func3 {
+                            0b010 => {
+                                return Instruction::AmoandW {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                    aq: unpacked.aq.unwrap(),
+                                    rl: unpacked.rl.unwrap(), 
+                                }
+                            },
+                            0b011 => {
+                                return Instruction::AmoandD {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                    aq: unpacked.aq.unwrap(),
+                                    rl: unpacked.rl.unwrap(), 
+                                }
+                            },
+                            _ => { return Instruction::Undefined }
+                        }
+                    },
+                    0b01000 => {
+                        match func3 {
+                            0b010 => {
+                                return Instruction::AmoorW {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                    aq: unpacked.aq.unwrap(),
+                                    rl: unpacked.rl.unwrap(), 
+                                }
+                            },
+                            0b011 => {
+                                return Instruction::AmoorD {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                    aq: unpacked.aq.unwrap(),
+                                    rl: unpacked.rl.unwrap(), 
+                                }
+                            },
+                            _ => { return Instruction::Undefined }
+                        }
+                    },
+                    0b10000 => {
+                        match func3 {
+                            0b010 => {
+                                return Instruction::AmominD {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                    aq: unpacked.aq.unwrap(),
+                                    rl: unpacked.rl.unwrap(), 
+                                }
+                            },
+                            0b011 => {
+                                return Instruction::AmominD {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                    aq: unpacked.aq.unwrap(),
+                                    rl: unpacked.rl.unwrap(), 
+                                }
+                            },
+                            _ => { return Instruction::Undefined }
+                        }
+                    },
+                    0b10100 => {
+                        match func3 {
+                            0b010 => {
+                                return Instruction::AmomaxD {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                    aq: unpacked.aq.unwrap(),
+                                    rl: unpacked.rl.unwrap(), 
+                                }
+                            },
+                            0b011 => {
+                                return Instruction::AmomaxD {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                    aq: unpacked.aq.unwrap(),
+                                    rl: unpacked.rl.unwrap(), 
+                                }
+                            },
+                            _ => { return Instruction::Undefined }
+                        }
+                    },
+                    0b11000 => {
+                        match func3 {
+                            0b010 => {
+                                return Instruction::AmominuD {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                    aq: unpacked.aq.unwrap(),
+                                    rl: unpacked.rl.unwrap(), 
+                                }
+                            },
+                            0b011 => {
+                                return Instruction::AmominuD {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                    aq: unpacked.aq.unwrap(),
+                                    rl: unpacked.rl.unwrap(), 
+                                }
+                            },
+                            _ => { return Instruction::Undefined }
+                        }
+                    },
+                    0b11100 => {
+                        match func3 {
+                            0b010 => {}
+                            0b011 => {}
+                            _ => { return Instruction::Undefined }
+                        }
+                        return Instruction::AmomaxuW {
+                            rd: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rs1.unwrap().into(),
+                            rs2: unpacked.rs2.unwrap().into(),
+                            aq: unpacked.aq.unwrap(),
+                            rl: unpacked.rl.unwrap(), 
+                        }
+                    },
+                    _ => { return Instruction::Undefined }
+                }
+            },
+            0b0000111 => {
+                let func3 = unpacked.func3.unwrap();
+                match func3 {
+                    0b010 => {
+                        return Instruction::Flw {
+                            rd: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rs1.unwrap().into(),
+                            imm: unpacked.imm.unwrap()
+                        }
+                    },
+                    0b011 => {
+                        return Instruction::Fld {
+                            rd: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rs1.unwrap().into(),
+                            imm: unpacked.imm.unwrap()
+                        }
+                    },
+                    0b100 => {
+                        return Instruction::Flq {
+                            rd: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rs1.unwrap().into(),
+                            imm: unpacked.imm.unwrap()
+                        }
+                    }
+                    _ => { return Instruction::Undefined }
+                }
+            },
+            0b0100111 => {
+                let func3 = unpacked.func3.unwrap();
+                match func3 {
+                    0b010 => {
+                        return Instruction::Fsw {
+                            rd: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rs1.unwrap().into(),
+                            rs2: unpacked.rs2.unwrap().into(),
+                            imm: unpacked.imm.unwrap()
+                        }
+                    },
+                    0b011 => {
+                        return Instruction::Fsd {
+                            rd: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rs1.unwrap().into(),
+                            rs2: unpacked.rs2.unwrap().into(),
+                            imm: unpacked.imm.unwrap()
+                        }
+                    },
+                    0b100 => {
+                        return Instruction::Fsq {
+                            rd: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rs1.unwrap().into(),
+                            rs2: unpacked.rs2.unwrap().into(),
+                            imm: unpacked.imm.unwrap()
+                        }
+                    }
+                    _ => { return Instruction::Undefined}
+                }
+            },
+            0b1000011 => {
+                let func2 = unpacked.func2.unwrap();
+                match func2 {
+                    0b00 => {
+                        return Instruction::FmaddS {
+                            rd: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rd.unwrap().into(),
+                            rs2: unpacked.rd.unwrap().into(),
+                            rs3: unpacked.rd.unwrap().into(),
+                            rm: unpacked.rm.unwrap() as u32,
+                        }
+                    },
+                    0b01 => {
+                        return Instruction::FmaddD {
+                            rd: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rd.unwrap().into(),
+                            rs2: unpacked.rd.unwrap().into(),
+                            rs3: unpacked.rd.unwrap().into(),
+                            rm: unpacked.rm.unwrap() as u32,
+                        }
+                    },
+                    0b11 => {
+                        return Instruction::FmaddQ {
+                            rd: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rd.unwrap().into(),
+                            rs2: unpacked.rd.unwrap().into(),
+                            rs3: unpacked.rd.unwrap().into(),
+                            rm: unpacked.rm.unwrap() as u32,
+                        }
+                    },
+                    _ => { return Instruction::Undefined}
+                }
+            },
+            0b1000111 => {
+                let func2 = unpacked.func2.unwrap();
+                match func2 {
+                    0b00 => {
+                        return Instruction::FmsubS {
+                            rd: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rd.unwrap().into(),
+                            rs2: unpacked.rd.unwrap().into(),
+                            rs3: unpacked.rd.unwrap().into(),
+                            rm: unpacked.rm.unwrap() as u32,
+                        }
+                    },
+                    0b01 => {
+                        return Instruction::FmsubD {
+                            rd: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rd.unwrap().into(),
+                            rs2: unpacked.rd.unwrap().into(),
+                            rs3: unpacked.rd.unwrap().into(),
+                            rm: unpacked.rm.unwrap() as u32,
+                        }
+                    },
+                    0b11 => {
+                        return Instruction::FmsubQ {
+                            rd: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rd.unwrap().into(),
+                            rs2: unpacked.rd.unwrap().into(),
+                            rs3: unpacked.rd.unwrap().into(),
+                            rm: unpacked.rm.unwrap() as u32,
+                        }
+                    },
+                    _ => { return Instruction::Undefined}
+                }
+            }
+            0b1001011 => {
+                let func2 = unpacked.func2.unwrap();
+                match func2 {
+                    0b00 => {
+                        return Instruction::FnmsubS {
+                            rd: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rd.unwrap().into(),
+                            rs2: unpacked.rd.unwrap().into(),
+                            rs3: unpacked.rd.unwrap().into(),
+                            rm: unpacked.rm.unwrap() as u32,
+                        }
+                    },
+                    0b01 => {
+                        return Instruction::FnmsubD {
+                            rd: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rd.unwrap().into(),
+                            rs2: unpacked.rd.unwrap().into(),
+                            rs3: unpacked.rd.unwrap().into(),
+                            rm: unpacked.rm.unwrap() as u32,
+                        }
+                    },
+                    0b11 => {
+                        return Instruction::FnmsubQ {
+                            rd: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rd.unwrap().into(),
+                            rs2: unpacked.rd.unwrap().into(),
+                            rs3: unpacked.rd.unwrap().into(),
+                            rm: unpacked.rm.unwrap() as u32,
+                        }
+                    },
+                    _ => { return Instruction::Undefined }
+                }
+            },
+            0b1001111 => {
+                let func2 = unpacked.func2.unwrap();
+                match func2 {
+                    0b00 => {
+                        return Instruction::FnmaddS {
+                            rd: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rd.unwrap().into(),
+                            rs2: unpacked.rd.unwrap().into(),
+                            rs3: unpacked.rd.unwrap().into(),
+                            rm: unpacked.rm.unwrap() as u32,
+                        }
+                    },
+                    0b01 => {
+                        return Instruction::FnmaddD {
+                            rd: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rd.unwrap().into(),
+                            rs2: unpacked.rd.unwrap().into(),
+                            rs3: unpacked.rd.unwrap().into(),
+                            rm: unpacked.rm.unwrap() as u32,
+                        }
+                    },
+                    0b11 => {
+                        return Instruction::FnmaddQ {
+                            rd: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rd.unwrap().into(),
+                            rs2: unpacked.rd.unwrap().into(),
+                            rs3: unpacked.rd.unwrap().into(),
+                            rm: unpacked.rm.unwrap() as u32,
+                        }
+                    },
+                    _ => { return Instruction::Undefined }
+                }
+            },
+            0b1010011 => {
+                let func7 = unpacked.func7.unwrap();
+                let func3 = unpacked.func3.unwrap();
+                match func7 {
+                    0b0000000 => {
+                        return Instruction::FaddS {
+                            rd: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rs1.unwrap().into(),
+                            rs2: unpacked.rs2.unwrap().into(),
+                            rm: unpacked.rm.unwrap() as u32
+                        }
+                    },
+                    0b0000001 => {
+                        return Instruction::FaddD {
+                            rd: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rs1.unwrap().into(),
+                            rs2: unpacked.rs2.unwrap().into(),
+                            rm: unpacked.rm.unwrap() as u32                            
+                        }
+                    },
+                    0b0000011 => {
+                        return Instruction::FaddQ {
+                            rd: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rs1.unwrap().into(),
+                            rs2: unpacked.rs2.unwrap().into(),
+                            rm: unpacked.rm.unwrap() as u32                            
+                        }
+                    },
+                    0b0000100 => {
+                        return Instruction::FsubS {
+                            rd: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rs1.unwrap().into(),
+                            rs2: unpacked.rs2.unwrap().into(),
+                            rm: unpacked.rm.unwrap() as u32
+                        }
+                    },
+                    0b0000101 => {
+                        return Instruction::FsubD {
+                            rd: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rs1.unwrap().into(),
+                            rs2: unpacked.rs2.unwrap().into(),
+                            rm: unpacked.rm.unwrap() as u32
+                        }
+                    },
+                    0b0000111 => {
+                        return Instruction::FsubQ {
+                            rd: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rs1.unwrap().into(),
+                            rs2: unpacked.rs2.unwrap().into(),
+                            rm: unpacked.rm.unwrap() as u32
+                        }
+                    },
+                    0b0001000 => {
+                        return Instruction::FmulS {
+                            rd: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rs1.unwrap().into(),
+                            rs2: unpacked.rs2.unwrap().into(),
+                            rm: unpacked.rm.unwrap() as u32
+                        }
+                    },
+                    0b0001001 => {
+                        return Instruction::FmulD {
+                            rd: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rs1.unwrap().into(),
+                            rs2: unpacked.rs2.unwrap().into(),
+                            rm: unpacked.rm.unwrap() as u32
+                        }
+                    },
+                    0b0001011 => {
+                        return Instruction::FmulQ {
+                            rd: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rs1.unwrap().into(),
+                            rs2: unpacked.rs2.unwrap().into(),
+                            rm: unpacked.rm.unwrap() as u32
+                        }
+                    },
+                    0b0001100 => {
+                        return Instruction::FdivS {
+                            rd: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rs1.unwrap().into(),
+                            rs2: unpacked.rs2.unwrap().into(),
+                            rm: unpacked.rm.unwrap() as u32
+                        }
+                    },
+                    0b0001101 => {
+                        return Instruction::FdivD {
+                            rd: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rs1.unwrap().into(),
+                            rs2: unpacked.rs2.unwrap().into(),
+                            rm: unpacked.rm.unwrap() as u32
+                        }
+                    },
+                    0b0001111 => {
+                        return Instruction::FdivQ {
+                            rd: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rs1.unwrap().into(),
+                            rs2: unpacked.rs2.unwrap().into(),
+                            rm: unpacked.rm.unwrap() as u32
+                        }
+                    },
+                    0b0101100 => {
+                        let func5 = unpacked.rs2.unwrap();
+                        match func5 {
+                            0b00000 => {
+                                return Instruction::FsqrtS {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rm: unpacked.rm.unwrap() as u32
+                                }
+                            },
+                            _ => { return Instruction::Undefined }
+                        }
+                    },
+                    0b0010000 => {
+                        match func3 {
+                            0b000 => {
+                                return Instruction::FsgnjS {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                }
+                            },
+                            0b001 => {
+                                return Instruction::FsgnjnS {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                }
+                            },
+                            0b010 => {
+                                return Instruction::FsgnjxS {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                }
+                            }
+                            _ => { return Instruction::Undefined }
+                        }
+                    },
+                    0b0010100 => {
+                        match func3 {
+                            0b000 => {
+                                return Instruction::FminS {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                }
+                            },
+                            0b001 => {
+                                return Instruction::FmaxS {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                }
+                            }
+                            _ => { return Instruction::Undefined }
+                        }
+                    },
+                    0b1100000 => {
+                        let func5 = unpacked.rs2.unwrap();
+                        match func5 {
+                            0b00000 => {
+                                return Instruction::FcvtWS {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rm: unpacked.rm.unwrap() as u32
+                                }
+                            },
+                            0b00001 => {
+                                return Instruction::FcvtWUS {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rm: unpacked.rm.unwrap() as u32
+                                }
+                            },
+                            0b00010 => {
+                                return Instruction::FcvtLS {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rm: unpacked.rm.unwrap() as u32,
+                                }
+                            },
+                            0b00011 => {
+                                return Instruction::FcvtLUS {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rm: unpacked.rm.unwrap() as u32,
+                                }
+                            },
+                            _ => { return Instruction::Undefined }
+                        }
+                    },
+                    0b1110000 => {
+                        let func3 = unpacked.func3.unwrap();
+                        let func5 = unpacked.rs2.unwrap();
+                        match func3 {
+                            0b000 => {
+                                match func5 {
+                                    0b00000 => {
+                                        return Instruction::FmvXW {
+                                            rd: unpacked.rd.unwrap().into(),
+                                            rs1: unpacked.rs1.unwrap().into(),
+                                        }
+                                    },
+                                    _ => { return Instruction::Undefined }
+                                }
+                            },
+                            0b001 => {
+                                match func5 {
+                                    0b00000 => {
+                                        return Instruction::FclassS {
+                                            rd: unpacked.rd.unwrap().into(),
+                                            rs1: unpacked.rs1.unwrap().into(),
+                                        }
+                                    },
+                                    _ => { return Instruction::Undefined }
+                                }
+                            }
+                            _ => { return Instruction::Undefined }
+                        }
+                    },
+                    0b1010000 => {
+                        let func3 = unpacked.func3.unwrap();
+                        match func3 {
+                            0b000 => {
+                                return Instruction::FleS {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into()
+                                }
+                            },
+                            0b010 => {
+                                return Instruction::FeqS {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into()
+                                }
+                            },
+                            0b001 => {
+                                return Instruction::FltS {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into()                                    
+                                }
+                            },
+                            _ => { return Instruction::Undefined }
+                        }
+                    },
+                    0b1101000 => {
+                        let func5 = unpacked.rs2.unwrap();
+                        match func5 {
+                            0b00000 => {
+                                return Instruction::FcvtSW {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rm: unpacked.rm.unwrap() as u32,
+                                }
+                            },
+                            0b00001 => {
+                                return Instruction::FcvtSWU {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rm: unpacked.rm.unwrap() as u32,                                    
+                                }
+                            },
+                            0b00010 => {
+                                return Instruction::FcvtSL {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rm: unpacked.rm.unwrap() as u32,
+                                }
+                            },
+                            0b00011 => {
+                                return Instruction::FcvtSLU {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rm: unpacked.rm.unwrap() as u32,
+                                }
+                            },
+                            _ => { return Instruction::Undefined }
+                        }
+                    },
+                    0b1111000 => {
+                        let func3 = unpacked.func3.unwrap();
+                        let func5 = unpacked.rs2.unwrap();
+                        match func3 {
+                            0b000 => {
+                                match func5 {
+                                    0b00000 => {
+                                        return Instruction::FmvWX {
+                                            rd: unpacked.rd.unwrap().into(),
+                                            rs1: unpacked.rs1.unwrap().into(),
+                                        }
+                                    },
+                                    _ => { return Instruction::Undefined }
+                                }
+                            },
+                            _ => { return Instruction::Undefined }
+                        }
+                    },
+                    0b0101101 => {
+                        let func5 = unpacked.rs2.unwrap();
+                        match func5 {
+                            0b00000 => {
+                                return Instruction::FsqrtD {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rm: unpacked.rm.unwrap() as u32,
+                                }
+                            },
+                            _ => { return Instruction::Undefined }
+                        }
+                    },
+                    0b0010001 => {
+                        let func3 = unpacked.func3.unwrap();
+                        match func3 {
+                            0b000 => {
+                                return Instruction::FsgnjD {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                }
+                            },
+                            0b001 => {
+                                return Instruction::FsgnjnD {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                }
+                            },
+                            0b010 => {
+                                return Instruction::FsgnjxD {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                }
+                            },
+                            _ => { return Instruction::Undefined }
+                        }
+                    },
+                    0b0010101 => {
+                        let func3 = unpacked.func3.unwrap();
+                        match func3 {
+                            0b000 => {
+                                return Instruction::FminD {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into()
+                                }
+                            },
+                            0b001 => {
+                                return Instruction::FmaxD {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into()
+                                }
+                            },
+                            _ => { Instruction::Undefined }
+                        }
+                    },
+                    0b0100000 => {
+                        let func5 = unpacked.rs2.unwrap();
+                        match func5 {
+                            0b00001 => {
+                                return Instruction::FcvtSD {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rm: unpacked.rm.unwrap() as u32,
+                                }
+                            },
+                            0b00000 => {
+                                return Instruction::FcvtDS {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rm: unpacked.rm.unwrap() as u32,
+                                }
+                            },
+                            0b00011 => {
+                                return Instruction::FcvtSQ {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rm: unpacked.rm.unwrap() as u32,                                    
+                                }
+                            }
+                            _ => { Instruction::Undefined }
+                        }
+                    },
+                    0b1010001 => {
+                        let func3 = unpacked.func3.unwrap();
+                        match func3 {
+                            0b010 => {
+                                return Instruction::FeqD {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into()
+                                }
+                            },
+                            0b001 => {
+                                return Instruction::FltD {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into()
+                                }
+                            },
+                            0b000 => {
+                                return Instruction::FleD {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into()
+                                }
+                            },
+                            _ => { Instruction::Undefined }
+                        }
+                    },
+                    0b1110001 => {
+                        let func3 = unpacked.func3.unwrap();
+                        let func5 = unpacked.rs2.unwrap();
+                        match func3 {
+                            0b001 => {
+                                match func5 {
+                                    0b00000 => {
+                                        return Instruction::FclassD {
+                                            rd: unpacked.rd.unwrap().into(),
+                                            rs1: unpacked.rs1.unwrap().into()
+                                        }
+                                    },
+                                    _ => { return Instruction::Undefined }
+                                }
+                            },
+                            0b000 => {
+                                match func5 {
+                                    0b00000 => {
+                                        return Instruction::FmvXD {
+                                            rd: unpacked.rd.unwrap().into(),
+                                            rs1: unpacked.rs1.unwrap().into()
+                                        }
+                                    },
+                                    _ => { return Instruction::Undefined }
+                                }
+                            },
+                            _ => { Instruction::Undefined }
+                        }
+                    },
+                    0b1100001 => {
+                        let func5 = unpacked.rs2.unwrap();
+                        match func5 {
+                            0b00000 => {
+                                return Instruction::FcvtWD {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rm: unpacked.rm.unwrap() as u32,
+                                }
+                            },
+                            0b00001 => {
+                                return Instruction::FcvtWUD {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rm: unpacked.rm.unwrap() as u32,
+                                }
+                            },
+                            0b00010 => {
+                                return Instruction::FcvtLD {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rm: unpacked.rm.unwrap() as u32,
+                                }
+                            },
+                            0b00011 => {
+                                return Instruction::FcvtLUD {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rm: unpacked.rm.unwrap() as u32,
+                                }
+                            },
+                            _ => { Instruction::Undefined }
+                        }
+                    },
+                    0b1101001 => {
+                        let func5 = unpacked.rs2.unwrap();
+                        match func5 {
+                            0b00000 => {
+                                return Instruction::FcvtDW {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rm: unpacked.rm.unwrap() as u32,
+                                }
+                            },
+                            0b00001 => {
+                                return Instruction::FcvtDWU {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rm: unpacked.rm.unwrap() as u32,
+                                }
+                            },
+                            0b00010 => {
+                                return Instruction::FcvtDL {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rm: unpacked.rm.unwrap() as u32,
+                                }
+                            },
+                            0b00011 => {
+                                return Instruction::FcvtDLU {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rm: unpacked.rm.unwrap() as u32,
+                                }
+                            },
+                            _ => { Instruction::Undefined }
+                        }
+                    },
+                    0b1111001 => {
+                        let func5 = unpacked.rs2.unwrap();
+                        let func3 = unpacked.func3.unwrap();
+                        match func3 {
+                            0b000 => {
+                                match func5 {
+                                    0b00000 => {
+                                        return Instruction::FmvDX {
+                                            rd: unpacked.rd.unwrap().into(),
+                                            rs1: unpacked.rs1.unwrap().into()
+                                        }
+                                    }
+                                    _ => { return Instruction::Undefined }
+                                }
+                            },
+                            _ => { Instruction::Undefined }
+                        }
+                    },
+                    0b0101111 => {
+                        let func5 = unpacked.rs2.unwrap();
+                        match func5 {
+                            0b00000 => {
+                                return Instruction::FsqrtQ {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rm: unpacked.rm.unwrap() as u32,
+                                }
+                            },
+                            _ => { return Instruction::Undefined }
+                        }
+                    },
+                    0b0010011 => {
+                        let func3 = unpacked.func3.unwrap();
+                        match func3 {
+                            0b000 => {
+                                return Instruction::FsgnjQ {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+
+                                }
+                            },
+                            0b001 => {
+                                return Instruction::FsgnjnQ {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+
+                                }
+                            },
+                            0b010 => {
+                                return Instruction::FsgnjxQ {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+
+                                }
+                            },
+                            _ => { return Instruction::Undefined }
+                        }
+                    },
+                    0b0010111 => {
+                        let func3 = unpacked.func3.unwrap();
+                        match func3 {
+                            0b000 => {
+                                return Instruction::FminQ {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                }
+                            },
+                            0b001 => {
+                                return Instruction::FmaxQ {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                }
+                            },
+                            _ => { return Instruction::Undefined }
+                        }
+                    },
+                    0b0100011 => {
+                        let func5 = unpacked.rs2.unwrap();
+                        match func5 {
+                            0b00000 => {
+                                return Instruction::FcvtQS {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rm: unpacked.rm.unwrap() as u32,
+                                }
+                            },
+                            0b00001 => {
+                                return Instruction::FcvtQD {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rm: unpacked.rm.unwrap() as u32,
+                                }
+                            }
+                            _ => { return Instruction::Undefined }
+                        }
+                    },
+                    0b0100001 => {
+                        let func5 = unpacked.rs2.unwrap();
+                        match func5 {
+                            0b00011 => {
+                                return Instruction::FcvtDQ {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rm: unpacked.rm.unwrap() as u32,
+                                }
+                            },
+                            _ => { return Instruction::Undefined }
+                        }
+                    },
+                    0b1010011 => {
+                        let func3 = unpacked.func3.unwrap();
+                        match func3 {
+                            0b010 => {
+                                return Instruction::FeqQ {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                }
+                            },
+                            0b001 => {
+                                return Instruction::FltQ{
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),                                    
+                                }
+                            },
+                            0b000 => {
+                                return Instruction::FleQ {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                }
+                            },
+                            _ => { return Instruction::Undefined }
+                        }
+                    },
+                    0b1110011 => {
+                        let func5 = unpacked.rs2.unwrap();
+                        let func3 = unpacked.func3.unwrap();
+                        match func3 {
+                            0b001 => {
+                                match func5 {
+                                    0b00000 => {
+                                        return Instruction::FclassQ {
+                                            rd: unpacked.rd.unwrap().into(),
+                                            rs1: unpacked.rs1.unwrap().into(),
+                                        }
+                                    },
+                                    _ => { return Instruction::Undefined }
+                                }
+                            },
+                            _ => { return Instruction::Undefined }
+                        }
+                    },
+                    0b1100011 => {
+                        let func5 = unpacked.rs2.unwrap();
+                        match func5 {
+                            0b00000 => {
+                                return Instruction::FcvtWQ {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rm: unpacked.rm.unwrap() as u32,
+                                }
+                            },
+                            0b00001 => {
+                                return Instruction::FcvtWUQ {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rm: unpacked.rm.unwrap() as u32,
+                                }
+                            },
+                            0b00010 => {
+                                return Instruction::FcvtLQ {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rm: unpacked.rm.unwrap() as u32,
+                                }
+                            },
+                            0b00011 => {
+                                return Instruction::FcvtLUQ {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rm: unpacked.rm.unwrap() as u32,
+                                }
+                            }
+                            _ => { return Instruction::Undefined }
+                        }
+                    },
+                    0b1101011 => {
+                        let func5 = unpacked.rs2.unwrap();
+                        match func5 {
+                            0b00000 => {
+                                return Instruction::FcvtQW {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rm: unpacked.rm.unwrap() as u32,
+                                }
+                            },
+                            0b00001 => {
+                                return Instruction::FcvtQWU {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rm: unpacked.rm.unwrap() as u32,
+                                }
+                            },
+                            0b00010 => {
+                                return Instruction::FcvtQL {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rm: unpacked.rm.unwrap() as u32,
+                                }
+                            },
+                            0b00011 => {
+                                return Instruction::FcvtQLU {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rm: unpacked.rm.unwrap() as u32,
+                                }
+                            }
+                            _ => { return Instruction::Undefined }
+                        }
+                    },
+                    
+                    _ => { return Instruction::Undefined }
+                }
+            },
+
             _ => return Instruction::Undefined,
         }
     }
