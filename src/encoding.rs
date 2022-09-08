@@ -330,6 +330,7 @@ impl From<Inst> for Unpacked {
                 unpacked.uimm = Some(uimm);
                 unpacked.aq = Some(aq);
                 unpacked.rl = Some(rl);
+                unpacked.rm = Some(rm);
                 return unpacked
             },
             OpCodeType::I => {
@@ -393,7 +394,17 @@ impl From<Inst> for Unpacked {
                 unpacked.imm = Some(imm);
                 return unpacked
             },
-            OpCodeType::R4 => Unpacked::default(),
+            OpCodeType::R4 => {
+                let mut unpacked = Unpacked::default();
+                unpacked.rd = Some(rd);
+                unpacked.rs3 = Some(rs3);
+                unpacked.func2 = Some(func2);
+                unpacked.rs2 = Some(rs2);
+                unpacked.rs1 = Some(rs1);
+                unpacked.rm = Some(rm);
+                unpacked.opcode = opcode;
+                return unpacked
+            },
             OpCodeType::Invalid => Unpacked::default()
         }
     }

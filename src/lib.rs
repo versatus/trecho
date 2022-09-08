@@ -20,7 +20,6 @@ mod tests {
 
         match reg {
             Register::X0 => {
-                println!("Matched Register 0");
                 assert!(true);
             }
             _ => {
@@ -308,7 +307,6 @@ mod tests {
     fn test_convert_valid_lbu_bits_into_instruction() {
         let bits: Inst = 0b1100_1100_1100_1010_1100_0101_1000_0011 as u32;
         let instruction: Instruction = bits.into();
-        // println!("{:?}", instruction);
         assert_eq!(
             instruction,
             Instruction::Lbu {
@@ -339,7 +337,6 @@ mod tests {
     fn test_convert_valid_sb_bits_into_instruction() {
         let bits: Inst = 0b1100_1100_1100_1010_1000_0101_1010_0011 as u32;
         let instruction: Instruction = bits.into();
-        // println!("{:?}", instruction);
         assert_eq!(
             instruction,
             Instruction::Sb {
@@ -925,9 +922,9 @@ mod tests {
                 func3: 1
             }
         );
-    }    
+    }
 
-    #[test]    
+    #[test]
     fn test_convert_valid_csrrs_bits_into_instruction() {
         let bits: Inst = 0b1010_1010_1100_1010_1010_0101_1111_0011 as u32;
         let instruction: Instruction = bits.into();
@@ -954,10 +951,10 @@ mod tests {
                 csr: 2732,
                 func3: 3
             }
-        );        
+        );
     }
 
-    #[test]    
+    #[test]
     fn test_convert_valid_csrrwi_bits_into_instruction() {
         let bits: Inst = 0b1010_1010_1100_1010_1101_0101_1111_0011 as u32;
         let instruction: Instruction = bits.into();
@@ -969,7 +966,7 @@ mod tests {
                 csr: 2732,
                 func3: 5
             }
-        );        
+        );
     }
 
     #[test]
@@ -1001,12 +998,10 @@ mod tests {
             }
         );
     }
-    
     #[test]
     fn test_convert_valid_mul_bits_into_instruction() {
         let bits: Inst = 0b0000_0010_1100_1010_1000_0101_1011_0011 as u32;
         let instruction: Instruction = bits.into();
-        // println!("{:?}", instruction);
         assert_eq!(
             instruction,
             Instruction::Mul {
@@ -1016,14 +1011,12 @@ mod tests {
                 func3: 0,
                 func7: 1
             }
-        );        
+        );
     }
-    
     #[test]
     fn test_convert_valid_mulh_bits_into_instruction() {
         let bits: Inst = 0b0000_0010_1100_1010_1001_0101_1011_0011 as u32;
         let instruction: Instruction = bits.into();
-        // println!("{:?}", instruction);
         assert_eq!(
             instruction,
             Instruction::Mulh {
@@ -1033,14 +1026,12 @@ mod tests {
                 func3: 1,
                 func7: 1
             }
-        );        
+        );
     }
-    
     #[test]
     fn test_convert_valid_mulhsu_bits_into_instruction() {
         let bits: Inst = 0b0000_0010_1100_1010_1010_0101_1011_0011 as u32;
         let instruction: Instruction = bits.into();
-        // println!("{:?}", instruction);
         assert_eq!(
             instruction,
             Instruction::Mulhsu {
@@ -1050,14 +1041,12 @@ mod tests {
                 func3: 2,
                 func7: 1
             }
-        );        
+        );
     }
-    
     #[test]
     fn test_convert_valid_mulhu_bits_into_instruction() {
         let bits: Inst = 0b0000_0010_1100_1010_1011_0101_1011_0011 as u32;
         let instruction: Instruction = bits.into();
-        // println!("{:?}", instruction);
         assert_eq!(
             instruction,
             Instruction::Mulhu {
@@ -1067,14 +1056,12 @@ mod tests {
                 func3: 3,
                 func7: 1
             }
-        );        
+        );
     }
-    
     #[test]
     fn test_convert_valid_div_bits_into_instruction() {
         let bits: Inst = 0b0000_0010_1100_1010_1100_0101_1011_0011 as u32;
         let instruction: Instruction = bits.into();
-        // println!("{:?}", instruction);
         assert_eq!(
             instruction,
             Instruction::Div {
@@ -1084,14 +1071,12 @@ mod tests {
                 func3: 4,
                 func7: 1
             }
-        );        
+        );
     }
-    
     #[test]
     fn test_convert_valid_divu_bits_into_instruction() {
         let bits: Inst = 0b0000_0010_1100_1010_1101_0101_1011_0011 as u32;
         let instruction: Instruction = bits.into();
-        // println!("{:?}", instruction);
         assert_eq!(
             instruction,
             Instruction::Divu {
@@ -1101,14 +1086,12 @@ mod tests {
                 func3: 5,
                 func7: 1
             }
-        );    
+        );
     }
-    
     #[test]
     fn test_convert_valid_rem_bits_into_instruction() {
         let bits: Inst = 0b0000_0010_1100_1010_1110_0101_1011_0011 as u32;
         let instruction: Instruction = bits.into();
-        // println!("{:?}", instruction);
         assert_eq!(
             instruction,
             Instruction::Rem {
@@ -1118,14 +1101,12 @@ mod tests {
                 func3: 6,
                 func7: 1
             }
-        );    
+        );
     }
-    
     #[test]
     fn test_convert_valid_remu_bits_into_instruction() {
         let bits: Inst = 0b0000_0010_1100_1010_1111_0101_1011_0011 as u32;
         let instruction: Instruction = bits.into();
-        // println!("{:?}", instruction);
         assert_eq!(
             instruction,
             Instruction::Remu {
@@ -1137,12 +1118,10 @@ mod tests {
             }
         );
     }
-    
     #[test]
     fn test_convert_valid_mulw_bits_into_instruction() {
         let bits: Inst = 0b0000_0010_1100_1010_1000_0101_1011_1011 as u32;
         let instruction: Instruction = bits.into();
-        // println!("{:?}", instruction);
         assert_eq!(
             instruction,
             Instruction::Mulw {
@@ -1154,12 +1133,10 @@ mod tests {
             }
         );
     }
-    
     #[test]
     fn test_convert_valid_divw_bits_into_instruction() {
         let bits: Inst = 0b0000_0010_1100_1010_1100_0101_1011_1011 as u32;
         let instruction: Instruction = bits.into();
-        // println!("{:?}", instruction);
         assert_eq!(
             instruction,
             Instruction::Divw {
@@ -1171,12 +1148,10 @@ mod tests {
             }
         );
     }
-    
     #[test]
     fn test_convert_valid_divuw_bits_into_instruction() {
         let bits: Inst = 0b0000_0010_1100_1010_1101_0101_1011_1011 as u32;
         let instruction: Instruction = bits.into();
-        // println!("{:?}", instruction);
         assert_eq!(
             instruction,
             Instruction::Divuw {
@@ -1188,12 +1163,10 @@ mod tests {
             }
         );
     }
-    
     #[test]
     fn test_convert_valid_remw_bits_into_instruction() {
         let bits: Inst = 0b0000_0010_1100_1010_1110_0101_1011_1011 as u32;
         let instruction: Instruction = bits.into();
-        // println!("{:?}", instruction);
         assert_eq!(
             instruction,
             Instruction::Remw {
@@ -1205,12 +1178,10 @@ mod tests {
             }
         );
     }
-    
     #[test]
     fn test_convert_valid_remuw_bits_into_instruction() {
         let bits: Inst = 0b0000_0010_1100_1010_1111_0101_1011_1011 as u32;
         let instruction: Instruction = bits.into();
-        // println!("{:?}", instruction);
         assert_eq!(
             instruction,
             Instruction::RemuW {
@@ -1235,70 +1206,1667 @@ mod tests {
                 aq: 1,
                 rl: 0
             }
-        );        
+        );
     }
 
     #[test]
-    fn test_convert_valid_scw_bits_into_instruction() {}
+    fn test_convert_valid_scw_bits_into_instruction() {
+        let bits: Inst = 0b0001_1010_0000_0101_0010_0011_0010_1111;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::ScW {
+                rd: Register::X6,
+                rs1: Register::X10,
+                rs2: Register::X0,
+                aq: 0,
+                rl: 1
+            }
+        )
+    }
 
     #[test]
-    fn test_convert_valid_amoswapw_bits_into_instruction() {}
+    fn test_convert_valid_amoswapw_bits_into_instruction() {
+        let bits: Inst = 0b0000_1010_0000_0101_0010_0011_0010_1111;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::AmoswapW {
+                rd: Register::X6,
+                rs1: Register::X10,
+                rs2: Register::X0,
+                aq: 0,
+                rl: 1
+            }
+        )
+    }
 
     #[test]
-    fn test_convert_valid_amoaddw_bits_into_instruction() {}
+    fn test_convert_valid_amoaddw_bits_into_instruction() {
+        let bits: Inst = 0b0000_0010_0000_0101_0010_0011_0010_1111;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::AmoaddW {
+                rd: Register::X6,
+                rs1: Register::X10,
+                rs2: Register::X0,
+                aq: 0,
+                rl: 1
+            }
+        )
+    }
 
     #[test]
-    fn test_convert_valid_amoxorw_bits_into_instruction() {}
+    fn test_convert_valid_amoxorw_bits_into_instruction() {
+        let bits: Inst = 0b0010_0010_0000_0101_0010_0011_0010_1111;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::AmoxorW {
+                rd: Register::X6,
+                rs1: Register::X10,
+                rs2: Register::X0,
+                aq: 0,
+                rl: 1
+            }
+        )
+    }
 
     #[test]
-    fn test_convert_valid_amoandw_bits_into_instruction() {}
+    fn test_convert_valid_amoandw_bits_into_instruction() {
+        let bits: Inst = 0b0110_0010_0000_0101_0010_0011_0010_1111;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::AmoandW {
+                rd: Register::X6,
+                rs1: Register::X10,
+                rs2: Register::X0,
+                aq: 0,
+                rl: 1
+            }
+        )
+    }
 
     #[test]
-    fn test_convert_valid_amoorw_bits_into_instruction() {}
+    fn test_convert_valid_amoorw_bits_into_instruction() {
+        let bits: Inst = 0b0100_0010_0000_0101_0010_0011_0010_1111;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::AmoorW {
+                rd: Register::X6,
+                rs1: Register::X10,
+                rs2: Register::X0,
+                aq: 0,
+                rl: 1
+            }
+        )
+    }
 
     #[test]
-    fn test_convert_valid_amominw_bits_into_instruction() {}    
+    fn test_convert_valid_amominw_bits_into_instruction() {
+        let bits: Inst = 0b1000_0010_0000_0101_0010_0011_0010_1111;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::AmominW {
+                rd: Register::X6,
+                rs1: Register::X10,
+                rs2: Register::X0,
+                aq: 0,
+                rl: 1
+            }
+        )
+    }
 
     #[test]
-    fn test_convert_valid_amomaxw_bits_into_instruction() {}
+    fn test_convert_valid_amomaxw_bits_into_instruction() {
+        let bits: Inst = 0b1010_0010_0000_0101_0010_0011_0010_1111;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::AmomaxW {
+                rd: Register::X6,
+                rs1: Register::X10,
+                rs2: Register::X0,
+                aq: 0,
+                rl: 1
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_amominuw_bits_into_instruction() {
+        let bits: Inst = 0b1100_0010_0000_0101_0010_0011_0010_1111;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::AmominuW {
+                rd: Register::X6,
+                rs1: Register::X10,
+                rs2: Register::X0,
+                aq: 0,
+                rl: 1
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_amomaxuw_bits_into_instruction() {
+        let bits: Inst = 0b1110_0010_0000_0101_0010_0011_0010_1111;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::AmomaxuW {
+                rd: Register::X6,
+                rs1: Register::X10,
+                rs2: Register::X0,
+                aq: 0,
+                rl: 1
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_lrd_bits_into_instruction() {
+        let bits: Inst = 0b0001_0100_0000_0101_0011_0110_0010_1111 as u32;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::LrD {
+                rd: Register::X12,
+                rs1: Register::X10,
+                aq: 1,
+                rl: 0
+            }
+        );
+    }
+    #[test]
+    fn test_convert_valid_scd_bits_into_instruction() {
+        let bits: Inst = 0b0001_1010_0000_0101_0011_0011_0010_1111;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::ScD {
+                rd: Register::X6,
+                rs1: Register::X10,
+                rs2: Register::X0,
+                aq: 0,
+                rl: 1
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_amoswapd_bits_into_instruction() {
+        let bits: Inst = 0b0000_1010_0000_0101_0011_0011_0010_1111;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::AmoswapD {
+                rd: Register::X6,
+                rs1: Register::X10,
+                rs2: Register::X0,
+                aq: 0,
+                rl: 1
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_amoaddd_bits_into_instruction() {
+        let bits: Inst = 0b0000_0010_0000_0101_0011_0011_0010_1111;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::AmoaddD {
+                rd: Register::X6,
+                rs1: Register::X10,
+                rs2: Register::X0,
+                aq: 0,
+                rl: 1
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_amoxord_bits_into_instruction() {
+        let bits: Inst = 0b0010_0010_0000_0101_0011_0011_0010_1111;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::AmoxorD {
+                rd: Register::X6,
+                rs1: Register::X10,
+                rs2: Register::X0,
+                aq: 0,
+                rl: 1
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_amoandd_bits_into_instruction() {
+        let bits: Inst = 0b0110_0010_0000_0101_0011_0011_0010_1111;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::AmoandD {
+                rd: Register::X6,
+                rs1: Register::X10,
+                rs2: Register::X0,
+                aq: 0,
+                rl: 1
+            }
+        )
+    }
+    #[test]
+    fn test_convert_valid_amoord_bits_into_instruction() {
+        let bits: Inst = 0b0100_0010_0000_0101_0011_0011_0010_1111;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::AmoorD {
+                rd: Register::X6,
+                rs1: Register::X10,
+                rs2: Register::X0,
+                aq: 0,
+                rl: 1
+            }
+        )
+    }
+    #[test]
+    fn test_convert_valid_amomind_bits_into_instruction() {
+        let bits: Inst = 0b1000_0010_0000_0101_0011_0011_0010_1111;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::AmominD {
+                rd: Register::X6,
+                rs1: Register::X10,
+                rs2: Register::X0,
+                aq: 0,
+                rl: 1
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_amomaxd_bits_into_instruction() {
+        let bits: Inst = 0b1010_0010_0000_0101_0011_0011_0010_1111;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::AmomaxD {
+                rd: Register::X6,
+                rs1: Register::X10,
+                rs2: Register::X0,
+                aq: 0,
+                rl: 1
+            }
+        )
+    }
     
     #[test]
-    fn test_convert_valid_amominuw_bits_into_instruction() {}
+    fn test_convert_valid_amominud_bits_into_instruction() {
+        let bits: Inst = 0b1100_0010_0000_0101_0011_0011_0010_1111;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::AmominuD {
+                rd: Register::X6,
+                rs1: Register::X10,
+                rs2: Register::X0,
+                aq: 0,
+                rl: 1
+            }
+        )
+    }
 
     #[test]
-    fn test_convert_valid_amomaxuw_bits_into_instruction() {}
+    fn test_convert_valid_amomaxud_bits_into_instruction() {
+        let bits: Inst = 0b1110_0010_0000_0101_0011_0011_0010_1111;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::AmomaxuD {
+                rd: Register::X6,
+                rs1: Register::X10,
+                rs2: Register::X0,
+                aq: 0,
+                rl: 1
+            }
+        )
+    }
 
     #[test]
-    fn test_convert_valid_lrd_bits_into_instruction() {}
-    
-    #[test]
-    fn test_convert_valid_scd_bits_into_instruction() {}
+    fn test_convert_valid_flw_bits_into_instruction() {
+        let bits: Inst = 0b0101_1011_1000_0101_0010_0011_0000_0111;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::Flw {
+                rd: Register::X6,
+                rs1: Register::X10,
+                imm: 1464
+            }
+        )
+    }
 
     #[test]
-    fn test_convert_valid_amoswapd_bits_into_instruction() {}
+    fn test_convert_valid_fsw_bits_into_instruction() {
+        let bits: Inst = 0b0101_1011_1000_0101_0010_0011_0010_0111;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::Fsw {
+                rs1: Register::X10,
+                rs2: Register::X24,
+                imm: 1446
+            }
+        )
+    }
 
     #[test]
-    fn test_convert_valid_amoaddd_bits_into_instruction() {}
+    fn test_convert_valid_fmadds_bits_into_instruction() {
+        let bits: Inst = 0b0101_0000_0110_1100_1010_1110_1100_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FmaddS {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rs2: Register::X6,
+                rs3: Register::X10,
+                rm: 2
+            }
+        )
+    }
 
     #[test]
-    fn test_convert_valid_amoxord_bits_into_instruction() {}    
+    fn test_convert_valid_fmsubs_bits_into_instruction() {
+        let bits: Inst = 0b0101_0000_0110_1100_1010_1110_1100_0111;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FmsubS {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rs2: Register::X6,
+                rs3: Register::X10,
+                rm: 2
+            }
+        )
+    }
 
     #[test]
-    fn test_convert_valid_amoandd_bits_into_instruction() {}    
-    
-    #[test]
-    fn test_convert_valid_amoord_bits_into_instruction() {}    
-    
-    #[test]
-    fn test_convert_valid_amomind_bits_into_instruction() {}    
-    
-    #[test]
-    fn test_convert_valid_amomaxd_bits_into_instruction() {}    
-    
-    #[test]
-    fn test_convert_valid_amominud_bits_into_instruction() {}                        
+    fn test_convert_valid_fnmsubs_bits_into_instruction() {
+        let bits: Inst = 0b0101_0000_0110_1100_1010_1110_1100_1011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FnmsubS {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rs2: Register::X6,
+                rs3: Register::X10,
+                rm: 2
+            }
+        )
+    }
 
     #[test]
-    fn test_convert_valid_amomaxud_bits_into_instruction() {}                        
+    fn test_convert_valid_fnmadds_bits_into_instruction() {
+        let bits: Inst = 0b0101_0000_0110_1100_1010_1110_1100_1111;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FnmaddS {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rs2: Register::X6,
+                rs3: Register::X10,
+                rm: 2
+            }
+        )
+    }
 
+    #[test]
+    fn test_convert_valid_fadds_bits_into_instruction() {
+        let bits: Inst = 0b0000_0000_0110_1100_1010_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FaddS {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rs2: Register::X6,
+                rm: 2
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fsubs_bits_into_instruction() {
+        let bits: Inst = 0b0000_1000_0110_1100_1010_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FsubS {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rs2: Register::X6,
+                rm: 2
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fmuls_bits_into_instruction() {
+        let bits: Inst = 0b0001_0000_0110_1100_1010_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FmulS {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rs2: Register::X6,
+                rm: 2
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fdivs_bits_into_instruction() {
+        let bits: Inst = 0b0001_1000_0110_1100_1010_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FdivS {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rs2: Register::X6,
+                rm: 2
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fsqrts_bits_into_instruction() {
+        let bits: Inst = 0b0101_1000_0000_0101_1010_1000_0101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FsqrtS {
+                rd: Register::X16,
+                rs1: Register::X11,
+                rm: 2
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fsgnjs_bits_into_instruction() {
+        let bits: Inst = 0b0010_0000_0110_0101_1000_1000_0101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FsgnjS {
+                rd: Register::X16,
+                rs1: Register::X11,
+                rs2: Register::X6
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fsgnjns_bits_into_instruction() {
+        let bits: Inst = 0b0010_0000_0110_0101_1001_1000_0101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FsgnjnS {
+                rd: Register::X16,
+                rs1: Register::X11,
+                rs2: Register::X6
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fsgnjxs_bits_into_instruction() {
+        let bits: Inst = 0b0010_0000_0110_0101_1010_1000_0101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FsgnjxS {
+                rd: Register::X16,
+                rs1: Register::X11,
+                rs2: Register::X6
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fmins_bits_into_instruction() {
+        let bits: Inst = 0b0010_1000_0110_0101_1000_1000_0101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FminS {
+                rd: Register::X16,
+                rs1: Register::X11,
+                rs2: Register::X6
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fmaxs_bits_into_instruction() {
+        let bits: Inst = 0b0010_1000_0110_0101_1001_1000_0101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FmaxS {
+                rd: Register::X16,
+                rs1: Register::X11,
+                rs2: Register::X6
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fcvtws_bits_into_instruction() {
+        let bits: Inst = 0b1100_0000_0000_0101_1011_0011_0101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FcvtWS {
+                rd: Register::X6,
+                rs1: Register::X11,
+                rm: 3
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fcvtwus_bits_into_instruction() {
+        let bits: Inst = 0b1100_0000_0001_0101_1011_0011_0101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FcvtWUS {
+                rd: Register::X6,
+                rs1: Register::X11,
+                rm: 3
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fmvxw_bits_into_instruction() {
+        let bits: Inst = 0b1110_0000_0000_0101_1000_0011_0101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FmvXW {
+                rd: Register::X6,
+                rs1: Register::X11,
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_feqs_bits_into_instruction() {
+        let bits: Inst = 0b1110_0000_0000_0101_1000_0011_0101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FmvXW {
+                rd: Register::X6,
+                rs1: Register::X11,
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_flts_bits_into_instruction() {
+        let bits: Inst = 0b1010_0000_0111_0110_1010_0001_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FeqS {
+                rd: Register::X3,
+                rs1: Register::X13,
+                rs2: Register::X7,
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fclasss_bits_into_instruction() {
+        let bits: Inst = 0b1110_0000_0000_0110_1001_0001_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FclassS {
+                rd: Register::X3,
+                rs1: Register::X13,
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fcvtsw_bits_into_instruction() {
+        let bits: Inst = 0b1101_0000_0000_0110_1001_0001_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FcvtSW {
+                rd: Register::X3,
+                rs1: Register::X13,
+                rm: 1,
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fcvtswu_bits_into_instruction() {
+        let bits: Inst = 0b1101_0000_0001_0110_1001_0001_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FcvtSWU {
+                rd: Register::X3,
+                rs1: Register::X13,
+                rm: 1,
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fmvwx_bits_into_instruction() {
+        let bits: Inst = 0b1111_0000_0000_0110_1000_0001_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FmvWX {
+                rd: Register::X3,
+                rs1: Register::X13,
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fcvtls_bits_into_instruction() {
+        let bits: Inst = 0b1100_0000_0010_0110_1001_0001_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FcvtLS {
+                rd: Register::X3,
+                rs1: Register::X13,
+                rm: 1,
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fcvtlus_bits_into_instruction() {
+        let bits: Inst = 0b1100_0000_0011_0110_1001_0001_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FcvtLUS {
+                rd: Register::X3,
+                rs1: Register::X13,
+                rm: 1,
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fcvtsl_bits_into_instruction() {
+        let bits: Inst = 0b1101_0000_0010_0110_1001_0001_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FcvtSL {
+                rd: Register::X3,
+                rs1: Register::X13,
+                rm: 1,
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fcvtslu_bits_into_instruction() {
+        let bits: Inst = 0b1101_0000_0011_0110_1001_0001_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FcvtSLU {
+                rd: Register::X3,
+                rs1: Register::X13,
+                rm: 1,
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fld_bits_into_instruction() {
+        let bits: Inst = 0b0101_1011_1000_0101_0011_0011_0000_0111;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::Fld {
+                rd: Register::X6,
+                rs1: Register::X10,
+                imm: 1464
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fsd_bits_into_instruction() {
+        let bits: Inst = 0b0101_1011_1000_0101_0011_0011_0010_0111;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::Fsd {
+                rs1: Register::X10,
+                rs2: Register::X24,
+                imm: 1446
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fmaddd_bits_into_instruction() {
+        let bits: Inst = 0b0101_0010_0110_1100_1010_1110_1100_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FmaddD {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rs2: Register::X6,
+                rs3: Register::X10,
+                rm: 2
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fmsubd_bits_into_instruction() {
+        let bits: Inst = 0b0101_0010_0110_1100_1010_1110_1100_0111;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FmsubD {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rs2: Register::X6,
+                rs3: Register::X10,
+                rm: 2
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fnmsubd_bits_into_instruction() {
+        let bits: Inst = 0b0101_0010_0110_1100_1010_1110_1100_1011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FnmsubD {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rs2: Register::X6,
+                rs3: Register::X10,
+                rm: 2
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fmnaddd_bits_into_instruction() {
+        let bits: Inst = 0b0101_0010_0110_1100_1010_1110_1100_1111;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FnmaddD {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rs2: Register::X6,
+                rs3: Register::X10,
+                rm: 2
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_faddd_bits_into_instruction() {
+        let bits: Inst = 0b0000_0010_0110_1100_1010_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FaddD {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rs2: Register::X6,
+                rm: 2
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fsubd_bits_into_instruction() {
+        let bits: Inst = 0b0000_1010_0110_1100_1010_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FsubD {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rs2: Register::X6,
+                rm: 2
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fmuld_bits_into_instruction() {
+        let bits: Inst = 0b0001_0010_0110_1100_1010_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FmulD {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rs2: Register::X6,
+                rm: 2
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fdivd_bits_into_instruction() {
+        let bits: Inst = 0b0001_1010_0110_1100_1010_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FdivD {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rs2: Register::X6,
+                rm: 2
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_sqrtd_bits_into_instruction() {
+        let bits: Inst = 0b0101_1010_0000_1100_1010_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FsqrtD {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rm: 2
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fsgnjd_bits_into_instruction() {
+        let bits: Inst = 0b0010_0010_0110_1100_1000_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FsgnjD {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rs2: Register::X6
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fsgnjnd_bits_into_instruction() {
+        let bits: Inst = 0b0010_0010_0110_1100_1001_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FsgnjnD {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rs2: Register::X6
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fsgnjxd_bits_into_instruction() {
+        let bits: Inst = 0b0010_0010_0110_1100_1010_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FsgnjxD {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rs2: Register::X6
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fmind_bits_into_instruction() {
+        let bits: Inst = 0b0010_1010_0110_1100_1000_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FminD {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rs2: Register::X6
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fmaxd_bits_into_instruction() {
+        let bits: Inst = 0b0010_1010_0110_1100_1001_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FmaxD {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rs2: Register::X6
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fcvtsd_bits_into_instruction() {
+        let bits: Inst = 0b0100_0000_0001_1100_1010_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FcvtSD {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rm: 2
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fcvtds_bits_into_instruction() {
+        let bits: Inst = 0b0100_0010_0000_1100_1010_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FcvtDS {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rm: 2
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_feqd_bits_into_instruction() {
+        let bits: Inst = 0b1010_0010_0011_1100_1010_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FeqD {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rs2: Register::X3,
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fltd_bits_into_instruction() {
+        let bits: Inst = 0b1010_0010_0011_1100_1001_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FltD {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rs2: Register::X3,
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fled_bits_into_instruction() {
+        let bits: Inst = 0b1010_0010_0011_1100_1000_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FleD {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rs2: Register::X3,
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fclassd_bits_into_instruction() {
+        let bits: Inst = 0b1110_0010_0000_1100_1001_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FclassD {
+                rd: Register::X29,
+                rs1: Register::X25,
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fcvtwd_bits_into_instruction() {
+        let bits: Inst = 0b1100_0010_0000_1100_1001_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FcvtWD {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rm: 1
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fcvtwud_bits_into_instruction() {
+        let bits: Inst = 0b1100_0010_0001_1100_1001_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FcvtWUD {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rm: 1
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fcvtdw_bits_into_instruction() {
+        let bits: Inst = 0b1101_0010_0000_1100_1001_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FcvtDW {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rm: 1
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fcvtdwu_bits_into_instruction() {
+        let bits: Inst = 0b1101_0010_0001_1100_1001_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FcvtDWU {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rm: 1
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fcvtld_bits_into_instruction() {
+        let bits: Inst = 0b1100_0010_0010_1100_1001_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FcvtLD {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rm: 1
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fcvtlud_bits_into_instruction() {
+        let bits: Inst = 0b1100_0010_0011_1100_1001_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FcvtLUD {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rm: 1
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fmvxd_bits_into_instruction() {
+        let bits: Inst = 0b1110_0010_0000_1100_1000_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FmvXD {
+                rd: Register::X29,
+                rs1: Register::X25,
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fcvtdl_bits_into_instruction() {
+        let bits: Inst = 0b1101_0010_0010_1100_1001_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FcvtDL {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rm: 1
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fcvtdlu_bits_into_instruction() {
+        let bits: Inst = 0b1101_0010_0011_1100_1001_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FcvtDLU {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rm: 1
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fmvdx_bits_into_instruction() {
+        let bits: Inst = 0b1111_0010_0000_1100_1000_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FmvDX {
+                rd: Register::X29,
+                rs1: Register::X25,
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_flq_bits_into_instruction() {
+        let bits: Inst = 0b0101_1011_1000_0101_0100_0011_0000_0111;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::Flq {
+                rd: Register::X6,
+                rs1: Register::X10,
+                imm: 1464
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fsq_bits_into_instruction() {
+        let bits: Inst = 0b0101_1011_1000_0101_0100_0011_0010_0111;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::Fsq {
+                rs1: Register::X10,
+                rs2: Register::X24,
+                imm: 1446
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fmaddq_bits_into_instruction() {
+        let bits: Inst = 0b0101_0110_0110_1100_1100_1110_1100_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FmaddQ {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rs2: Register::X6,
+                rs3: Register::X10,
+                rm: 4
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fmsubq_bits_into_instruction() {
+        let bits: Inst = 0b0101_0110_0110_1100_1100_1110_1100_0111;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FmsubQ {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rs2: Register::X6,
+                rs3: Register::X10,
+                rm: 4
+            }
+        )
+    }
+    #[test]
+    fn test_convert_valid_fnmsubq_bits_into_instruction() {
+        let bits: Inst = 0b0101_0110_0110_1100_1100_1110_1100_1011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FnmsubQ {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rs2: Register::X6,
+                rs3: Register::X10,
+                rm: 4
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fnmaddq_bits_into_instruction() {
+        let bits: Inst = 0b0101_0110_0110_1100_1100_1110_1100_1111;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FnmaddQ {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rs2: Register::X6,
+                rs3: Register::X10,
+                rm: 4
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_faddq_bits_into_instruction() {
+        let bits: Inst = 0b0000_0110_0110_1100_1010_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FaddQ {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rs2: Register::X6,
+                rm: 2
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fsubq_bits_into_instruction() {
+        let bits: Inst = 0b0000_1110_0110_1100_1010_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FsubQ {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rs2: Register::X6,
+                rm: 2
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fmulq_bits_into_instruction() {
+        let bits: Inst = 0b0001_0110_0110_1100_1010_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FmulQ {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rs2: Register::X6,
+                rm: 2
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fdivq_bits_into_instruction() {
+        let bits: Inst = 0b0001_1110_0110_1100_1010_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FdivQ {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rs2: Register::X6,
+                rm: 2
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fsqrtq_bits_into_instruction() {
+        let bits: Inst = 0b0101_1110_0000_1100_1010_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FsqrtQ {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rm: 2
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fsgnjq_bits_into_instruction() {
+        let bits: Inst = 0b0010_0110_0110_1100_1000_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FsgnjQ {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rs2: Register::X6,
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fsgnjnq_bits_into_instruction() {
+        let bits: Inst = 0b0010_0110_0110_1100_1001_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FsgnjnQ {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rs2: Register::X6,
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fsgnjxq_bits_into_instruction() {
+        let bits: Inst = 0b0010_0110_0110_1100_1010_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FsgnjxQ {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rs2: Register::X6,
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fminq_bits_into_instruction() {
+        let bits: Inst = 0b0010_1110_0110_1100_1000_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FminQ {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rs2: Register::X6,
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fmaxq_bits_into_instruction() {
+        let bits: Inst = 0b0010_1110_0110_1100_1001_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FmaxQ {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rs2: Register::X6,
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fcvtsq_bits_into_instruction() {
+        let bits: Inst = 0b0100_0000_0011_1100_1010_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FcvtSQ {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rm: 2
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fcvtqs_bits_into_instruction() {
+        let bits: Inst = 0b0100_0110_0000_1100_1010_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FcvtQS {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rm: 2
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fcvtdq_bits_into_instruction() {
+        let bits: Inst = 0b0100_0010_0011_1100_1010_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FcvtDQ {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rm: 2
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fcvtqd_bits_into_instruction() {
+        let bits: Inst = 0b0100_0110_0001_1100_1010_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FcvtQD {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rm: 2
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_feqq_bits_into_instruction() {
+        let bits: Inst = 0b1010_0110_0011_1100_1010_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FeqQ {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rs2: Register::X3,
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fltq_bits_into_instruction() {
+        let bits: Inst = 0b1010_0110_0011_1100_1001_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FltQ {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rs2: Register::X3,
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fleq_bits_into_instruction() {
+        let bits: Inst = 0b1010_0110_0011_1100_1000_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FleQ {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rs2: Register::X3,
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fclassq_bits_into_instruction() {
+        let bits: Inst = 0b1110_0110_0000_1100_1001_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FclassQ {
+                rd: Register::X29,
+                rs1: Register::X25,
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fcvtwq_bits_into_instruction() {
+        let bits: Inst = 0b1100_0110_0000_1100_1010_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FcvtWQ {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rm: 2
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fcvtwuq_bits_into_instruction() {
+        let bits: Inst = 0b1100_0110_0001_1100_1010_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FcvtWUQ {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rm: 2
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fcvtqw_bits_into_instruction() {
+        let bits: Inst = 0b1101_0110_0000_1100_1010_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FcvtQW {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rm: 2
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fcvtqwu_bits_into_instruction() {
+        let bits: Inst = 0b1101_0110_0001_1100_1010_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FcvtQWU {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rm: 2
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fcvtlq_bits_into_instruction() {
+        let bits: Inst = 0b1100_0110_0010_1100_1010_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FcvtLQ {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rm: 2
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fcvtluq_bits_into_instruction() {
+        let bits: Inst = 0b1100_0110_0011_1100_1010_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FcvtLUQ {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rm: 2
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fcvtql_bits_into_instruction() {
+        let bits: Inst = 0b1101_0110_0010_1100_1010_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FcvtQL {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rm: 2
+            }
+        )
+    }
+
+    #[test]
+    fn test_convert_valid_fcvtqlu_bits_into_instruction() {
+        let bits: Inst = 0b1101_0110_0011_1100_1010_1110_1101_0011;
+        let instruction: Instruction = bits.into();
+        assert_eq!(
+            instruction,
+            Instruction::FcvtQLU {
+                rd: Register::X29,
+                rs1: Register::X25,
+                rm: 2
+            }
+        )
+    }
 }

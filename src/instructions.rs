@@ -731,7 +731,6 @@ pub enum Instruction {
     },
     #[strum(props(Base = "32", Ext = "F"))]
     Fsw {
-        rd: Register,
         rs1: Register,
         rs2: Register,
         imm: i32,
@@ -921,7 +920,6 @@ pub enum Instruction {
     },
     #[strum(props(Base = "32", Ext = "D"))]
     Fsd {
-        rd: Register,
         rs1: Register,
         rs2: Register,
         imm: i32,
@@ -1123,7 +1121,6 @@ pub enum Instruction {
     },
     #[strum(props(Base = "32", Ext = "Q"))]
     Fsq {
-        rd: Register,
         rs1: Register,
         rs2: Register,
         imm: i32,
@@ -2250,7 +2247,7 @@ impl From<Inst> for Instruction {
                     0b10000 => {
                         match func3 {
                             0b010 => {
-                                return Instruction::AmominD {
+                                return Instruction::AmominW {
                                     rd: unpacked.rd.unwrap().into(),
                                     rs1: unpacked.rs1.unwrap().into(),
                                     rs2: unpacked.rs2.unwrap().into(),
@@ -2273,7 +2270,7 @@ impl From<Inst> for Instruction {
                     0b10100 => {
                         match func3 {
                             0b010 => {
-                                return Instruction::AmomaxD {
+                                return Instruction::AmomaxW {
                                     rd: unpacked.rd.unwrap().into(),
                                     rs1: unpacked.rs1.unwrap().into(),
                                     rs2: unpacked.rs2.unwrap().into(),
@@ -2296,7 +2293,7 @@ impl From<Inst> for Instruction {
                     0b11000 => {
                         match func3 {
                             0b010 => {
-                                return Instruction::AmominuD {
+                                return Instruction::AmominuW {
                                     rd: unpacked.rd.unwrap().into(),
                                     rs1: unpacked.rs1.unwrap().into(),
                                     rs2: unpacked.rs2.unwrap().into(),
@@ -2318,16 +2315,25 @@ impl From<Inst> for Instruction {
                     },
                     0b11100 => {
                         match func3 {
-                            0b010 => {}
-                            0b011 => {}
+                            0b010 => {
+                                return Instruction::AmomaxuW {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                    aq: unpacked.aq.unwrap(),
+                                    rl: unpacked.rl.unwrap(), 
+                                }
+                            }
+                            0b011 => {
+                                return Instruction::AmomaxuD {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rs2: unpacked.rs2.unwrap().into(),
+                                    aq: unpacked.aq.unwrap(),
+                                    rl: unpacked.rl.unwrap(), 
+                                }
+                            }
                             _ => { return Instruction::Undefined }
-                        }
-                        return Instruction::AmomaxuW {
-                            rd: unpacked.rd.unwrap().into(),
-                            rs1: unpacked.rs1.unwrap().into(),
-                            rs2: unpacked.rs2.unwrap().into(),
-                            aq: unpacked.aq.unwrap(),
-                            rl: unpacked.rl.unwrap(), 
                         }
                     },
                     _ => { return Instruction::Undefined }
@@ -2365,7 +2371,6 @@ impl From<Inst> for Instruction {
                 match func3 {
                     0b010 => {
                         return Instruction::Fsw {
-                            rd: unpacked.rd.unwrap().into(),
                             rs1: unpacked.rs1.unwrap().into(),
                             rs2: unpacked.rs2.unwrap().into(),
                             imm: unpacked.imm.unwrap()
@@ -2373,7 +2378,6 @@ impl From<Inst> for Instruction {
                     },
                     0b011 => {
                         return Instruction::Fsd {
-                            rd: unpacked.rd.unwrap().into(),
                             rs1: unpacked.rs1.unwrap().into(),
                             rs2: unpacked.rs2.unwrap().into(),
                             imm: unpacked.imm.unwrap()
@@ -2381,7 +2385,6 @@ impl From<Inst> for Instruction {
                     },
                     0b100 => {
                         return Instruction::Fsq {
-                            rd: unpacked.rd.unwrap().into(),
                             rs1: unpacked.rs1.unwrap().into(),
                             rs2: unpacked.rs2.unwrap().into(),
                             imm: unpacked.imm.unwrap()
@@ -2396,31 +2399,31 @@ impl From<Inst> for Instruction {
                     0b00 => {
                         return Instruction::FmaddS {
                             rd: unpacked.rd.unwrap().into(),
-                            rs1: unpacked.rd.unwrap().into(),
-                            rs2: unpacked.rd.unwrap().into(),
-                            rs3: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rs1.unwrap().into(),
+                            rs2: unpacked.rs2.unwrap().into(),
+                            rs3: unpacked.rs3.unwrap().into(),
                             rm: unpacked.rm.unwrap() as u32,
                         }
                     },
                     0b01 => {
                         return Instruction::FmaddD {
                             rd: unpacked.rd.unwrap().into(),
-                            rs1: unpacked.rd.unwrap().into(),
-                            rs2: unpacked.rd.unwrap().into(),
-                            rs3: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rs1.unwrap().into(),
+                            rs2: unpacked.rs2.unwrap().into(),
+                            rs3: unpacked.rs3.unwrap().into(),
                             rm: unpacked.rm.unwrap() as u32,
                         }
                     },
                     0b11 => {
                         return Instruction::FmaddQ {
                             rd: unpacked.rd.unwrap().into(),
-                            rs1: unpacked.rd.unwrap().into(),
-                            rs2: unpacked.rd.unwrap().into(),
-                            rs3: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rs1.unwrap().into(),
+                            rs2: unpacked.rs2.unwrap().into(),
+                            rs3: unpacked.rs3.unwrap().into(),
                             rm: unpacked.rm.unwrap() as u32,
                         }
                     },
-                    _ => { return Instruction::Undefined}
+                    _ => { return Instruction::Undefined }
                 }
             },
             0b1000111 => {
@@ -2429,27 +2432,27 @@ impl From<Inst> for Instruction {
                     0b00 => {
                         return Instruction::FmsubS {
                             rd: unpacked.rd.unwrap().into(),
-                            rs1: unpacked.rd.unwrap().into(),
-                            rs2: unpacked.rd.unwrap().into(),
-                            rs3: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rs1.unwrap().into(),
+                            rs2: unpacked.rs2.unwrap().into(),
+                            rs3: unpacked.rs3.unwrap().into(),
                             rm: unpacked.rm.unwrap() as u32,
                         }
                     },
                     0b01 => {
                         return Instruction::FmsubD {
                             rd: unpacked.rd.unwrap().into(),
-                            rs1: unpacked.rd.unwrap().into(),
-                            rs2: unpacked.rd.unwrap().into(),
-                            rs3: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rs1.unwrap().into(),
+                            rs2: unpacked.rs2.unwrap().into(),
+                            rs3: unpacked.rs3.unwrap().into(),
                             rm: unpacked.rm.unwrap() as u32,
                         }
                     },
                     0b11 => {
                         return Instruction::FmsubQ {
                             rd: unpacked.rd.unwrap().into(),
-                            rs1: unpacked.rd.unwrap().into(),
-                            rs2: unpacked.rd.unwrap().into(),
-                            rs3: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rs1.unwrap().into(),
+                            rs2: unpacked.rs2.unwrap().into(),
+                            rs3: unpacked.rs3.unwrap().into(),
                             rm: unpacked.rm.unwrap() as u32,
                         }
                     },
@@ -2462,27 +2465,27 @@ impl From<Inst> for Instruction {
                     0b00 => {
                         return Instruction::FnmsubS {
                             rd: unpacked.rd.unwrap().into(),
-                            rs1: unpacked.rd.unwrap().into(),
-                            rs2: unpacked.rd.unwrap().into(),
-                            rs3: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rs1.unwrap().into(),
+                            rs2: unpacked.rs2.unwrap().into(),
+                            rs3: unpacked.rs3.unwrap().into(),
                             rm: unpacked.rm.unwrap() as u32,
                         }
                     },
                     0b01 => {
                         return Instruction::FnmsubD {
                             rd: unpacked.rd.unwrap().into(),
-                            rs1: unpacked.rd.unwrap().into(),
-                            rs2: unpacked.rd.unwrap().into(),
-                            rs3: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rs1.unwrap().into(),
+                            rs2: unpacked.rs2.unwrap().into(),
+                            rs3: unpacked.rs3.unwrap().into(),
                             rm: unpacked.rm.unwrap() as u32,
                         }
                     },
                     0b11 => {
                         return Instruction::FnmsubQ {
                             rd: unpacked.rd.unwrap().into(),
-                            rs1: unpacked.rd.unwrap().into(),
-                            rs2: unpacked.rd.unwrap().into(),
-                            rs3: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rs1.unwrap().into(),
+                            rs2: unpacked.rs2.unwrap().into(),
+                            rs3: unpacked.rs3.unwrap().into(),
                             rm: unpacked.rm.unwrap() as u32,
                         }
                     },
@@ -2495,27 +2498,27 @@ impl From<Inst> for Instruction {
                     0b00 => {
                         return Instruction::FnmaddS {
                             rd: unpacked.rd.unwrap().into(),
-                            rs1: unpacked.rd.unwrap().into(),
-                            rs2: unpacked.rd.unwrap().into(),
-                            rs3: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rs1.unwrap().into(),
+                            rs2: unpacked.rs2.unwrap().into(),
+                            rs3: unpacked.rs3.unwrap().into(),
                             rm: unpacked.rm.unwrap() as u32,
                         }
                     },
                     0b01 => {
                         return Instruction::FnmaddD {
                             rd: unpacked.rd.unwrap().into(),
-                            rs1: unpacked.rd.unwrap().into(),
-                            rs2: unpacked.rd.unwrap().into(),
-                            rs3: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rs1.unwrap().into(),
+                            rs2: unpacked.rs2.unwrap().into(),
+                            rs3: unpacked.rs3.unwrap().into(),
                             rm: unpacked.rm.unwrap() as u32,
                         }
                     },
                     0b11 => {
                         return Instruction::FnmaddQ {
                             rd: unpacked.rd.unwrap().into(),
-                            rs1: unpacked.rd.unwrap().into(),
-                            rs2: unpacked.rd.unwrap().into(),
-                            rs3: unpacked.rd.unwrap().into(),
+                            rs1: unpacked.rs1.unwrap().into(),
+                            rs2: unpacked.rs2.unwrap().into(),
+                            rs3: unpacked.rs3.unwrap().into(),
                             rm: unpacked.rm.unwrap() as u32,
                         }
                     },
@@ -2892,13 +2895,6 @@ impl From<Inst> for Instruction {
                                     rm: unpacked.rm.unwrap() as u32,
                                 }
                             },
-                            0b00000 => {
-                                return Instruction::FcvtDS {
-                                    rd: unpacked.rd.unwrap().into(),
-                                    rs1: unpacked.rs1.unwrap().into(),
-                                    rm: unpacked.rm.unwrap() as u32,
-                                }
-                            },
                             0b00011 => {
                                 return Instruction::FcvtSQ {
                                     rd: unpacked.rd.unwrap().into(),
@@ -2909,6 +2905,26 @@ impl From<Inst> for Instruction {
                             _ => { Instruction::Undefined }
                         }
                     },
+                    0b0100001 => {
+                        let func5 = unpacked.rs2.unwrap();
+                        match func5 {
+                            0b00000 => {
+                                return Instruction::FcvtDS {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rm: unpacked.rm.unwrap() as u32,
+                                }
+                            },
+                            0b00011 => {
+                                return Instruction::FcvtDQ {
+                                    rd: unpacked.rd.unwrap().into(),
+                                    rs1: unpacked.rs1.unwrap().into(),
+                                    rm: unpacked.rm.unwrap() as u32,
+                                }
+                            },
+                            _ => { return Instruction::Undefined }
+                        }
+                    }
                     0b1010001 => {
                         let func3 = unpacked.func3.unwrap();
                         match func3 {
@@ -3131,19 +3147,6 @@ impl From<Inst> for Instruction {
                                     rm: unpacked.rm.unwrap() as u32,
                                 }
                             }
-                            _ => { return Instruction::Undefined }
-                        }
-                    },
-                    0b0100001 => {
-                        let func5 = unpacked.rs2.unwrap();
-                        match func5 {
-                            0b00011 => {
-                                return Instruction::FcvtDQ {
-                                    rd: unpacked.rd.unwrap().into(),
-                                    rs1: unpacked.rs1.unwrap().into(),
-                                    rm: unpacked.rm.unwrap() as u32,
-                                }
-                            },
                             _ => { return Instruction::Undefined }
                         }
                     },
