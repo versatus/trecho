@@ -8,6 +8,7 @@ pub mod vm;
 
 #[cfg(test)]
 mod tests {
+    #![allow(unused)]
     use super::*;
     use crate::encoding::{InstructionDecoder, OpCodeType, Unpacked};
     use crate::encoding_types::*;
@@ -2869,4 +2870,13 @@ mod tests {
             }
         )
     }
+
+    #[test]
+    fn test_valid_bits_for_invalid_base() {}
+
+    #[test]
+    fn test_valid_bits_for_invalid_ext() {}
+
+    #[test]
+    fn test_invalid_bits_for_valid_base_and_ext() {}
 }
