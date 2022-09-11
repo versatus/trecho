@@ -10,7 +10,8 @@ pub mod vm;
 mod tests {
     #![allow(unused)]
     use super::*;
-    use crate::encoding::{InstructionDecoder, OpCodeType, Unpacked};
+    use crate::encoding::{InstructionDecoder, OpCodeType, Unpacked, EncodingTable};
+    use crate::extensions::{Extension, Base};
     use crate::encoding_types::*;
     use crate::instructions::Instruction;
     use crate::register::{HardWiredZero, Register, RegisterAbi};
@@ -2872,11 +2873,36 @@ mod tests {
     }
 
     #[test]
-    fn test_valid_bits_for_invalid_base() {}
+    fn test_valid_bits_for_invalid_base() {
+        let bits: Inst = 0b0000_0000_0000_1000_0110_0100_0000_0011 as u32;
+        let enc_table = EncodingTable::new(Extension::I, Base::I32);
+        let instruction: Instruction = Instruction::decode(bits, &enc_table);
+        assert_eq!(
+            instruction,
+            Instruction::Undefined
+        )
+
+    }
 
     #[test]
-    fn test_valid_bits_for_invalid_ext() {}
+    fn test_valid_bits_for_invalid_ext() {
+        let bits: Inst = 0b0001_0100_0000_0101_0010_0110_0010_1111 as u32;
+        let enc_table = EncodingTable::new(Extension::M, Base::I32);
+        let instruction: Instruction = Instruction::decode(bits, &enc_table);
+        assert_eq!(
+            instruction,
+            Instruction::Undefined
+        )
+    }
 
     #[test]
-    fn test_invalid_bits_for_valid_base_and_ext() {}
+    fn test_invalid_bits_for_valid_base_and_ext() {
+        let bits: Inst = 0b0001_0100_0001_0101_0010_0110_0010_1111 as u32;
+        let enc_table = EncodingTable::new(Extension::A, Base::I32);
+        let instruction: Instruction = Instruction::decode(bits, &enc_table);
+        assert_eq!(
+            instruction,
+            Instruction::Undefined
+        )
+    }
 }

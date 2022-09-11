@@ -23,6 +23,15 @@ pub enum OpCodeType {
 }
 
 impl EncodingTable {
+    pub fn new(ext: Extension, base: Base) -> EncodingTable {
+        EncodingTable {
+            table: TYPE_TABLE,
+            ext,
+            base,
+        }
+    }
+
+
     pub fn get_opcode_type(&self, opcode: OpCode) -> OpCodeType {
         self.table[opcode as usize]
     }
