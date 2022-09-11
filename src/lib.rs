@@ -15,6 +15,7 @@ mod tests {
     use crate::encoding_types::*;
     use crate::instructions::Instruction;
     use crate::register::{HardWiredZero, Register, RegisterAbi};
+    use crate::soft::SoftThread;
 
     #[test]
     fn test_match_register() {
@@ -111,7 +112,6 @@ mod tests {
         assert_eq!(unpacked.opcode, 111);
     }
 
-    // TODO: Add test cases for each `Instruction` struct variant type with a fixed u32 inst to test conversion.
     #[test]
     fn test_convert_valid_lui_bits_into_instruction() {
         let bits: Inst = 0b1100_1100_1100_1100_1100_1100_1011_0111 as u32;
@@ -2903,6 +2903,78 @@ mod tests {
         assert_eq!(
             instruction,
             Instruction::Undefined
+        )
+    }
+
+    #[test]
+    fn test_fetch_and_decode_add_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0000_0000 as u8, 0b1100_1010 as u8, 0b1000_0101 as u8, 0b1011_0011 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+        assert_eq!(
+            instruction,
+            Instruction::Add {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X12,
+                func3: 0,
+                func7: 0
+            }
+        )
+    }
+
+    #[test]
+    fn test_add_execution() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0000_0000 as u8, 0b1100_1010 as u8, 0b1000_0101 as u8, 0b1011_0011 as u8];
+
+        // Preload some values int the relevant registers
+        soft.registers[Register::X12 as usize] = 24u64;
+        soft.registers[Register::X21 as usize] = 32u64;
+
+        // Load the program code
+        soft.load_program(program);
+        soft.execute();
+
+        assert_eq!(
+            soft.registers[Register::X11 as usize],
+            56u64
+        )
+    }
+
+    #[test]
+    fn test_fetch_and_decode_addi_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1000_0101 as u8, 0b1001_0011 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+        assert_eq!(
+            instruction,
+            Instruction::Addi {
+                rd: Register::X11,
+                rs1: Register::X21,
+                imm: 3276,
+                func3: 0
+            }
+        );
+    }
+
+    #[test]
+    fn test_addi_execution() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1000_0101 as u8, 0b1001_0011 as u8];
+
+        // Preload value into rs1
+        soft.registers[Register::X21 as usize] = 1000u64;
+
+        // Load the program code
+        soft.load_program(program);
+        soft.execute();
+
+        assert_eq!(
+            soft.registers[Register::X11 as usize],
+            4276u64
         )
     }
 }
