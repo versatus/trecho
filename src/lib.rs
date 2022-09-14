@@ -5,6 +5,10 @@ pub mod instructions;
 pub mod register;
 pub mod soft;
 pub mod vm;
+pub mod memory;
+pub mod exceptions;
+pub mod machine;
+
 
 #[cfg(test)]
 mod tests {
@@ -2976,5 +2980,25 @@ mod tests {
             soft.registers[Register::X11 as usize],
             4276u64
         )
+    }
+
+    #[test]
+    fn conversion_to_unsigned() {
+        let i32_bits = (0b_11000111_00110011_00001111_11110000 as u32) as i32;
+        let u32_bits = (0b_11000111_00110011_00001111_11110000 as u32);
+        assert_eq!(i32_bits as u32, u32_bits)
+    }
+
+    #[test]
+    fn conversion_to_signed() {
+        let abits = 0b_1000_0001 as u8;
+        let bbits = 0b_1111_1111 as u8;
+        println!("{:#0b}", (abits & bbits));
+        println!("{:#0b}", (abits | bbits));
+        println!("{:#0b}", (!abits));
+        println!("{:#0b}", (abits << 3));
+        println!("{:#0b}", (abits >> 3));
+        println!("{:#0b}", (abits >> 7 & 0b1000000))
+
     }
 }
