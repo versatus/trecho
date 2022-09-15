@@ -1,4 +1,5 @@
 use crate::exceptions::Exception;
+use crate::register::RegisterValue;
 
 pub const BASE: u64 = 0x8000_0000;
 pub const BYTE: u8 = 8;
@@ -7,14 +8,46 @@ pub const HALFWORD: u8 = 16;
 pub const WORD: u8 = 32;
 pub const MEM_SIZE: u64 = 1024 * 1024 * 128;
 
-pub struct Memory {
+// Trait to provide memory functionality and types. 
+// b == Byte
+// hw == Half Word
+// w == Word
+// dw == DoubleWord
+pub trait Memory {
+    type RegValue: RegisterValue;
+    type Bytes;
+    type Error: std::error::Error;
+
+    fn init(&self, addr: u64, size: u64, flags: u8, source: Option<Self::Bytes>, offset: u64) -> Result<(), Self::Error>;
+    fn get_flag(&mut self, index: u64) -> Result<u8, Self::Error>;
+    fn set_flag(&mut self, index: u64, flag: u8) -> Result<(), Self::Error>;
+    fn clear_flag(&mut self, index: u64, flag: u8) -> Result<(), Self::Error>;
+    fn store_byte(&mut self, addr: u64, size: u64, val: u8) -> Result<(), Self::Error>;
+    fn store_byte_array(&mut self, addr: u64, val: &[u8]) -> Result<(), Self::Error>;
+    fn execute_loadhw(&mut self, addr: u64) -> Result<u16, Self::Error>;
+    fn execute_loadw(&mut self, addr: u64) -> Result<u32, Self::Error>;
+
+
+    fn loadb(&mut self, addr: &Self::RegValue) -> Result<Self::RegValue, Self::Error>;
+    fn loadhw(&mut self, addr: &Self::RegValue) -> Result<Self::RegValue, Self::Error>;
+    fn loadw(&mut self, addr: &Self::RegValue) -> Result<Self::RegValue, Self::Error>;
+    fn loaddw(&mut self, addr: &Self::RegValue) -> Result<Self::RegValue, Self::Error>;
+    
+    fn storeb(&mut self, addr: &Self::RegValue, value: &Self::RegValue) -> Result<(), Self::Error>;
+    fn storehw(&mut self, addr: &Self::RegValue, value: &Self::RegValue) -> Result<(), Self::Error>;
+    fn storew(&mut self, addr: &Self::RegValue, value: &Self::RegValue) -> Result<(), Self::Error>;
+    fn storedw(&mut self, addr: &Self::RegValue, value: &Self::RegValue) -> Result<(), Self::Error>;
+    
+}
+
+pub struct Dram {
     pub mem: Vec<u8>,
     size: u64,
 }
 
-impl Memory {
-    pub fn new() -> Memory {
-        Memory {
+impl Dram {
+    pub fn new() -> Dram {
+        Dram {
             mem: vec![0; MEM_SIZE as usize],
             size: 0
         }
@@ -113,5 +146,13 @@ impl Memory {
         self.mem[idx + 5] = ((val >> 40) & 0xff) as u8;
         self.mem[idx + 6] = ((val >> 48) & 0xff) as u8;
         self.mem[idx + 7] = ((val >> 56) & 0xff) as u8;
+    }
+}
+
+#[inline(always)]
+pub fn memset(arr: &mut [u8], val: u8) {
+    let p = arr.as_mut_ptr();
+    unsafe {
+        std::ptr::write_bytes(p, val, arr.len())
     }
 }

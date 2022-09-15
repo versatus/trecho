@@ -1,4 +1,60 @@
 #![allow(unused, unused_mut, dead_code)]
+use std::ops::{BitAnd, BitOr, BitXor, Not, Shl, Shr};
+
+pub trait RegisterValue:
+    Sized +
+    Clone +
+    Not<Output = Self> +
+    BitAnd<Output = Self> +
+    BitOr<Output = Self> +
+    BitXor<Output = Self> +
+    Shl<Output = Self> +
+    Shr<Output = Self> +
+
+{
+    const BITS: u8;
+    const SHIFT_MASK: u8;
+
+    fn zero() -> Self;
+    fn one() -> Self;
+    fn min() -> Self;
+    fn max() -> Self;
+    fn equal(&self, other: &Self) -> Self;
+    fn less_than(&self, other: &Self) -> Self;
+    fn less_than_signed(&self, other: &Self) -> Self;
+    fn not_equal(&self, rhs: &Self) -> Self;
+    fn greater_equal(&self, rhs: &Self) -> Self;
+    fn greater_equal_signed(&self, rhs: &Self) -> Self;
+    fn logical_not(&self) -> Self;
+    fn condition(&self, tval: &Self, fval: &Self) -> Self;
+    fn overflowing_add(&self, rhs: &Self) -> Self;
+    fn overflowing_sub(&self, rhs: &Self) -> Self;
+    fn overflowing_mul(&self, rhs: &Self) -> Self;
+    fn overflowing_div(&self, rhs: &Self) -> Self;
+    fn overflowing_div_euclid(&self, rhs: &Self) -> Self;
+    fn overflowing_rem(&self, rhs: &Self) -> Self;
+    fn overflowing_rem_euclid(&self, rhs: &Self) -> Self;
+    fn overflowing_mul_high_signed(&self, rhs: &Self) -> Self;
+    fn overflowing_mul_high_unsigned(&self, rhs: &Self) -> Self;
+    fn overflowing_neg(&self) -> Self;
+    fn overflowing_pow(&self, exp: &Self) -> Self;
+    fn overflowing_shl(&self, bits: &Self) -> Self;
+    fn overflowing_shr(&self, bits: &Self) -> Self;
+    fn msb_zeros(&self) -> Self;
+    fn lsb_zeros(&self) -> Self;
+    fn n_ones(&self) -> Self;
+    fn mul_no_carry(&self) -> Self;
+    fn mul_no_carry_high(&self) -> Self;
+    fn mul_no_carry_rev(&self) -> Self;
+    fn revb(&self) -> Self;
+    fn shl_signed(&self, bits: &Self) -> Self;
+    fn shr_signed(&self, bits: &Self) -> Self;
+    fn rotatel(&self, rhs: &Self) -> Self;
+    fn rotater(&self, rhs: &Self) -> Self;
+    fn zero_extend(&self, start: &Self) -> Self;
+    fn sign_extend(&self, start: &Self) -> Self;
+}
+
 // The basic register addresses
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Register {
