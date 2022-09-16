@@ -1,0 +1,10 @@
+pub const INDEX_SHIFTS: usize = 12;
+pub const INDEX_SIZE: usize = 1 << INDEX_SHIFTS;
+pub const N_REGISTERS: usize = 32;
+pub const MAX_MEM: usize = 4 << 20;
+pub const STACK_SIZE: usize = 1 << 20;
+pub const INDICES: usize = MAX_MEM / INDEX_SIZE;
+pub const FRAME_SHIFTS: usize = 18;
+pub const FRAME_SIZE: usize = 1 << FRAME_SHIFTS;
+pub const FRAMES: usize = MAX_MEM / FRAME_SIZE;
+pub const FRAME_INDEX_SHIFTS: usize = FRAME_SHIFTS - INDEX_SHIFTS;

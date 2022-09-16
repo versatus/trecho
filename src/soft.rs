@@ -6,20 +6,20 @@ use crate::instructions::Instruction;
 use crate::register::Register;
 use crate::memory::{Dram, MEM_SIZE};
 use crate::machine::{Machine, Support};
+use crate::memory::Memory;
 
-
-pub struct SoftThread {
+pub struct SoftThread<M> {
     pub registers: [u64; 33],
     pc: u64,
     pub program: Vec<u8>,
     remainder: u32,
     eq_flag: bool,
     enc_table: EncodingTable,
-    bus: Dram
+    bus: M
 }
 
-impl SoftThread {
-    pub fn new(enc_table: EncodingTable) -> SoftThread {
+impl<M: Memory> SoftThread<M> {
+    pub fn new(enc_table: EncodingTable) -> SoftThread<M> {
         let mut soft = SoftThread {
             registers: [0; 33],
             pc: 0,
@@ -27,7 +27,7 @@ impl SoftThread {
             remainder: 0,
             eq_flag: false,
             enc_table,
-            bus: Dram::new()
+            bus: M::default()
         };
 
         soft.registers[2] = MEM_SIZE;
@@ -114,32 +114,32 @@ impl SoftThread {
             },
             Instruction::Lb { rd, rs1, imm, .. } => {
                 let addr = self.registers[rs1 as usize].wrapping_add((imm as i64) as u64);
-                if let Ok(val) = self.bus.read(addr, 8) {
-                    self.registers[rd as usize] = ((val as i8) as i64) as u64;
+                if let Ok(val) = self.bus.read(&addr.into(), 8) {
+                    self.registers[rd as usize] = ((self.bus.into_u64(&val)) as i64) as u64;
                 }
             },
             Instruction::Lh { rd, rs1, imm, .. } => {
                 let addr = self.registers[rs1 as usize].wrapping_add((imm as i64) as u64);
-                if let Ok(val) = self.bus.read(addr, 16) {
-                    self.registers[rd as usize] = ((val as i16) as i64) as u64;
+                if let Ok(val) = self.bus.read(&addr.into(), 16) {
+                    self.registers[rd as usize] = ((self.bus.into_u64(&val)) as i64) as u64;
                 }
             },
             Instruction::Lw { rd, rs1, imm, .. } => {
                 let addr = self.registers[rs1 as usize].wrapping_add((imm as i64) as u64);
-                if let Ok(val) = self.bus.read(addr, 32) {
-                    self.registers[rd as usize] = ((val as i32) as i64) as u64
+                if let Ok(val) = self.bus.read(&addr.into(), 32) {
+                    self.registers[rd as usize] = ((self.bus.into_u64(&val) as i32) as i64) as u64
                 }
             },
             Instruction::Lbu { rd, rs1, imm, .. } => {
                 let addr = self.registers[rs1 as usize].wrapping_add((imm as i64) as u64);
-                if let Ok(val) = self.bus.read(addr, 8) {
-                    self.registers[rd as usize] = val;
+                if let Ok(val) = self.bus.read(&addr.into(), 8) {
+                    self.registers[rd as usize] = self.bus.into_u64(&val);
                 }
             },
             Instruction::Lhu { rd, rs1, imm, .. } => {
                 let addr = self.registers[rs1 as usize].wrapping_add((imm as i64) as u64);
-                if let Ok(val) = self.bus.read(addr, 16) {
-                    self.registers[rd as usize] = val;
+                if let Ok(val) = self.bus.read(&addr.into(), 16) {
+                    self.registers[rd as usize] = self.bus.into_u64(&val);
                 }
             },
             Instruction::Sb { rs1, rs2, imm, .. } => {
@@ -248,14 +248,14 @@ impl SoftThread {
             },
             Instruction::Lwu { rd, rs1, imm, .. } => {
                 let addr = self.registers[rs1 as usize].wrapping_add((imm as i64) as u64);
-                if let Ok(val) = self.bus.read(addr, 32) {
-                    self.registers[rd as usize] = val;
+                if let Ok(val) = self.bus.read(&addr.into(), 32) {
+                    self.registers[rd as usize] = self.bus.into_u64(&val);
                 }
             },
             Instruction::Ld { rd, rs1, imm, .. } => {
                 let addr = self.registers[rs1 as usize].wrapping_add((imm as i64) as u64);
-                if let Ok(val) = self.bus.read(addr, 64) {
-                    self.registers[rd as usize] = val;
+                if let Ok(val) = self.bus.read(&addr.into(), 64) {
+                    self.registers[rd as usize] = self.bus.into_u64(&val);
                 }
             },
             Instruction::Sd { rs1, rs2, imm, .. } => {
@@ -303,8 +303,8 @@ impl SoftThread {
     }
 }
 
-impl Default for SoftThread {
-    fn default() -> SoftThread {
+impl<M: Memory> Default for SoftThread<M> {
+    fn default() -> SoftThread<M> {
         let enc_table = EncodingTable::default();
         SoftThread::new(enc_table)
     }

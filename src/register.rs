@@ -285,3 +285,47 @@ impl Default for Register {
         return Register::X0;
     }
 }
+
+impl RegisterValue for u64 {
+    const BITS: u8 = 64;
+    const SHIFT_MASK: u8 = 0x3F;
+
+    fn zero() -> Self { todo!() }
+    fn one() -> Self { todo!() }
+    fn min() -> Self { todo!() }
+    fn max() -> Self { todo!() }
+    fn equal(&self, other: &Self) -> Self { todo!() }
+    fn less_than(&self, other: &Self) -> Self { todo!() }
+    fn less_than_signed(&self, other: &Self) -> Self { todo!() }
+    fn not_equal(&self, rhs: &Self) -> Self { todo!() }
+    fn greater_equal(&self, rhs: &Self) -> Self { todo!() }
+    fn greater_equal_signed(&self, rhs: &Self) -> Self { todo!() }
+    fn logical_not(&self) -> Self { todo!() }
+    fn condition(&self, tval: &Self, fval: &Self) -> Self { todo!() }
+    fn overflowing_add(&self, rhs: &Self) -> Self { todo!() }
+    fn overflowing_sub(&self, rhs: &Self) -> Self { todo!() }
+    fn overflowing_mul(&self, rhs: &Self) -> Self { todo!() }
+    fn overflowing_div(&self, rhs: &Self) -> Self { todo!() }
+    fn overflowing_div_euclid(&self, rhs: &Self) -> Self { todo!() }
+    fn overflowing_rem(&self, rhs: &Self) -> Self { todo!() }
+    fn overflowing_rem_euclid(&self, rhs: &Self) -> Self { todo!() }
+    fn overflowing_mul_high_signed(&self, rhs: &Self) -> Self { todo!() }
+    fn overflowing_mul_high_unsigned(&self, rhs: &Self) -> Self { todo!() }
+    fn overflowing_neg(&self) -> Self { todo!() }
+    fn overflowing_pow(&self, exp: &Self) -> Self { todo!() }
+    fn overflowing_shl(&self, bits: &Self) -> Self { todo!() }
+    fn overflowing_shr(&self, bits: &Self) -> Self { todo!() }
+    fn msb_zeros(&self) -> Self { todo!() }
+    fn lsb_zeros(&self) -> Self { todo!() }
+    fn n_ones(&self) -> Self{ todo!() }
+    fn mul_no_carry(&self) -> Self { todo!() }
+    fn mul_no_carry_high(&self) -> Self { todo!() }
+    fn mul_no_carry_rev(&self) -> Self { todo!() }
+    fn revb(&self) -> Self { todo!() }
+    fn shl_signed(&self, bits: &Self) -> Self { todo!() }
+    fn shr_signed(&self, bits: &Self) -> Self { todo!() }
+    fn rotatel(&self, rhs: &Self) -> Self { todo!() }
+    fn rotater(&self, rhs: &Self) -> Self { todo!() }
+    fn zero_extend(&self, start: &Self) -> Self { todo!() }
+    fn sign_extend(&self, start: &Self) -> Self { todo!() }
+}
