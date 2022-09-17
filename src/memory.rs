@@ -3,7 +3,7 @@ use crate::exceptions::Exception;
 use crate::register::RegisterValue;
 use std::fmt::{Display, Formatter};
 use std::error::Error;
-use crate::consts::{MAX_MEM, INDICES, };
+use crate::consts::{MAX_MEM, INDICES, INDEX_SHIFTS, DIRTY};
 
 pub const BASE: u64 = 0x8000_0000;
 pub const BYTE: u8 = 8;
@@ -26,34 +26,23 @@ pub trait Memory: Default {
     fn get_flag(&mut self, index: u64) -> Result<u8, Self::Error>;
     fn set_flag(&mut self, index: u64, flag: u8) -> Result<(), Self::Error>;
     fn clear_flag(&mut self, index: u64, flag: u8) -> Result<(), Self::Error>;
+    fn get_indices(addr: u64, size: u64) -> Result<(u64, u64), Self::Error>;
 
-    fn store_byte(&mut self, addr: u64, size: u64, val: u8) -> Result<(), Self::Error>;
-    fn store_byte_array(&mut self, addr: u64, val: &[u8]) -> Result<(), Self::Error>;
-    fn execute_loadhw(&mut self, addr: u64) -> Result<u16, Self::Error>;
-    fn execute_loadw(&mut self, addr: u64) -> Result<u32, Self::Error>;
+    fn execute_readhw(&mut self, addr: u64) -> Self::RegValue;
+    fn execute_readw(&mut self, addr: u64) -> Self::RegValue;
 
-
-    fn loadb(&mut self, addr: &Self::RegValue) -> Result<Self::RegValue, Self::Error>;
-    fn loadhw(&mut self, addr: &Self::RegValue) -> Result<Self::RegValue, Self::Error>;
-    fn loadw(&mut self, addr: &Self::RegValue) -> Result<Self::RegValue, Self::Error>;
-    fn loaddw(&mut self, addr: &Self::RegValue) -> Result<Self::RegValue, Self::Error>;
-    
-    fn storeb(&mut self, addr: &Self::RegValue, value: &Self::RegValue) -> Result<(), Self::Error>;
-    fn storehw(&mut self, addr: &Self::RegValue, value: &Self::RegValue) -> Result<(), Self::Error>;
-    fn storew(&mut self, addr: &Self::RegValue, value: &Self::RegValue) -> Result<(), Self::Error>;
-    fn storedw(&mut self, addr: &Self::RegValue, value: &Self::RegValue) -> Result<(), Self::Error>;
-    
     fn read(&self, addr: &Self::RegValue, size: u8) -> Result<Self::RegValue, Self::Error>;
     fn readb(&self, addr: &Self::RegValue) -> Self::RegValue;
     fn readhw(&self, addr: &Self::RegValue) -> Self::RegValue;
     fn readw(&self, addr: &Self::RegValue) -> Self::RegValue;
     fn readdw(&self, addr: &Self::RegValue) -> Self::RegValue;
 
+    fn write_array(&mut self, addr: Self::RegValue, val: Self::Bytes) -> Result<(), Self::Error>;
     fn write(&mut self, addr: u64, value: u64, size: u8) -> Result<(), Self::Error>;
-    fn write_byte(&mut self, addr: u64, val: u64);
-    fn write_halfword(&mut self, addr: u64, val: u64);
-    fn write_word(&mut self, addr: u64, val: u64);
-    fn write_doubleword(&mut self, addr: u64, val: u64);
+    fn writeb(&mut self, addr: Self::RegValue, val: Self::RegValue);
+    fn writehw(&mut self, addr: Self::RegValue, val: Self::RegValue);
+    fn writew(&mut self, addr: Self::RegValue, val: Self::RegValue);
+    fn writedw(&mut self, addr: u64, val: u64);
     fn into_u64(&self, val: &Self::RegValue) -> u64;
 
  }
@@ -76,24 +65,6 @@ impl Dram {
     pub fn init(&mut self, bin: Vec<u8>) {
         self.size = bin.len() as u64;
         self.mem.splice(..bin.len(), bin.iter().cloned());
-    }
-
-    pub fn read(&self, addr: u64, size: u8) -> Result<u64, Exception> {
-        match size {
-            BYTE => {
-                Ok(self.read_byte(addr))
-            },
-            HALFWORD => {
-                Ok(self.read_halfword(addr))
-            },
-            WORD => {
-                Ok(self.read_word(addr))
-            },
-            DOUBLEWORD => {
-                Ok(self.read_doubleword(addr))
-            },
-            _ => return Err(Exception::LoadAccessFault)
-        }
     }
 
     fn read_byte(&self, addr: u64) -> u64 {
@@ -171,7 +142,9 @@ impl Dram {
 
 #[derive(Debug, Clone)]
 pub enum MemError {
-    OutOfBounds
+    OutOfBounds,
+    LoadAccessFault,
+    StoreAMOAccessFault
 }
 
 impl Display for MemError {
@@ -191,24 +164,18 @@ impl Memory for Dram {
         let mut written = 0;
         if offset > 0 {
             let actual = std::cmp::min(size, offset);
-            if let Err(e) = self.store_byte(addr, actual, 0) {
-                return Err(e)
-            }
+            self.writeb(addr, actual);
             written += actual;
         }
         if let Some(src) = source {
             let actual = std::cmp::min(size - written, src.len() as u64);
             if actual > 0 {
-                if let Err(e) = self.store_byte_array(addr + written, &src[0..actual as usize]) {
-                    return Err(e)
-                }
+                self.write_array((addr + written), src[0..actual as usize].to_vec());
                 written += actual;
             }
         }
         if written < size {
-            if let Err(e) = self.store_byte(addr + written, size - written, 0) {
-                return Err(e)
-            }
+            self.writeb(addr + written, size - written);
         }
 
         Ok(())
@@ -240,33 +207,133 @@ impl Memory for Dram {
         }
     }
 
-    fn store_byte(&mut self, addr: u64, size: u64, val: u8) -> Result<(), Self::Error> { todo!() }
-    fn store_byte_array(&mut self, addr: u64, val: &[u8]) -> Result<(), Self::Error> { todo!() }
-    fn execute_loadhw(&mut self, addr: u64) -> Result<u16, Self::Error> { todo!() }
-    fn execute_loadw(&mut self, addr: u64) -> Result<u32, Self::Error> { todo!() }
+    fn get_indices(addr: u64, size: u64) -> Result<(u64, u64), Self::Error> {
+        let (end, overflow) = addr.overflowing_add(size);
+        if overflow {
+            return Err(MemError::OutOfBounds);
+        }
 
-    fn loadb(&mut self, addr: &Self::RegValue) -> Result<Self::RegValue, Self::Error> { todo!() }
-    fn loadhw(&mut self, addr: &Self::RegValue) -> Result<Self::RegValue, Self::Error> { todo!()}
-    fn loadw(&mut self, addr: &Self::RegValue) -> Result<Self::RegValue, Self::Error> { todo!() }
-    fn loaddw(&mut self, addr: &Self::RegValue) -> Result<Self::RegValue, Self::Error> { todo!() }
-    
-    fn storeb(&mut self, addr: &Self::RegValue, value: &Self::RegValue) -> Result<(), Self::Error> { todo!() }
-    fn storehw(&mut self, addr: &Self::RegValue, value: &Self::RegValue) -> Result<(), Self::Error> { todo!() }
-    fn storew(&mut self, addr: &Self::RegValue, value: &Self::RegValue) -> Result<(), Self::Error> { todo!() }
-    fn storedw(&mut self, addr: &Self::RegValue, value: &Self::RegValue) -> Result<(), Self::Error> { todo!() }
-    
-    fn read(&self, addr: &Self::RegValue, size: u8) -> Result<Self::RegValue, Self::Error> { todo!() }
-    fn readb(&self, addr: &Self::RegValue) -> Self::RegValue { todo!() }
-    fn readhw(&self, addr: &Self::RegValue) -> Self::RegValue { todo!() }
-    fn readw(&self, addr: &Self::RegValue) -> Self::RegValue { todo!() }
-    fn readdw(&self, addr: &Self::RegValue) -> Self::RegValue { todo!() }
+        if end > MAX_MEM as u64 {
+            return Err(MemError::OutOfBounds);
+        }
 
-    fn write(&mut self, addr: u64, value: u64, size: u8) -> Result<(), Self::Error> { todo!() }
-    fn write_byte(&mut self, addr: u64, val: u64) { todo!() }
-    fn write_halfword(&mut self, addr: u64, val: u64) { todo!() }
-    fn write_word(&mut self, addr: u64, val: u64) { todo!() }
-    fn write_doubleword(&mut self, addr: u64, val: u64) { todo!() }
-    fn into_u64(&self, val: &Self::RegValue) -> u64 { todo!() }
+        let idx = addr >> INDEX_SHIFTS;
+        let idx_end = (end - 1) >> INDEX_SHIFTS;
+
+        Ok((idx, idx_end))
+    }
+
+    fn execute_readhw(&mut self, addr: u64) -> Self::RegValue { 
+        self.readhw(&addr)
+    }
+
+    fn execute_readw(&mut self, addr: u64) -> Self::RegValue {
+        self.readw(&addr)
+    }
+    
+    fn read(&self, addr: &Self::RegValue, size: u8) -> Result<Self::RegValue, Self::Error> {
+        match size {
+            BYTE => {
+                Ok(self.readb(addr))
+            },
+            HALFWORD => {
+                Ok(self.readhw(addr))
+            },
+            WORD => {
+                Ok(self.readw(addr))
+            },
+            DOUBLEWORD => {
+                Ok(self.readdw(addr))
+            },
+            _ => return Err(MemError::LoadAccessFault)
+        }
+    }
+
+    fn readb(&self, addr: &Self::RegValue) -> Self::RegValue {
+        let idx = (addr - BASE) as usize;
+        self.mem[idx] as u64
+    }
+    fn readhw(&self, addr: &Self::RegValue) -> Self::RegValue {
+        let idx = (addr - BASE) as usize;
+        return (self.mem[idx] as u64) | ((self.mem[idx + 1] as u64) << 8);
+    }
+    fn readw(&self, addr: &Self::RegValue) -> Self::RegValue {
+        let idx = (addr - BASE) as usize;
+        return (self.mem[idx] as u64) | 
+            ((self.mem[idx + 1] as u64) << 8) | 
+            ((self.mem[idx + 1] as u64) << 16) | 
+            ((self.mem[idx + 1] as u64) << 24);
+    }
+
+    fn readdw(&self, addr: &Self::RegValue) -> Self::RegValue {
+        let idx = (addr - BASE) as usize;
+        return (self.mem[idx] as u64) |
+            ((self.mem[idx + 1] as u64) << 8) |
+            ((self.mem[idx + 2] as u64) << 16) |
+            ((self.mem[idx + 3] as u64) << 24) |
+            ((self.mem[idx + 4] as u64) << 32) |
+            ((self.mem[idx + 5] as u64) << 40) |
+            ((self.mem[idx + 6] as u64) << 48) |
+            ((self.mem[idx + 7] as u64) << 56)        
+    }
+
+    fn write_array(&mut self, addr: Self::RegValue, value: Self::Bytes) -> Result<(), Self::Error> {
+        let size = value.len() as u64;
+        if size == 0 {
+            return Ok(());
+        }
+        let indices = Self::get_indices(addr, size)?;
+        self.set_flag(addr, DIRTY);
+        let arr = &mut self.mem[addr as usize..(addr + size) as usize];
+        arr.copy_from_slice(&value);
+        Ok(())
+    }
+
+    fn write(&mut self, addr: u64, value: u64, size: u8) -> Result<(), Self::Error> { 
+        match size {
+            BYTE => { self.write_byte(addr, value) },
+            HALFWORD => { self.write_halfword(addr, value) },
+            WORD => { self.write_word(addr, value) },
+            DOUBLEWORD => { self.write_doubleword(addr, value) },
+            _ => return Err(MemError::StoreAMOAccessFault),
+        }
+        Ok(())    
+    }
+    fn writeb(&mut self, addr: u64, val: u64) {
+        let idx = (addr - BASE) as usize;
+        self.mem[idx] = val as u8;
+    }
+
+    fn writehw(&mut self, addr: u64, val: u64) {
+        let idx = (addr - BASE) as usize;
+        self.mem[idx] = (val & 0xff) as u8;
+        self.mem[idx + 1] = ((val >> 8) & 0xff) as u8;
+    }
+    
+    fn writew(&mut self, addr: u64, val: u64) {
+        let idx = (addr - BASE) as usize;
+        self.mem[idx] = (val & 0xff) as u8;
+        self.mem[idx + 1] = ((val >> 8) & 0xff) as u8;
+        self.mem[idx + 2] = ((val >> 16) & 0xff) as u8;
+        self.mem[idx + 3] = ((val >> 24) & 0xff) as u8;
+    }
+    
+    fn writedw(&mut self, addr: u64, val: u64) {
+        let idx = (addr - BASE) as usize;
+        self.mem[idx] = (val & 0xff) as u8;
+        self.mem[idx + 1] = ((val >> 8) & 0xff) as u8;
+        self.mem[idx + 2] = ((val >> 16) & 0xff) as u8;
+        self.mem[idx + 3] = ((val >> 24) & 0xff) as u8;
+        self.mem[idx + 4] = ((val >> 32) & 0xff) as u8;
+        self.mem[idx + 5] = ((val >> 40) & 0xff) as u8;
+        self.mem[idx + 6] = ((val >> 48) & 0xff) as u8;
+        self.mem[idx + 7] = ((val >> 56) & 0xff) as u8;
+
+    }
+    
+    fn into_u64(&self, val: &Self::RegValue) -> u64 {
+        *val as u64
+    }
 }
 
 impl Default for Dram {
