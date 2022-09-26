@@ -2911,76 +2911,472 @@ mod tests {
         )
     }
 
-    // #[test]
-    // fn test_fetch_and_decode_add_instruction() {
-    //     let mut soft = SoftThread::default();
-    //     let program = vec![0b0000_0000 as u8, 0b1100_1010 as u8, 0b1000_0101 as u8, 0b1011_0011 as u8];
-    //     soft.load_program(program);
-    //     let instruction: Instruction = soft.fetch().into();
-    //     assert_eq!(
-    //         instruction,
-    //         Instruction::Add {
-    //             rd: Register::X11,
-    //             rs1: Register::X21,
-    //             rs2: Register::X12,
-    //             func3: 0,
-    //             func7: 0
-    //         }
-    //     )
-    // }
+    #[test]
+    fn test_fetch_and_decode_add_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0000_0000 as u8, 0b1100_1010 as u8, 0b1000_0101 as u8, 0b1011_0011 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+        assert_eq!(
+            instruction,
+            Instruction::Add {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X12,
+                func3: 0,
+                func7: 0
+            }
+        )
+    }
 
-    // #[test]
-    // fn test_add_execution() {
-    //     let mut soft = SoftThread::default();
-    //     let program = vec![0b0000_0000 as u8, 0b1100_1010 as u8, 0b1000_0101 as u8, 0b1011_0011 as u8];
+    #[test]
+    fn test_add_execution() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0000_0000 as u8, 0b1100_1010 as u8, 0b1000_0101 as u8, 0b1011_0011 as u8];
 
-    //     // Preload some values int the relevant registers
-    //     soft.registers[Register::X12 as usize] = 24u64;
-    //     soft.registers[Register::X21 as usize] = 32u64;
+        // Preload some values int the relevant registers
+        soft.registers[Register::X12 as usize] = 24u64;
+        soft.registers[Register::X21 as usize] = 32u64;
 
-    //     // Load the program code
-    //     soft.load_program(program);
-    //     soft.execute();
+        // Load the program code
+        soft.load_program(program);
+        soft.execute();
 
-    //     assert_eq!(
-    //         soft.registers[Register::X11 as usize],
-    //         56u64
-    //     )
-    // }
+        assert_eq!(
+            soft.registers[Register::X11 as usize],
+            56u64
+        )
+    }
 
-    // #[test]
-    // fn test_fetch_and_decode_addi_instruction() {
-    //     let mut soft = SoftThread::default();
-    //     let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1000_0101 as u8, 0b1001_0011 as u8];
-    //     soft.load_program(program);
-    //     let instruction: Instruction = soft.fetch().into();
-    //     assert_eq!(
-    //         instruction,
-    //         Instruction::Addi {
-    //             rd: Register::X11,
-    //             rs1: Register::X21,
-    //             imm: 3276,
-    //             func3: 0
-    //         }
-    //     );
-    // }
+    #[test]
+    fn test_fetch_and_decode_addi_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1000_0101 as u8, 0b1001_0011 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+        assert_eq!(
+            instruction,
+            Instruction::Addi {
+                rd: Register::X11,
+                rs1: Register::X21,
+                imm: 3276,
+                func3: 0
+            }
+        );
+    }
 
-    // #[test]
-    // fn test_addi_execution() {
-    //     let mut soft = SoftThread::default();
-    //     let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1000_0101 as u8, 0b1001_0011 as u8];
+    #[test]
+    fn test_addi_execution() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1000_0101 as u8, 0b1001_0011 as u8];
 
-    //     // Preload value into rs1
-    //     soft.registers[Register::X21 as usize] = 1000u64;
+        // Preload value into rs1
+        soft.registers[Register::X21 as usize] = 1000u64;
 
-    //     // Load the program code
-    //     soft.load_program(program);
-    //     soft.execute();
+        // Load the program code
+        soft.load_program(program);
+        soft.execute();
 
-    //     assert_eq!(
-    //         soft.registers[Register::X11 as usize],
-    //         4276u64
-    //     )
-    // }
+        assert_eq!(
+            soft.registers[Register::X11 as usize],
+            4276u64
+        )
+    }
+
+    #[test]
+    fn fetch_and_decode_lui_instruction() {}
+
+    #[test]
+    fn test_lui_execution() {}
+
+    #[test]
+    fn fetch_and_decode_auipc_instruction() {}
+
+    #[test]
+    fn test_auipc_execution() {}
+
+    #[test]
+    fn fetch_and_decode_jal_instruction() {}
+    
+    #[test]
+    fn test_jal_execution() {}
+
+    #[test]
+    fn fetch_and_decode_jalr_instruction() {}
+
+    #[test]
+    fn test_jalr_execution() {}
+
+    #[test]
+    fn fetch_and_decode_beq_instruction() {}
+    
+    #[test]
+    fn test_beq_execution() {}
+
+    #[test]
+    fn fetch_and_decode_bne_instruction() {}
+
+    #[test]
+    fn test_bne_execution() {}
+
+    #[test]
+    fn fetch_and_decode_blt_instruction() {}
+
+    #[test]
+    fn test_blt_execution() {}
+
+    #[test]
+    fn fetch_and_decode_bge_instruction() {}
+
+    #[test]
+    fn test_bge_execution() {}
+
+    #[test]
+    fn fetch_and_decode_bltu_instruction() {}
+
+    #[test]
+    fn test_bltu_execution() {}
+
+    #[test]
+    fn fetch_and_decode_bgeu_instruction() {}
+
+    #[test]
+    fn test_bgeu_execution() {}
+
+    #[test]
+    fn fetch_and_decode_lb_instruction() {}
+    
+    #[test]
+    fn test_lb_execution() {}
+
+    #[test]
+    fn fetch_and_decode_lh_instruction() {}
+    
+    #[test]
+    fn test_lh_execution() {}
+
+    #[test]
+    fn fetch_and_decode_lw_instruction() {}
+    
+    #[test]
+    fn test_lw_execution() {}
+
+    #[test]
+    fn fetch_and_decode_lbu_instruction() {}
+    
+    #[test]
+    fn test_lbu_execution() {}
+
+    #[test]
+    fn fetch_and_decode_lhu_instruction() {}
+
+    #[test]
+    fn test_lhu_execution() {}
+
+    #[test]
+    fn fetch_and_decode_sb_instruction() {}
+    
+    #[test]
+    fn test_sb_execution() {}
+
+    #[test]
+    fn fetch_and_decode_sh_instruction() {}    
+
+    #[test]
+    fn test_su_execution() {}
+
+    #[test]
+    fn fetch_and_decode_sw_instruction() {}
+
+    #[test]
+    fn test_sw_execution() {}
+
+    #[test]
+    fn fetch_and_decode_slti_instruction() {}
+    
+    #[test]
+    fn test_slti_execution() {}
+
+    #[test]
+    fn fetch_and_decode_xori_instruction() {}    
+
+    #[test]
+    fn test_xori_execution() {}
+
+    #[test]
+    fn fetch_and_decode_ori_instruction() {}
+
+    #[test]
+    fn test_ori_execution() {}
+
+    #[test]
+    fn fetch_and_decode_andi_instruction() {}    
+
+    #[test]
+    fn test_andi_execution() {}
+
+    #[test]
+    fn fetch_and_decode_slli_instruction() {}
+
+    #[test]
+    fn test_slli_execution() {}
+
+    #[test]
+    fn fetch_and_decode_srli_instruction() {}
+    
+    #[test]
+    fn test_srli_execution() {}
+
+    #[test]
+    fn fetch_and_decode_srai_instruction() {}
+
+    #[test]
+    fn test_srai_execution() {}
+
+    #[test]
+    fn fetch_and_decode_sub_instruction() {}
+
+    #[test]
+    fn test_sub_execution() {}
+
+    #[test]
+    fn fetch_and_decode_sll_instruction() {}
+
+    #[test]
+    fn test_sll_execution() {}
+
+    #[test]
+    fn fetch_and_decode_slt_instruction() {}
+
+    #[test]
+    fn test_slt_execution() {}
+
+    #[test]
+    fn fetch_and_decode_sltu_instruction() {}
+
+    #[test]
+    fn test_sltu_execution() {}
+
+    #[test]
+    fn fetch_and_decode_xor_instruction() {}
+
+    #[test]
+    fn test_xor_execution() {}
+
+    #[test]
+    fn fetch_and_decode_srl_instruction() {}
+
+    #[test]
+    fn test_srl_execution() {}
+
+    #[test]
+    fn fetch_and_decode_sra_instruction() {}
+
+    #[test]
+    fn test_sra_execution() {}
+
+    #[test]
+    fn fetch_and_decode_or_instruction() {}
+
+    #[test]
+    fn test_or_execution() {}
+
+    #[test]
+    fn fetch_and_decode_and_instruction() {}
+
+    #[test]
+    fn test_and_execution() {}
+
+    #[test]
+    fn fetch_and_decode_fence_instruction() {}
+
+    #[test]
+    fn fetch_and_decode_ecall_instruction() {}
+
+    #[test]
+    fn fetch_and_decode_ebreak_instruction() {}
+
+    #[test]
+    fn fetch_and_decode_lwu_instruction() {}
+
+    #[test]
+    fn test_lwu_execution() {}
+
+    #[test]
+    fn fetch_and_decode_ld_instruction() {}
+
+    #[test]
+    fn test_ld_execution() {}
+
+    #[test]
+    fn fetch_and_decode_sd_instruction() {}
+
+    #[test]
+    fn test_sd_execution() {}
+
+    #[test]
+    fn fetch_and_decode_addiw_instruction() {}
+
+    #[test]
+    fn test_addiw_execution() {}
+
+    #[test]
+    fn fetch_and_decode_slliw_instruction() {}
+
+    #[test]
+    fn test_slliw_execution() {}
+
+    #[test]
+    fn fetch_and_decode_sraiw_instruction() {}
+
+    #[test]
+    fn test_sraiw_execution() {}
+
+    #[test]
+    fn fetch_and_decode_addw_instruction() {}
+
+    #[test]
+    fn test_addw_execution() {}
+
+    #[test]
+    fn fetch_and_decode_subw_instruction() {}
+
+    #[test]
+    fn test_subw_execution() {}
+
+    #[test]
+    fn fetch_and_decode_sllw_instruction() {}
+
+    #[test]
+    fn test_sllw_execution() {}
+
+    #[test]
+    fn fetch_and_decode_srlw_instruction() {}
+
+    #[test]
+    fn test_srlw_execution() {}
+
+    #[test]
+    fn fetch_and_decode_sraw_instruction() {}
+
+    #[test]
+    fn test_sraw_execution() {}
+
+    #[test]
+    fn fetch_and_decode_fencei_instruction() {}
+    
+    #[test]
+    fn fetch_and_decode_csrrw_instruction() {}
+
+    #[test]
+    fn test_csrrw_execution() {}
+
+    #[test]
+    fn fetch_and_decode_csrrs_instruction() {}
+
+    #[test]
+    fn test_csrrs_execution() {}
+
+    #[test]
+    fn fetch_and_decode_csrrc_instruction() {}
+
+    #[test]
+    fn test_csrrc_execution() {}
+
+    #[test]
+    fn fetch_and_decode_csrrwi_instruction() {}
+
+    #[test]
+    fn test_csrrwi_execution() {}
+
+    #[test]
+    fn fetch_and_decode_csrrsi_instruction() {}
+
+    #[test]
+    fn test_csrrsi_execution() {}
+
+    #[test]
+    fn fetch_and_decode_csrrci_instruction() {}
+
+    #[test]
+    fn test_csrrci_execution() {}
+
+    #[test]
+    fn fetch_and_decode_mul_instruction() {}
+
+    #[test]
+    fn test_mul_execution() {}
+
+    #[test]
+    fn fetch_and_decode_mulh_instruction() {}
+
+    #[test]
+    fn test_mulh_execution() {}
+
+    #[test]
+    fn fetch_and_decode_mulhsu_instruction() {}
+
+    #[test]
+    fn test_mulhsu_execution() {}
+
+    #[test]
+    fn fetch_and_decode_mulhu_instruction() {}
+
+    #[test]
+    fn test_mulhu_execution() {}
+
+    #[test]
+    fn fetch_and_decode_div_instruction() {}
+
+    #[test]
+    fn test_div_execution() {}
+
+    #[test]
+    fn fetch_and_decode_divu_instruction() {}
+
+    #[test]
+    fn test_divu_execution() {}
+
+    #[test]
+    fn fetch_and_decode_rem_instruction() {}
+
+    #[test]
+    fn test_rem_execution() {}
+
+    #[test]
+    fn fetch_and_decode_remu_instruction() {}
+
+    #[test]
+    fn test_remu_execution() {}
+
+    #[test]
+    fn fetch_and_decode_mulw_instruction() {}
+
+    #[test]
+    fn test_mulw_execution() {}
+
+    #[test]
+    fn fetch_and_decode_divw_instruction() {}
+
+    #[test]
+    fn test_divw_execution() {}
+
+    #[test]
+    fn fetch_and_decode_divuw_instruction() {}
+
+    #[test]
+    fn test_divuw_execution() {}
+
+    #[test]
+    fn fetch_and_decode_remw_instruction() {}
+
+    #[test]
+    fn test_remw_execution() {}
+
+    #[test]
+    fn fetch_and_decode_remuw_instruction() {}
+
+    #[test]
+    fn test_remuw_execution() {}
 
 }

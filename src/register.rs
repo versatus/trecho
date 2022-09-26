@@ -9,7 +9,7 @@ pub trait RegisterValue:
     BitOr<Output = Self> +
     BitXor<Output = Self> +
     Shl<Output = Self> +
-    Shr<Output = Self> +
+    Shr<Output = Self>
 
 {
     const BITS: u8;

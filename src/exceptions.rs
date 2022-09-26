@@ -16,7 +16,8 @@ pub enum Exception {
     EnvironmentCallFromMMode,
     InstructionPageFault(u64),
     LoadPageFault(u64),
-    StoreAMOPageFault(u64)
+    StoreAMOPageFault(u64),
+    General,
 }
 
 #[derive(Debug)]

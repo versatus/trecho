@@ -3,23 +3,24 @@ use crate::encoding::{EncodingTable, InstructionDecoder};
 use crate::encoding_types::Inst;
 use crate::extensions::{Base, Extension};
 use crate::instructions::Instruction;
-use crate::register::Register;
+use crate::register::{Register, RegisterValue};
 use crate::memory::{Dram, MEM_SIZE};
 use crate::machine::{Machine, Support};
 use crate::memory::Memory;
 
-pub struct SoftThread<M> {
-    pub registers: [u64; 33],
-    pc: u64,
+pub struct SoftThread<R, M> {
+    pub registers: [R; 33],
+    pc: R,
     pub program: Vec<u8>,
     remainder: u32,
     eq_flag: bool,
     enc_table: EncodingTable,
-    bus: M
+    bus: M,
+    csr: [R; 4096]
 }
 
-impl<M: Memory> SoftThread<M> {
-    pub fn new(enc_table: EncodingTable) -> SoftThread<M> {
+impl SoftThread<u64, Dram> {
+    pub fn new(enc_table: EncodingTable) -> SoftThread<u64, Dram> {
         let mut soft = SoftThread {
             registers: [0; 33],
             pc: 0,
@@ -27,7 +28,7 @@ impl<M: Memory> SoftThread<M> {
             remainder: 0,
             eq_flag: false,
             enc_table,
-            bus: M::default()
+            bus: Dram::default()
         };
 
         soft.registers[2] = MEM_SIZE;
@@ -41,12 +42,11 @@ impl<M: Memory> SoftThread<M> {
     }
 
     pub(crate) fn fetch(&self) -> Inst {
-        let idx: usize = self.pc as usize;
         let mut bytes: [u8; 4] = [
-            self.program[idx + 3],
-            self.program[idx + 2],
-            self.program[idx + 1],
-            self.program[idx],
+            self.program[(self.pc + 3) as usize],
+            self.program[(self.pc + 2) as usize],
+            self.program[(self.pc + 1) as usize],
+            self.program[self.pc as usize],
         ];
         let inst: Inst = u32::from_le_bytes(bytes);
         return inst;
@@ -290,6 +290,93 @@ impl<M: Memory> SoftThread<M> {
                 self.registers[rd as usize] = ((self.registers[rs1 as usize] as i32) >> (shamt as i32)) as u64;
             },
             Instruction::FenceI { .. } => { todo!() },
+            Instruction::Csrrw { csr, rs1, rd, .. } => {
+                if rd != Register::X0 {
+                    let csr_val = self.csr[csr as usize];
+                    csr_val.zero_extend();
+                    self.registers[rd as usize] = csr_val;
+                    self.csr[csr as usize] = self.registers[rs1 as usize]
+                }
+            },
+            Instruction::Csrrs { csr, rs1, rd, .. } => {
+                if rs1 != Register::X0 {
+                    let csr_val = self.csr[csr as usize];
+                    csr_val.zero_extend();
+                    self.registers[rd as usize] = csr_val;
+                    self.csr[csr as usize] = self.csr[csr as usize] | self.registers[rs1 as usize];    
+                }                
+            },
+            Instruction::Csrrc { csr, rs1, rd, .. } => {
+                if rs1 != Register::X0 {
+                    let csr_val = self.csr[csr as usize];
+                    csr_val.zero_extend();
+                    self.registers[rd as usize] = csr_val;
+                    self.csr[csr as usize] = self.csr[csr as usize] & self.registers[rs1 as usize];
+                }
+            },
+            Instruction::Csrrwi { rd, csr, uimm, .. } => {
+                if rd != Register::X0 {
+                    let csr_val = self.csr[csr as usize];
+                    let imm = uimm.zero_extend();
+                    self.registers[rd as usize] = csr_val;
+                    self.csr[csr as usize] = imm;
+                }
+            },
+            Instruction::Csrrsi { rd, csr, uimm, .. } => {
+                if uimm != Register::X0 {
+                    let csr_val = self.csr[csr as usize];
+                    let imm = uimm.zero_extend();
+                    self.registers[rd as usize] = csr_val;
+                    self.csr[csr as usize] = self.csr[csr as usize] | imm;
+                }
+            },
+            Instruction::Csrrci { rd, csr, uimm, .. } => {
+                if uimm != Register::X0 {
+                    let csr_val = self.csr[csr as usize];
+                    let imm = uimm.zero_extend();
+                    self.registers[rd as usize] = csr_val;
+                    self.csr[csr as usize] = self.csr[csr as usize] & imm;
+                }
+            },
+            Instruction::Mul { rd, rs1, rs2, .. } => {
+                self.registers[rd as usize] = self.registers[rs1 as usize].overflowing_mul(self.registers[rs2 as usize]);
+            },
+            Instruction::Mulh { rd, rs1, rs2, .. } => {
+                self.registers[rd as usize] = self.registers[rs1 as usize].overflowing_mul_high_signed(self.registers[rs2 as usize]);
+            },
+            Instruction::Mulhsu { rd, rs1, rs2, .. } => {
+                self.registers[rd as usize] = self.registers[rs1 as usize].overflowing_mul_high_signed_unsigned(self.registers[rs2 as usize]);
+            },
+            Instruction::Mulhu { rd, rs1, rs2, .. } => {
+                self.registers[rd as usize] = self.registers[rs1 as usize].overflowing_mul_high_unsigned(self.registers[rs2 as usize]);
+            },
+            Instruction::Div { rd, rs1, rs2, .. } => {
+                self.registers[rd as usize] = self.registers[rs1 as usize].overflowing_div_signed(self.registers[rs2 as usize]);
+            },
+            Instruction::Divu { rd, rs1, rs2, .. } => {
+                self.registers[rd as usize] = self.registers[rs1 as usize].overflowing_div(self.registers[rs2 as usize]);
+            },
+            Instruction::Rem { rd, rs1, rs2, .. } => {
+                self.registers[rd as usize] = self.registers[rs1 as usize].overflowing_rem_signed(self.registers[rs2 as usize]);
+            },
+            Instruction::Remu { rd, rs1, rs2, .. } => {
+                self.registers[rd as usize] = self.registers[rs1 as usize].overflowing_rem(self.registers[rs2 as usize]);
+            },
+            Instruction::Mulw { rd, rs1, rs2, .. } => {
+                self.registers[rd as usize] = self.registers[rs1 as usize].overflowing_mul(self.registers[rs2 as usize]);
+            },
+            Instruction::Divw { rd, rs1, rs2, .. } => {
+                self.registers[rd as usize] = self.registers[rs1 as usize].overflowing_div_signed(self.registers[rs2 as usize]);
+            },
+            Instruction::Divuw { rd, rs1, rs2, .. } => {
+                self.registers[rd as usize] = self.registers[rs1 as usize].overflowing_div(self.registers[rs2 as usize]);
+            },
+            Instruction::Remw { rd, rs1, rs2, .. } => {
+                self.registers[rd as usize] = self.registers[rs1 as usize].overflowing_rem_signed(self.registers[rs2 as usize]);
+            },
+            Instruction::RemuW { rd, rs1, rs2, .. } => {
+                self.registers[rd as usize] = self.registers[rs1 as usize].overflowing_rem(self.registers[rs2 as usize]);
+            }
             _ => {
                 unimplemented!()
             }
@@ -303,9 +390,11 @@ impl<M: Memory> SoftThread<M> {
     }
 }
 
-impl<M: Memory> Default for SoftThread<M> {
-    fn default() -> SoftThread<M> {
+
+
+impl Default for SoftThread<u64, Dram> {
+    fn default() -> SoftThread<u64, Dram> {
         let enc_table = EncodingTable::default();
-        SoftThread::new(enc_table)
+        SoftThread::<u64, Dram>::new(enc_table)
     }
 }

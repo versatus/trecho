@@ -33,6 +33,5 @@ pub trait Support: Machine {
     fn load_inner_elf(&mut self, program: &Self::Bytes, update_pc: bool) -> Result<(), <Self as Machine>::Error>;
     fn load_elf(&mut self, program: &Self::Bytes, update_pc: bool) -> Result<u64, <Self as Machine>::Error>;
     fn init_stack(&mut self, args: &[Self::Bytes], start: u64, size: u64) -> Result<u64, <Self as Machine>::Error>;
-    //TODO: Make Feature Enabled 
     fn code(&self) -> &Self::Bytes;
 }
