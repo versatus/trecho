@@ -3475,7 +3475,6 @@ mod tests {
             soft.registers[Register::X11],
             235
         )
-
     }
 
     #[test]
@@ -3543,139 +3542,718 @@ mod tests {
     }
 
     #[test]
-    fn fetch_and_decode_lbu_instruction() {}
+    fn fetch_and_decode_lbu_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1100_0101 as u8, 0b0000_0011 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+        assert_eq!(
+            instruction,
+            Instruction::Lbu {
+                rd: Register::X11,
+                rs1: Register::X21,
+                imm: 3276,
+                func3: 4,
+            }
+        );
+    }
     
     #[test]
-    fn test_lbu_execution() {}
+    fn test_lbu_execution() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1100_0101 as u8, 0b0000_0011 as u8];
+        soft.load_program(program);
+        soft.registers[Register::X21 as usize] = 100;
+        soft.bus.mem[3376] = 235;
+        soft.execute();
+
+        assert_eq!(
+            soft.registers[Register::X11],
+            235
+        )
+    }
 
     #[test]
-    fn fetch_and_decode_lhu_instruction() {}
+    fn fetch_and_decode_lhu_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1101_0101 as u8, 0b0000_0011 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+        assert_eq!(
+            instruction,
+            Instruction::Lhu {
+                rd: Register::X11,
+                rs1: Register::X21,
+                imm: 3276,
+                func3: 5,
+            }
+        );
+    }
 
     #[test]
-    fn test_lhu_execution() {}
+    fn test_lhu_execution() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1100_0101 as u8, 0b0000_0011 as u8];
+        soft.load_program(program);
+        soft.registers[Register::X21 as usize] = 100;
+        soft.bus.mem[3376] = 3000;
+        soft.execute();
+
+        assert_eq!(
+            soft.registers[Register::X11],
+            3000
+        )
+    }
 
     #[test]
-    fn fetch_and_decode_sb_instruction() {}
+    fn fetch_and_decode_sb_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1000_0101 as u8, 0b0010_0011 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+        assert_eq!(
+            instruction,
+            Instruction::Sb {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X12
+                imm: 3276,
+                func3: 0,
+            }
+        );
+    }
     
     #[test]
-    fn test_sb_execution() {}
+    fn test_sb_execution() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1000_0101 as u8, 0b0010_0011 as u8];
+        soft.load_program(program);
+        soft.registers[Register::X21 as usize] = 100;
+        soft.registers[Register::X12 as usize] = 235;
+        soft.execute();
+
+        assert_eq!(
+            soft.bus.mem[3376],
+            235
+        )
+        
+    }
 
     #[test]
-    fn fetch_and_decode_sh_instruction() {}    
+    fn fetch_and_decode_sh_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1001_0101 as u8, 0b0010_0011 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+        assert_eq!(
+            instruction,
+            Instruction::Sh {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X12
+                imm: 3276,
+                func3: 1,
+            }
+        );
+    }    
 
     #[test]
-    fn test_su_execution() {}
+    fn test_sh_execution() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1001_0101 as u8, 0b0010_0011 as u8];
+        soft.load_program(program);
+        soft.registers[Register::X21 as usize] = 100;
+        soft.registers[Register::X12 as usize] = 3000;
+        soft.execute();
+
+        assert_eq!(
+            soft.bus.mem[3376],
+            3000
+        )
+    }
 
     #[test]
-    fn fetch_and_decode_sw_instruction() {}
+    fn fetch_and_decode_sw_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1010_0101 as u8, 0b0010_0011 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+        assert_eq!(
+            instruction,
+            Instruction::Sw {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X12
+                imm: 3276,
+                func3: 2,
+            }
+        );
+    }
 
     #[test]
-    fn test_sw_execution() {}
+    fn test_sw_execution() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1010_0101 as u8, 0b0010_0011 as u8];
+        soft.load_program(program);
+        soft.registers[Register::X21 as usize] = 100;
+        soft.registers[Register::X12 as usize] = 100000;
+        soft.execute();
+
+        assert_eq!(
+            soft.bus.mem[3376],
+            100000
+        )
+    }
 
     #[test]
-    fn fetch_and_decode_slti_instruction() {}
+    fn fetch_and_decode_slti_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1010_0101 as u8, 0b0001_0011 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+        assert_eq!(
+            instruction,
+            Instruction::Slti {
+                rd: Register::X11,
+                rs1: Register::X21,
+                imm: 3276,
+                func3: 2,
+            }
+        );
+    }
     
     #[test]
-    fn test_slti_execution() {}
+    fn test_slti_less_than_execution() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1010_0101 as u8, 0b0001_0011 as u8];
+        soft.load_program(program);
+        self.registers[Register::X21 as usize] = 2;
+        soft.execute();
+
+        assert_eq!(
+            self.registers[Register::X11],
+            1
+        )
+    }
 
     #[test]
-    fn fetch_and_decode_xori_instruction() {}    
+    fn test_slti_greater_or_equal_execution() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1010_0101 as u8, 0b0001_0011 as u8];
+        soft.load_program(program);
+        self.registers[Register::X21 as usize] = 100000;
+        soft.execute();
+
+        assert_eq!(
+            self.registers[Register::X11],
+            0
+        )
+    }
 
     #[test]
-    fn test_xori_execution() {}
+    fn fetch_and_decode_xori_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1100_0101 as u8, 0b0001_0011 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+        
+        assert_eq!(
+            instruction,
+            Instruction::Xori {
+                rd: Register::X11,
+                rs1: Register::X21,
+                imm: 3276,
+                func3: 4,
+            }
+        );
+    }    
 
     #[test]
-    fn fetch_and_decode_ori_instruction() {}
+    fn test_xori_execution() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1100_0101 as u8, 0b0001_0011 as u8];
+        soft.load_program(program);
+        self.registers[Register::X21 as usize] = 0b1100_1100_1100;
+        soft.execute();
+
+        assert_eq!(
+            self.registers[Register::X11 as usize],
+            0b0000_0000_0000
+        )
+    }
 
     #[test]
-    fn test_ori_execution() {}
+    fn fetch_and_decode_ori_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1110_0101 as u8, 0b0001_0011 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+        
+        assert_eq!(
+            instruction,
+            Instruction::Ori {
+                rd: Register::X11,
+                rs1: Register::X21,
+                imm: 3276,
+                func3: 6,
+            }
+        );
+    }
 
     #[test]
-    fn fetch_and_decode_andi_instruction() {}    
+    fn test_ori_execution() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1110_0101 as u8, 0b0001_0011 as u8];
+        soft.load_program(program);
+        self.registers[Register::X21 as usize] = 0b0011_0011_0011;
+        soft.execute();
+
+        assert_eq!(
+            self.registers[Register::X11 as usize],
+            0b1111_1111_1111
+        )
+    }
 
     #[test]
-    fn test_andi_execution() {}
+    fn fetch_and_decode_andi_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1111_0101 as u8, 0b0001_0011 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+        
+        assert_eq!(
+            instruction,
+            Instruction::Andi {
+                rd: Register::X11,
+                rs1: Register::X21,
+                imm: 3276,
+                func3: 6,
+            }
+        );
+    }    
 
     #[test]
-    fn fetch_and_decode_slli_instruction() {}
+    fn test_andi_execution() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1111_0101 as u8, 0b0001_0011 as u8];
+        soft.load_program(program);
+        self.registers[Register::X21 as usize] = 0b0011_0011_0011;
+        soft.execute();
+
+        assert_eq!(
+            self.registers[Register::X11 as usize],
+            0b0000_0000_0000
+        )
+    }
 
     #[test]
-    fn test_slli_execution() {}
+    fn fetch_and_decode_slli_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0000_0000 as u8, 0b1100_1010 as u8, 0b1001_0101 as u8, 0b0001_0011 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+        
+        assert_eq!(
+            instruction,
+            Instruction::Slli {
+                rd: Register::X11,
+                rs1: Register::X21,
+                shamt: 12
+                func3: 6,
+                func7: 0,
+            }
+        );
+    }
 
     #[test]
-    fn fetch_and_decode_srli_instruction() {}
+    fn test_slli_execution() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0000_0000 as u8, 0b1100_1010 as u8, 0b1001_0101 as u8, 0b0001_0011 as u8];
+        soft.load_program(program);
+        soft.registers[Register::X21 as usize] = 1000;
+        soft.execute();
+
+        assert_eq(
+            soft.registers[Register::X11 as usize],
+            1000u64.wrapping_shl(12)
+        )
+    }
+
+    #[test]
+    fn fetch_and_decode_srli_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0000_0000 as u8, 0b1100_1010 as u8, 0b1101_0101 as u8, 0b0001_0011 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+        
+        assert_eq!(
+            instruction,
+            Instruction::Srli {
+                rd: Register::X11,
+                rs1: Register::X21,
+                shamt: 12
+                func3: 5,
+                func7: 0,
+            }
+        );
+    }
     
     #[test]
-    fn test_srli_execution() {}
+    fn test_srli_execution() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0000_0000 as u8, 0b1100_1010 as u8, 0b1101_0101 as u8, 0b0001_0011 as u8];
+        soft.load_program(program);
+        soft.registers[Register::X21 as usize] = 1000;
+        soft.execute();
+
+        assert_eq(
+            soft.registers[Register::X11 as usize],
+            1000u64.wrapping_shr(12)
+        );
+    }
 
     #[test]
-    fn fetch_and_decode_srai_instruction() {}
+    fn fetch_and_decode_srai_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0100_0000 as u8, 0b1100_1010 as u8, 0b1101_0101 as u8, 0b0001_0011 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+        
+        assert_eq!(
+            instruction,
+            Instruction::Srai {
+                rd: Register::X11,
+                rs1: Register::X21,
+                shamt: 12,
+                func3: 5,
+                func7: 0,
+            }
+        );
+    }
 
     #[test]
-    fn test_srai_execution() {}
+    fn test_srai_execution() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0100_0000 as u8, 0b1100_1010 as u8, 0b1101_0101 as u8, 0b0001_0011 as u8];
+        soft.load_program(program);
+        soft.registers[Register::X21 as usize] = 1000;
+        soft.execute();
+
+        assert_eq(
+            soft.registers[Register::X11 as usize],
+            1000i64.wrapping_shr(12) as u64
+        );
+    }
 
     #[test]
-    fn fetch_and_decode_sub_instruction() {}
+    fn fetch_and_decode_sub_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0100_0000 as u8, 0b1100_1010 as u8, 0b1000_0101 as u8, 0b0011_0011 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+
+        assert_eq!(
+            instruction,
+            Instruction::Srai {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X12,
+                func3: 5,
+                func7: 32,
+            }
+        );
+    }
 
     #[test]
-    fn test_sub_execution() {}
+    fn test_sub_execution() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0100_0000 as u8, 0b1100_1010 as u8, 0b1000_0101 as u8, 0b0011_0011 as u8];
+        soft.load_program(program);
+        soft.registers[Register::X21 as usize] = 1000;
+        soft.registers[Register::X12 as usize] = 300;
+        soft.execute();
+
+        assert_eq(
+            soft.registers[Register::X11 as usize],
+            700;
+        )
+    }
 
     #[test]
-    fn fetch_and_decode_sll_instruction() {}
+    fn fetch_and_decode_sll_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0000_0000 as u8, 0b1100_1010 as u8, 0b1001_0101 as u8, 0b0011_0011 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+
+        assert_eq!(
+            instruction,
+            Instruction::Sll {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X12,
+                func3: 1,
+                func7: 0,
+            }
+        );
+    }
 
     #[test]
-    fn test_sll_execution() {}
+    fn test_sll_execution() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0000_0000 as u8, 0b1100_1010 as u8, 0b1001_0101 as u8, 0b0011_0011 as u8];
+        soft.load_program(program);
+        soft.registers[Register::X12 as usize] = 12;
+        soft.registers[Register::X21 as usize] = 1000;
+        soft.execute();
+
+        assert_eq(
+            soft.registers[Register::X11 as usize],
+            1000 << (((0b1100 & 0x3f) as u64) as u32)
+        )
+    }
 
     #[test]
-    fn fetch_and_decode_slt_instruction() {}
+    fn fetch_and_decode_slt_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0000_0000 as u8, 0b1100_1010 as u8, 0b1010_0101 as u8, 0b0011_0011 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+
+        assert_eq!(
+            instruction,
+            Instruction::Slt {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X12,
+                func3: 2,
+                func7: 0,
+            }
+        );
+    }
 
     #[test]
-    fn test_slt_execution() {}
+    fn test_slt_execution() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0000_0000 as u8, 0b1100_1010 as u8, 0b1010_0101 as u8, 0b0011_0011 as u8];
+        soft.load_program(program);
+        soft.registers[Register::X12 as usize] = 12;
+        soft.registers[Register::X21 as usize] = 10;
+        soft.execute();
+
+        assert_eq(
+            soft.registers[Register::X11 as usize],
+            1
+        )
+    }
 
     #[test]
-    fn fetch_and_decode_sltu_instruction() {}
+    fn fetch_and_decode_sltu_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0000_0000 as u8, 0b1100_1010 as u8, 0b1011_0101 as u8, 0b0011_0011 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+
+        assert_eq!(
+            instruction,
+            Instruction::Sltu {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X12,
+                func3: 3,
+                func7: 0,
+            }
+        );
+    }
 
     #[test]
-    fn test_sltu_execution() {}
+    fn test_sltu_execution() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0000_0000 as u8, 0b1100_1010 as u8, 0b1011_0101 as u8, 0b0011_0011 as u8];
+        soft.load_program(program);
+        soft.registers[Register::X12 as usize] = 12;
+        soft.registers[Register::X21 as usize] = 10;
+        soft.execute();
+
+        assert_eq(
+            soft.registers[Register::X11 as usize],
+            1            
+        )
+    }
 
     #[test]
-    fn fetch_and_decode_xor_instruction() {}
+    fn fetch_and_decode_xor_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0000_0000 as u8, 0b1100_1010 as u8, 0b1100_0101 as u8, 0b0011_0011 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+
+        assert_eq!(
+            instruction,
+            Instruction::Xor {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X12,
+                func3: 4,
+                func7: 0,
+            }
+        );
+    }
 
     #[test]
-    fn test_xor_execution() {}
+    fn test_xor_execution() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0000_0000 as u8, 0b1100_1010 as u8, 0b1100_0101 as u8, 0b0011_0011 as u8];
+        soft.load_program(program);
+        soft.registers[Register::X21 as usize] = 0b1100_1100_1100;
+        soft.registers[Register::X12 as usize] = 0b0011_0011_0011;
+        soft.execute();
+        
+        assert_eq!(
+            soft.registers[Register::X11 as usize],
+            0b1111_1111_1111
+        )
+        
+    }
 
     #[test]
-    fn fetch_and_decode_srl_instruction() {}
+    fn fetch_and_decode_srl_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0000_0000 as u8, 0b1100_1010 as u8, 0b1101_0101 as u8, 0b0011_0011 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+
+        assert_eq!(
+            instruction,
+            Instruction::Srl {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X12,
+                func3: 5,
+                func7: 0,
+            }
+        );
+    }
 
     #[test]
-    fn test_srl_execution() {}
+    fn test_srl_execution() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0000_0000 as u8, 0b1100_1010 as u8, 0b1101_0101 as u8, 0b0011_0011 as u8];
+        soft.load_program(program);
+        soft.registers[Register::X12 as usize] = 12;
+        soft.registers[Register::X21 as usize] = 10;
+        soft.execute();
+        let shamt = ((12 & 0x3f) as u64) as u32;
+
+        assert_eq!(
+            soft.registers[Register::X11 as usize],
+            10u64.wrapping_shr(shamt)
+        )
+    }
 
     #[test]
-    fn fetch_and_decode_sra_instruction() {}
+    fn fetch_and_decode_sra_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0100_0000 as u8, 0b1100_1010 as u8, 0b1101_0101 as u8, 0b0011_0011 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+
+        assert_eq!(
+            instruction,
+            Instruction::Sra {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X12,
+                func3: 5,
+                func7: 32,
+            }
+        );
+    }
 
     #[test]
-    fn test_sra_execution() {}
+    fn test_sra_execution() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0100_0000 as u8, 0b1100_1010 as u8, 0b1101_0101 as u8, 0b0011_0011 as u8];
+        soft.load_program(program);
+        soft.registers[Register::X12 as usize] = 12;
+        soft.registers[Register::X21 as usize] = 10;
+        soft.execute();
+        let shamt = ((12 & 0x3f) as u64) as u32;
+
+        assert_eq!(
+            soft.registers[Register::X11 as usize],
+            (10i64.wrapping_shr(shamt) as u64)
+        )
+    }
 
     #[test]
-    fn fetch_and_decode_or_instruction() {}
+    fn fetch_and_decode_or_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0000_0000 as u8, 0b1100_1010 as u8, 0b1110_0101 as u8, 0b0011_0011 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+
+        assert_eq!(
+            instruction,
+            Instruction::Or {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X12,
+                func3: 6,
+                func7: 0,
+            }
+        );
+    }
 
     #[test]
-    fn test_or_execution() {}
+    fn test_or_execution() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0000_0000 as u8, 0b1100_1010 as u8, 0b1110_0101 as u8, 0b0011_0011 as u8];
+        soft.load_program(program);
+        soft.registers[Register::X12 as usize] = 12;
+        soft.registers[Register::X21 as usize] = 10;
+        soft.execute();
+        
+        assert_eq!(
+            soft.registers[Register::X11 as usize],
+            (0b0000_1010 | 0b0000_1100)
+        )
+    }
 
     #[test]
-    fn fetch_and_decode_and_instruction() {}
+    fn fetch_and_decode_and_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0000_0000 as u8, 0b1100_1010 as u8, 0b1111_0101 as u8, 0b0011_0011 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+
+        assert_eq!(
+            instruction,
+            Instruction::And {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X12,
+                func3: 7,
+                func7: 0,
+            }
+        );
+    }
 
     #[test]
-    fn test_and_execution() {}
-
-    #[test]
-    fn fetch_and_decode_fence_instruction() {}
-
-    #[test]
-    fn fetch_and_decode_ecall_instruction() {}
-
-    #[test]
-    fn fetch_and_decode_ebreak_instruction() {}
+    fn test_and_execution() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0000_0000 as u8, 0b1100_1010 as u8, 0b1111_0101 as u8, 0b0011_0011 as u8];
+        soft.load_program(program);
+        
+        soft.registers[Register::X12 as usize] = 12;
+        soft.registers[Register::X21 as usize] = 10;
+        soft.execute();
+        
+        assert_eq!(
+            soft.registers[Register::X11 as usize],
+            (0b0000_1010 & 0b0000_1100)
+        )
+    }
 
     #[test]
     fn fetch_and_decode_lwu_instruction() {}

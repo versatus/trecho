@@ -180,7 +180,7 @@ impl SoftThread<u64, Dram> {
                 self.registers[rd as usize] = self.registers[rs1 as usize] & ((imm as i64) as u64);
             },
             Instruction::Slli { rd, rs1, shamt, .. } => {
-                self.registers[rd as usize] = self.registers[rs1 as usize] << shamt;
+                self.registers[rd as usize] = self.registers[rs1 as usize].wrapping_shl(shamt);
             },
             Instruction::Srli { rd, rs1, shamt, .. } => {
                 self.registers[rd as usize] = self.registers[rs1 as usize].wrapping_shr(shamt);
@@ -189,18 +189,10 @@ impl SoftThread<u64, Dram> {
                 self.registers[rd as usize] = (self.registers[rs1 as usize] as i64).wrapping_shr(shamt) as u64;
             },
             Instruction::Add { rd, rs1, rs2, .. } => {
-                if let Some(res) =
-                    self.registers[rs1 as usize].checked_add(self.registers[rs2 as usize])
-                {
-                    self.registers[rd as usize] = res;
-                }
+                self.registers[rs1 as usize].overflowing_add(self.registers[rs2 as usize])
             },
             Instruction::Sub { rd, rs1, rs2, .. } => {
-                if let Some(res) =
-                    self.registers[rs1 as usize].checked_sub(self.registers[rs2 as usize])
-                {
-                    self.registers[rd as usize] = res;
-                }
+                self.registers[rs1 as usize].overflowing_sub(self.registers[rs2 as usize])  
             },
             Instruction::Sll { rd, rs1, rs2, .. } => {
                 let shamt = ((self.registers[rs2 as usize] & 0x3f) as u64) as u32;
