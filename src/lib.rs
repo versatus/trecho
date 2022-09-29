@@ -4624,40 +4624,241 @@ mod tests {
     }
 
     #[test]
-    fn fetch_and_decode_csrrw_instruction() {}
+    fn fetch_and_decode_csrrw_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0100_0000 as u8, 0b1100_1010 as u8, 0b1001_0101 as u8, 0b0111_0011 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+        
+        assert_eq!(
+            instruction,
+            Instruction::Cssrw {
+                rd: Register::X11,
+                rs1: Register::X21,
+                csr: 44,
+                func3: 1
+            }
+        );
+    }
 
     #[test]
-    fn test_csrrw_execution() {}
+    fn test_csrrw_execution_dest_non_zero() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0100_0000 as u8, 0b1100_1010 as u8, 0b1001_0101 as u8, 0b0111_0011 as u8];
+        soft.load_program(program);
+        soft.csr[44usize] = 1000;
+        soft.registers[Register::X21 as usize] = 500;
+        soft.execute();
+        let csr_val = 0b0011_1110_1000;
+        
+        assert_eq!(
+            soft.registers[Register::X11 as usize],
+            csr_val.zero_extend()
+        );
+
+        assert_eq!(
+            soft.csr[44usize],
+            soft.registers[Register::X21 as usize]
+        )
+    }
 
     #[test]
-    fn fetch_and_decode_csrrs_instruction() {}
+    fn fetch_and_decode_csrrs_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0100_0000 as u8, 0b1100_1010 as u8, 0b1010_0101 as u8, 0b0111_0011 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+        
+        assert_eq!(
+            instruction,
+            Instruction::Cssrs {
+                rd: Register::X11,
+                rs1: Register::X21,
+                csr: 44,
+                func3: 2
+            }
+        );
+    }
 
     #[test]
-    fn test_csrrs_execution() {}
+    fn test_csrrs_execution_dest_non_zero() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0100_0000 as u8, 0b1100_1010 as u8, 0b1010_0101 as u8, 0b0111_0011 as u8];
+        soft.load_program(program);
+        soft.csr[44usize] = 1000;
+        soft.registers[Register::X21 as usize] = 500;
+        soft.execute();
+        let csr_val = 0b0011_1110_1000;
+        
+        assert_eq!(
+            soft.registers[Register::X11 as usize],
+            csr_val.zero_extend()
+        );
+
+        assert_eq!(
+            soft.csr[44usize],
+            (csr_val | soft.register[Register::X21 as usize])
+        )
+    }
 
     #[test]
-    fn fetch_and_decode_csrrc_instruction() {}
+    fn fetch_and_decode_csrrc_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0100_0000 as u8, 0b1100_1010 as u8, 0b1011_0101 as u8, 0b0111_0011 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+        
+        assert_eq!(
+            instruction,
+            Instruction::Cssrc {
+                rd: Register::X11,
+                rs1: Register::X21,
+                csr: 44,
+                func3: 3
+            }
+        );
+    }
 
     #[test]
-    fn test_csrrc_execution() {}
+    fn test_csrrc_execution_dest_non_zero() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0100_0000 as u8, 0b1100_1010 as u8, 0b1011_0101 as u8, 0b0111_0011 as u8];
+        soft.load_program(program);
+        soft.csr[44usize] = 1000;
+        soft.registers[Register::X21 as usize] = 500;
+        soft.execute();
+        let csr_val = 0b0011_1110_1000;
+        
+        assert_eq!(
+            soft.registers[Register::X11 as usize],
+            csr_val.zero_extend()
+        );
+
+        assert_eq!(
+            soft.csr[44usize],
+            (csr_val & soft.register[Register::X21 as usize])
+        )
+    }
 
     #[test]
-    fn fetch_and_decode_csrrwi_instruction() {}
+    fn fetch_and_decode_csrrwi_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0100_0000 as u8, 0b1100_1010 as u8, 0b1101_0101 as u8, 0b0111_0011 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+        
+        assert_eq!(
+            instruction,
+            Instruction::Cssrwi {
+                rd: Register::X11,
+                uimm: 21,
+                csr: 44,
+                func3: 5
+            }
+        );
+    }
 
     #[test]
-    fn test_csrrwi_execution() {}
+    fn test_csrrwi_execution_dest_non_zero() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0100_0000 as u8, 0b1100_1010 as u8, 0b1101_0101 as u8, 0b0111_0011 as u8];
+        soft.load_program(program);
+        soft.csr[44usize] = 1000;
+        soft.registers[Register::X21 as usize] = 500;
+        soft.execute();
+        let csr_val = 0b0011_1110_1000;
+        let imm = 21u64.zero_extend();
+        
+        assert_eq!(
+            soft.registers[Register::X11 as usize],
+            csr_val
+        );
+
+        assert_eq!(
+            soft.csr[44usize],
+            imm
+        )
+    }
 
     #[test]
-    fn fetch_and_decode_csrrsi_instruction() {}
+    fn fetch_and_decode_csrrsi_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0100_0000 as u8, 0b1100_1010 as u8, 0b1110_0101 as u8, 0b0111_0011 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+        
+        assert_eq!(
+            instruction,
+            Instruction::Cssrsi {
+                rd: Register::X11,
+                uimm: 21,
+                csr: 44,
+                func3: 6
+            }
+        );
+    }
 
     #[test]
-    fn test_csrrsi_execution() {}
+    fn test_csrrsi_execution_dest_non_zero() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0100_0000 as u8, 0b1100_1010 as u8, 0b1110_0101 as u8, 0b0111_0011 as u8];
+        soft.load_program(program);
+        soft.csr[44usize] = 1000;
+        soft.registers[Register::X21 as usize] = 500;
+        soft.execute();
+        let csr_val = 0b0011_1110_1000;
+        let imm = 21u64.zero_extend();
+        
+        assert_eq!(
+            soft.registers[Register::X11 as usize],
+            csr_val
+        );
+
+        assert_eq!(
+            soft.csr[44usize],
+            imm | csr_val
+        )
+    }
 
     #[test]
-    fn fetch_and_decode_csrrci_instruction() {}
+    fn fetch_and_decode_csrrci_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0100_0000 as u8, 0b1100_1010 as u8, 0b1111_0101 as u8, 0b0111_0011 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+        
+        assert_eq!(
+            instruction,
+            Instruction::Cssrci {
+                rd: Register::X11,
+                uimm: 21,
+                csr: 44,
+                func3: 6
+            }
+        );
+    }
 
     #[test]
-    fn test_csrrci_execution() {}
+    fn test_csrrci_execution_dest_non_zero() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0100_0000 as u8, 0b1100_1010 as u8, 0b1111_0101 as u8, 0b0111_0011 as u8];
+        soft.load_program(program);
+        soft.csr[44usize] = 1000;
+        soft.registers[Register::X21 as usize] = 500;
+        soft.execute();
+        let csr_val = 0b0011_1110_1000;
+        let imm = 21u64.zero_extend();
+        
+        assert_eq!(
+            soft.registers[Register::X11 as usize],
+            csr_val
+        );
+
+        assert_eq!(
+            soft.csr[44usize],
+            imm & csr_val
+        )
+    }
 
     #[test]
     fn fetch_and_decode_mul_instruction() {
