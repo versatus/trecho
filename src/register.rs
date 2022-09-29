@@ -346,6 +346,7 @@ impl RegisterValue for u64 {
     fn overflowing_mul(&self, rhs: &Self) -> Self {
         (*self).overflowing_mul(*rhs).0
     }
+    
     fn overflowing_div(&self, rhs: &Self) -> Self {
         if *rhs == 0 {
             Self::max_val()
