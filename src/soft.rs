@@ -368,7 +368,197 @@ impl SoftThread<u64, Dram> {
             },
             Instruction::RemuW { rd, rs1, rs2, .. } => {
                 self.registers[rd as usize] = self.registers[rs1 as usize].overflowing_rem(self.registers[rs2 as usize]);
-            }
+            },
+            // For W instructions below ALL words being read from
+            // memory must be naturally aligned to 32 bits
+            // i.e. mod 4 == 0;
+            // For D instructions belwo ALL doublewords being
+            // read from memory most be naturally aligned to
+            // 64 bit words, i.e. mod 8 == 0;
+            Instruction::LrW { rd, rs1, .. } => {
+                // Get memory address from rs1 value
+                // Load a word from the address in rs1
+                // place sign extended value into rd
+                //
+                // Register a reservation set
+                // Reservation set is a set of bytes
+                // that subsumes the bytes in the addressed
+                // word. i.e. put the address into the reservation
+                // set... Test whether vec or hashset is best suited for this.
+                todo!()
+            },
+            Instruction::ScW { rd, rs1, rs2, .. } => {
+                // if an address reservation is still value
+                // and contains the bytes being written
+                // then write the word in rs2 to addr in
+                // rs1, and set rd to zero.
+                // otherwise write a nonzero value to rd.
+                // Invalidate any reservation held be this
+                // thread.
+                todo!();
+            },
+            Instruction::AmoswapW { rd, rs1, rs2, ..} => {
+                // read a word from the address in rs1
+                // write the value in rs2 register to
+                // address in rs1, take value from rs1 and
+                // sign extend then store in rd
+                todo!()
+            },
+            Instruction::AmoaddW { rd, rs1, rs2, ..} => {
+                // read word from address in rs1
+                // add the value from rs2 to the word
+                // read at rs1 address and save result
+                // in memory at address in rs1. Write
+                // previous value in address at rs1
+                // to rd.
+                todo!()
+            },
+            Instruction::AmoxorW { rd, rs1, rs2, .. } => {
+                // read word from address in rs1
+                // xor the word against the value in rs2
+                // save the original value found at address
+                // in rs1 to rd. Save the xor value in the
+                // memory at the address from rs1.
+                todo!()
+            },
+            Instruction::AmoandW { rd, rs1, rs2, .. } => {
+                // read word from address in rs1
+                // bitwise and word against the value in rs2
+                // save the original value found at address
+                // in rs1 to rd. Save the bitwise and'd value
+                // in the memory at the address from rs1.
+                todo!()
+            },
+            Instruction::AmoorW { rd, rs1, rs2, .. } => {
+                // read word from address in rs1
+                // bitwise or word against value in rs2
+                // save the original value found at address
+                // in rs1 to rd. save the bitwise or'd value
+                // in the memory at the address from rs1.
+                todo!()
+            },
+            Instruction::AmominW { rd, rs1, rs2, .. } => {
+                // read word from address in rs1
+                // compare the value of the word to the
+                // value in rs2 and save the lowest value
+                // to memory at the address in rs1.
+                // store the original word at address in rs1
+                // to rd. 
+                todo!()
+            },
+            Instruction::AmomaxW { rd, rs1, rs2, .. } => {
+                // read word from address in rs1
+                // compare the value of the word to the
+                // value in rs2. Store the highest value
+                // in memory at the address in rs1.
+                // store the original word atw address in rs1
+                // to rd.
+                todo!()
+            },
+            Instruction::AmominuW { rd, rs1, rs2, .. } => {
+                // read word from address in rs1
+                // compare the unsigned value to an unsigned
+                // value in rs2. Store the lowest value to
+                // memory at the address in rs1
+                // store the original word at address in rs1
+                // to rd.
+                todo!()
+            },
+            Instruction::AmomaxuW { rd, rs1, rs2, .. } => {
+                // read word from address in rs1
+                // compare the unsigned value to an unsigned
+                // value in rs2. Store the higheste value to
+                // memory at the address in rs1
+                // store the original word at address in rs1
+                // to rd.
+                todo!()
+            },
+            Instruction::LrD { rd, rs1 .. } => {
+                // See LrD, but instead of reading word
+                // from address at rs1, read double word.
+                todo!()
+            },
+            Instruction::ScD { rd, rs1, rs2, .. } => {
+                // See ScW, but instead of conditionally
+                // saving a word, save a double word.
+                todo!()
+            },
+            Instruction::AmoswapD { rd, rs1, rs2, ..} => {
+                // read a doubleword from the address in rs1
+                // write the value in rs2 register to
+                // address in rs1, take value from rs1 and
+                // sign extend then store in rd
+                todo!()
+            },
+            Instruction::AmoaddW { rd, rs1, rs2, ..} => {
+                // read doubleword from address in rs1
+                // add the value from rs2 to the doubleword
+                // read at rs1 address and save result
+                // in memory at address in rs1. Write
+                // previous value in address at rs1
+                // to rd.
+                todo!()
+            },
+            Instruction::AmoxorW { rd, rs1, rs2, .. } => {
+                // read doubleword from address in rs1
+                // xor the doubleword against the value in rs2
+                // save the original value found at address
+                // in rs1 to rd. Save the xor value in the
+                // memory at the address from rs1.
+                todo!()
+            },
+            Instruction::AmoandW { rd, rs1, rs2, .. } => {
+                // read doubleword from address in rs1
+                // bitwise and doubleword against the value in rs2
+                // save the original value found at address
+                // in rs1 to rd. Save the bitwise and'd value
+                // in the memory at the address from rs1.
+                todo!()
+            },
+            Instruction::AmoorW { rd, rs1, rs2, .. } => {
+                // read doubleword from address in rs1
+                // bitwise or doubleword against value in rs2
+                // save the original value found at address
+                // in rs1 to rd. save the bitwise or'd value
+                // in the memory at the address from rs1.
+                todo!()
+            },
+            Instruction::AmominW { rd, rs1, rs2, .. } => {
+                // read doubleword from address in rs1
+                // compare the value of the doubleword to the
+                // value in rs2 and save the lowest value
+                // to memory at the address in rs1.
+                // store the original doubleword at address in rs1
+                // to rd. 
+                todo!()
+            },
+            Instruction::AmomaxW { rd, rs1, rs2, .. } => {
+                // read doubleword from address in rs1
+                // compare the value of the doubleword to the
+                // value in rs2. Store the highest value
+                // in memory at the address in rs1.
+                // store the original doubleword atw address in rs1
+                // to rd.
+                todo!()
+            },
+            Instruction::AmominuW { rd, rs1, rs2, .. } => {
+                // read doubleword from address in rs1
+                // compare the unsigned value to an unsigned
+                // value in rs2. Store the lowest value to
+                // memory at the address in rs1
+                // store the original doubleword at address in rs1
+                // to rd.
+                todo!()
+            },
+            Instruction::AmomaxuW { rd, rs1, rs2, .. } => {
+                // read doubleword from address in rs1
+                // compare the unsigned value to an unsigned
+                // value in rs2. Store the higheste value to
+                // memory at the address in rs1
+                // store the original doubleword at address in rs1
+                // to rd.
+                todo!()
+            },
             _ => {
                 unimplemented!()
             }
