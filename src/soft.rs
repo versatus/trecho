@@ -17,6 +17,7 @@ pub struct SoftThread<R, M> {
     enc_table: EncodingTable,
     bus: M,
     csr: [R; 4096]
+    res: Vec<u64>,
 }
 
 impl SoftThread<u64, Dram> {
@@ -29,6 +30,7 @@ impl SoftThread<u64, Dram> {
             eq_flag: false,
             enc_table,
             bus: Dram::default()
+            
         };
 
         soft.registers[2] = MEM_SIZE;
@@ -376,16 +378,20 @@ impl SoftThread<u64, Dram> {
             // read from memory most be naturally aligned to
             // 64 bit words, i.e. mod 8 == 0;
             Instruction::LrW { rd, rs1, .. } => {
-                // Get memory address from rs1 value
-                // Load a word from the address in rs1
-                // place sign extended value into rd
-                //
-                // Register a reservation set
-                // Reservation set is a set of bytes
-                // that subsumes the bytes in the addressed
-                // word. i.e. put the address into the reservation
-                // set... Test whether vec or hashset is best suited for this.
-                todo!()
+
+                // Test whether vec or hashset is best suited for this.
+                let addr = self.registers[rs1 as usize];
+
+                if addr % 4 != 0 {
+                    // TODO: Reject
+                    todo!();
+                }
+                
+                let val = ((self.bus.read(addr, 32) as i32) as i64) as u64;
+                
+                self.registers[rd as usize] = val;
+                self.reservation.push(self.registers[rs1 as usize]);
+
             },
             Instruction::ScW { rd, rs1, rs2, .. } => {
                 // if an address reservation is still value
@@ -395,14 +401,40 @@ impl SoftThread<u64, Dram> {
                 // otherwise write a nonzero value to rd.
                 // Invalidate any reservation held be this
                 // thread.
-                todo!();
+                let addr = self.registers[rs1 as usize];
+                
+                if addr % 4 != 0 {
+                    //TODO: Reject
+                    todo!();
+                }
+                    
+                if self.reservation.contains(addr) {
+                    self.reservation.retain(|x| x != addr);
+                    let word = self.registers[rs2 as usize];
+                    self.bus.write(addr, word, 32);
+                    self.registers[rd as usize] = 0;
+                } else {
+                    self.reservation.retain(|x| x != addr);
+                    self.registers[rd as usize] = 1;
+                }
             },
             Instruction::AmoswapW { rd, rs1, rs2, ..} => {
                 // read a word from the address in rs1
                 // write the value in rs2 register to
                 // address in rs1, take value from rs1 and
                 // sign extend then store in rd
-                todo!()
+                let addr = self.registers[rs1 as usize];
+
+                if addr % 4 != 0 {
+                    // Reject
+                    todo!();
+                }
+                
+                let temp = ((self.bus.read(addr, 32) as i32) as i64) as u64;
+                let val = self.registers[rs2 as usize];
+                
+                self.bus.write(addr, val, 32);
+                self.registers[rd as usize] = temp;  
             },
             Instruction::AmoaddW { rd, rs1, rs2, ..} => {
                 // read word from address in rs1
@@ -411,7 +443,18 @@ impl SoftThread<u64, Dram> {
                 // in memory at address in rs1. Write
                 // previous value in address at rs1
                 // to rd.
-                todo!()
+                let addr = self.registers[rs1 as usize];
+                
+                if addr % 4 != 0 {
+                    // Reject
+                    todo!();
+                }
+                
+                let temp = ((self.bus.read(addr, 32) as i32) as i64) as u64;
+                let val = self.registers[rs2 as usize];
+                let res = temp + val;
+                self.bus.write(addr, res, 32);
+                self.registers[rd as usize] = temp; 
             },
             Instruction::AmoxorW { rd, rs1, rs2, .. } => {
                 // read word from address in rs1
@@ -419,7 +462,18 @@ impl SoftThread<u64, Dram> {
                 // save the original value found at address
                 // in rs1 to rd. Save the xor value in the
                 // memory at the address from rs1.
-                todo!()
+                let addr = self.registers[rs1 as usize];
+                
+                if addr % 4 != 0 {
+                    // Reject
+                    todo!();
+                }
+                
+                let temp = ((self.bus.read(addr, 32) as i32) as i64) as u64;
+                let val = self.registers[rs2 as usize];
+                let res = temp ^ val;
+                self.bus.write(addr, res, 32);
+                self.registers[rd as usize] = temp;
             },
             Instruction::AmoandW { rd, rs1, rs2, .. } => {
                 // read word from address in rs1
@@ -427,7 +481,18 @@ impl SoftThread<u64, Dram> {
                 // save the original value found at address
                 // in rs1 to rd. Save the bitwise and'd value
                 // in the memory at the address from rs1.
-                todo!()
+                let addr = self.registers[rs1 as usize];
+                
+                if addr % 4 != 0 {
+                    // Reject
+                    todo!();
+                }
+                
+                let temp = ((self.bus.read(addr, 32) as i32) as i64) as u64;
+                let val = self.registers[rs2 as usize];
+                let res = temp & val;
+                self.bus.write(addr, res, 32);
+                self.registers[rd as usize] = temp;
             },
             Instruction::AmoorW { rd, rs1, rs2, .. } => {
                 // read word from address in rs1
@@ -435,7 +500,18 @@ impl SoftThread<u64, Dram> {
                 // save the original value found at address
                 // in rs1 to rd. save the bitwise or'd value
                 // in the memory at the address from rs1.
-                todo!()
+                let addr = self.registers[rs1 as usize];
+
+                if addr % 4 != 0 {
+                    // Reject
+                    todo!();
+                }
+                
+                let temp = ((self.bus.read(addr, 32) as i32) as i64) as u64;
+                let val = self.registers[rs2 as usize];
+                let res = temp | val;
+                self.bus.write(addr, res, 32);
+                self.registers[rd as usize] = temp;
             },
             Instruction::AmominW { rd, rs1, rs2, .. } => {
                 // read word from address in rs1
@@ -444,7 +520,19 @@ impl SoftThread<u64, Dram> {
                 // to memory at the address in rs1.
                 // store the original word at address in rs1
                 // to rd. 
-                todo!()
+                let addr = self.registers[rs1 as usize];
+                
+                if addr % 4 != 0 {
+                    // Reject
+                    todo!();
+                }
+                
+                let temp = ((self.bus.read(addr, 32) as i32) as i64) as u64;
+                let val = self.registers[rs2 as usize];
+                let res = std::cmp::min(temp, val);
+                
+                self.bus.write(addr, res, 32);
+                self.registers[rd as usize] = temp;
             },
             Instruction::AmomaxW { rd, rs1, rs2, .. } => {
                 // read word from address in rs1
@@ -453,7 +541,19 @@ impl SoftThread<u64, Dram> {
                 // in memory at the address in rs1.
                 // store the original word atw address in rs1
                 // to rd.
-                todo!()
+                let addr = self.registers[rs1 as usize];
+                
+                if addr % 4 != 0 {
+                    // Reject
+                    todo!();
+                }
+                
+                let temp = ((self.bus.read(addr, 32) as i32) as i64) as u64;
+                let val = self.registers[rs2 as usize];
+                let res = std::cmp::max(temp, val);
+                
+                self.bus.write(addr, res, 32);
+                self.registers[rd as usize] = temp;
             },
             Instruction::AmominuW { rd, rs1, rs2, .. } => {
                 // read word from address in rs1
@@ -462,7 +562,16 @@ impl SoftThread<u64, Dram> {
                 // memory at the address in rs1
                 // store the original word at address in rs1
                 // to rd.
-                todo!()
+                let addr = self.registers[rs1 as usize];
+                if addr % 4 != 0 {
+                    // Reject
+                    todo!();
+                }
+                let temp = self.bus.read(addr, 32) as u64;
+                let val = self.registers[rs2 as usize];
+                let res = std::cmp::min(temp, val);
+                self.bus.write(addr, res, 32);
+                self.registers[rd as usize] = temp;
             },
             Instruction::AmomaxuW { rd, rs1, rs2, .. } => {
                 // read word from address in rs1
@@ -471,93 +580,222 @@ impl SoftThread<u64, Dram> {
                 // memory at the address in rs1
                 // store the original word at address in rs1
                 // to rd.
-                todo!()
+                let addr = self.registers[rs1 as usize];
+                if addr % 4 != 0 {
+                    // Reject
+                    todo!();
+                }
+                let temp = self.bus.read(addr, 32) as u64;
+                let val = self.registers[rs2 as usize];
+                let res = std::cmp::max(temp, val);
+                self.bus.write(addr, res, 32);
+                self.registers[rd as usize] = temp;
             },
             Instruction::LrD { rd, rs1 .. } => {
                 // See LrD, but instead of reading word
                 // from address at rs1, read double word.
-                todo!()
+                let addr = self.registers[rs1 as usize];
+                let val = (self.bus.read(addr, 64) as i64) as u64;
+                if addr % 8 != 0 {
+                    // TODO: Reject
+                    todo!();
+                }
+                self.registers[rd as usize] = val;
+                self.reservation.push(self.registers[rs1 as usize]);
             },
             Instruction::ScD { rd, rs1, rs2, .. } => {
                 // See ScW, but instead of conditionally
                 // saving a word, save a double word.
-                todo!()
+                let addr = self.registers[rs1 as usize];
+                
+                if addr % 8 != 0 {
+                    //TODO: Reject
+                    todo!();
+                }
+                    
+                if self.reservation.contains(addr) {
+                    self.reservation.retain(|x| x != addr);
+                    let dword = self.registers[rs2 as usize];
+                    self.bus.write(addr, dword, 64);
+                    self.registers[rd as usize] = 0;
+                } else {
+                    self.reservation.retain(|x| x != addr);
+                    self.registers[rd as usize] = 1;
+                }
             },
             Instruction::AmoswapD { rd, rs1, rs2, ..} => {
                 // read a doubleword from the address in rs1
                 // write the value in rs2 register to
                 // address in rs1, take value from rs1 and
                 // sign extend then store in rd
-                todo!()
+                let addr = self.registers[rs1 as usize];
+
+                if addr % 8 != 0 {
+                    // Reject
+                    todo!();
+                }
+                
+                let temp = (self.bus.read(addr, 64) as i64) as u64;
+                let val = self.registers[rs2 as usize];
+                
+                self.bus.write(addr, val, 64);
+                self.registers[rd as usize] = temp;
             },
-            Instruction::AmoaddW { rd, rs1, rs2, ..} => {
+            Instruction::AmoaddD { rd, rs1, rs2, ..} => {
                 // read doubleword from address in rs1
                 // add the value from rs2 to the doubleword
                 // read at rs1 address and save result
                 // in memory at address in rs1. Write
                 // previous value in address at rs1
                 // to rd.
-                todo!()
+                let addr = self.registers[rs1 as usize];
+                
+                if addr % 8 != 0 {
+                    // Reject
+                    todo!();
+                }
+                
+                let temp = (self.bus.read(addr, 64) as i64) as u64;
+                let val = self.registers[rs2 as usize];
+                let res = temp + val;
+                self.bus.write(addr, res, 64);
+                self.registers[rd as usize] = temp;
             },
-            Instruction::AmoxorW { rd, rs1, rs2, .. } => {
+            Instruction::AmoxorD { rd, rs1, rs2, .. } => {
                 // read doubleword from address in rs1
                 // xor the doubleword against the value in rs2
                 // save the original value found at address
                 // in rs1 to rd. Save the xor value in the
                 // memory at the address from rs1.
-                todo!()
+                let addr = self.registers[rs1 as usize];
+                
+                if addr % 8 != 0 {
+                    // Reject
+                    todo!();
+                }
+                
+                let temp = (self.bus.read(addr, 64) as i64) as u64;
+                let val = self.registers[rs2 as usize];
+                let res = temp ^ val;
+                self.bus.write(addr, res, 64);
+                self.registers[rd as usize] = temp;
             },
-            Instruction::AmoandW { rd, rs1, rs2, .. } => {
+            Instruction::AmoandD { rd, rs1, rs2, .. } => {
                 // read doubleword from address in rs1
                 // bitwise and doubleword against the value in rs2
                 // save the original value found at address
                 // in rs1 to rd. Save the bitwise and'd value
                 // in the memory at the address from rs1.
-                todo!()
+                let addr = self.registers[rs1 as usize];
+                
+                if addr % 8 != 0 {
+                    // Reject
+                    todo!();
+                }
+                
+                let temp = (self.bus.read(addr, 64) as i64) as u64;
+                let val = self.registers[rs2 as usize];
+                let res = temp & val;
+                self.bus.write(addr, res, 64);
+                self.registers[rd as usize] = temp;
             },
-            Instruction::AmoorW { rd, rs1, rs2, .. } => {
+            Instruction::AmoorD { rd, rs1, rs2, .. } => {
                 // read doubleword from address in rs1
                 // bitwise or doubleword against value in rs2
                 // save the original value found at address
                 // in rs1 to rd. save the bitwise or'd value
                 // in the memory at the address from rs1.
-                todo!()
+                let addr = self.registers[rs1 as usize];
+
+                if addr % 8 != 0 {
+                    // Reject
+                    todo!();
+                }
+                
+                let temp = (self.bus.read(addr, 64) as i64) as u64;
+                let val = self.registers[rs2 as usize];
+                let res = temp | val;
+                self.bus.write(addr, res, 64);
+                self.registers[rd as usize] = temp;
             },
-            Instruction::AmominW { rd, rs1, rs2, .. } => {
+            Instruction::AmominD { rd, rs1, rs2, .. } => {
                 // read doubleword from address in rs1
                 // compare the value of the doubleword to the
                 // value in rs2 and save the lowest value
                 // to memory at the address in rs1.
                 // store the original doubleword at address in rs1
                 // to rd. 
-                todo!()
+                let addr = self.registers[rs1 as usize];
+                
+                if addr % 8 != 0 {
+                    // Reject
+                    todo!();
+                }
+                
+                let temp = (self.bus.read(addr, 64) as i64) as u64;
+                let val = self.registers[rs2 as usize];
+                let res = std::cmp::min(temp, val);
+                
+                self.bus.write(addr, res, 64);
+                self.registers[rd as usize] = temp;
             },
-            Instruction::AmomaxW { rd, rs1, rs2, .. } => {
-                // read doubleword from address in rs1
-                // compare the value of the doubleword to the
-                // value in rs2. Store the highest value
-                // in memory at the address in rs1.
-                // store the original doubleword atw address in rs1
-                // to rd.
-                todo!()
+            Instruction::AmomaxD { rd, rs1, rs2, .. } => {
+                let addr = self.registers[rs1 as usize];
+                
+                if addr % 4 != 0 {
+                    // Reject
+                    todo!();
+                }
+                
+                let temp = (self.bus.read(addr, 64) as i64) as u64;
+                let val = self.registers[rs2 as usize];
+                let res = std::cmp::max(temp, val);
+                
+                self.bus.write(addr, res, 64);
+                self.registers[rd as usize] = temp;
+                
             },
-            Instruction::AmominuW { rd, rs1, rs2, .. } => {
+            Instruction::AmominuD { rd, rs1, rs2, .. } => {
                 // read doubleword from address in rs1
                 // compare the unsigned value to an unsigned
                 // value in rs2. Store the lowest value to
                 // memory at the address in rs1
                 // store the original doubleword at address in rs1
                 // to rd.
-                todo!()
+                let addr = self.registers[rs1 as usize];
+                
+                if addr % 8 != 0 {
+                    // Reject
+                    todo!();
+                }
+                
+                let temp = self.bus.read(addr, 64) as u64;
+                let val = self.registers[rs2 as usize];
+                let res = std::cmp::min(temp, val);
+                
+                self.bus.write(addr, res, 64);
+                self.registers[rd as usize] = temp;
             },
-            Instruction::AmomaxuW { rd, rs1, rs2, .. } => {
+            Instruction::AmomaxuD { rd, rs1, rs2, .. } => {
                 // read doubleword from address in rs1
                 // compare the unsigned value to an unsigned
                 // value in rs2. Store the higheste value to
                 // memory at the address in rs1
                 // store the original doubleword at address in rs1
                 // to rd.
-                todo!()
+                let addr = self.registers[rs1 as usize];
+                
+                if addr % 4 != 0 {
+                    // Reject
+                    todo!();
+                }
+                
+                let temp = self.bus.read(addr, 64) as u64;
+                let val = self.registers[rs2 as usize];
+                let res = std::cmp::max(temp, val);
+                
+                self.bus.write(addr, res, 64);
+                self.registers[rd as usize] = temp;
             },
             _ => {
                 unimplemented!()
