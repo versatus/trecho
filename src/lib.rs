@@ -5294,4 +5294,124 @@ mod tests {
         )
     }
 
+    #[test]
+    fn fetch_and_decode_lrw_instruction() {}
+
+    #[test]
+    fn test_lrw_execution() {}
+
+    #[test]
+    fn fetch_and_decode_scw_instruction() {}
+
+    #[test]
+    fn test_scw_execution() {}
+
+    #[test]
+    fn fetch_and_decode_amoswapw_instruction() {}
+
+    #[test]
+    fn test_amoswapw_execution() {}
+
+    #[test]
+    fn fetch_and_decode_amoxorw_instruction() {}
+
+    #[test]
+    fn test_amoxorw_execution() {}
+
+    #[test]
+    fn fetch_and_decode_amoandw_instruction() {}
+
+    #[test]
+    fn test_amoandw_execution() {}
+
+    #[test]
+    fn fetch_and_decode_amoorw_instruction() {}
+
+    #[test]
+    fn test_amoorw_execution() {}
+
+    #[test]
+    fn fetch_and_decode_amominw_instruction() {}
+
+    #[test]
+    fn test_amominw_execution() {}
+
+    #[test]
+    fn fetch_and_decode_amomaxw_instruction() {}
+
+    #[test]
+    fn test_amomaxw_execution() {}
+
+    #[test]
+    fn fetch_and_decode_amominuw_instruction() {}
+
+    #[test]
+    fn test_amominuw_execution() {}
+
+    #[test]
+    fn fetch_and_decode_amomaxuw_instruction() {}
+
+    #[test]
+    fn test_amomaxuw_execution() {}
+
+    #[test]
+    fn fetch_and_decode_lrd_instruction() {}
+
+    #[test]
+    fn test_lrd_execution() {}
+
+    #[test]
+    fn fetch_and_decode_scd_instruction() {}
+
+    #[test]
+    fn test_scd_execution() {}
+
+    #[test]
+    fn fetch_and_decode_amoswapd_instruction() {}
+
+    #[test]
+    fn test_amoswapd_execution() {}
+
+    #[test]
+    fn fetch_and_decode_amoxord_instruction() {}
+
+    #[test]
+    fn test_amoxord_execution() {}
+
+    #[test]
+    fn fetch_and_decode_amoandd_instruction() {}
+
+    #[test]
+    fn test_amoandd_execution() {}
+
+    #[test]
+    fn fetch_and_decode_amoord_instruction() {}
+
+    #[test]
+    fn test_amoord_execution() {}
+
+    #[test]
+    fn fetch_and_decode_amomind_instruction() {}
+
+    #[test]
+    fn test_amomind_execution() {}
+
+    #[test]
+    fn fetch_and_decode_amomaxd_instruction() {}
+
+    #[test]
+    fn test_amomaxd_execution() {}
+
+    #[test]
+    fn fetch_and_decode_amominud_instruction() {}
+
+    #[test]
+    fn test_amominud_execution() {}
+
+    #[test]
+    fn fetch_and_decode_amomaxud_instruction() {}
+
+    #[test]
+    fn test_amomaxud_execution() {}
+
 }
