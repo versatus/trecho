@@ -1904,10 +1904,6 @@ impl From<Inst> for Instruction {
                 let func7 = unpacked.func7.unwrap();
                 match func3 {
                     0b000 => {
-                        if func7 != 0b0000000 {
-                            return Instruction::Undefined;
-                        }
-
                         return Instruction::Addiw {
                             rd: unpacked.rd.unwrap().into(),
                             rs1: unpacked.rs1.unwrap().into(),

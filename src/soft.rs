@@ -10,14 +10,14 @@ use crate::memory::Memory;
 
 pub struct SoftThread<R, M> {
     pub registers: [R; 33],
-    pc: R,
+    pub pc: R,
     pub program: Vec<u8>,
-    remainder: u32,
+    pub remainder: u32,
     eq_flag: bool,
     enc_table: EncodingTable,
-    bus: M,
-    csr: [R; 4096]
-    res: Vec<u64>,
+    pub bus: M,
+    pub csr: [R; 4096],
+    pub res: Vec<u64>,
 }
 
 impl SoftThread<u64, Dram> {
@@ -29,7 +29,9 @@ impl SoftThread<u64, Dram> {
             remainder: 0,
             eq_flag: false,
             enc_table,
-            bus: Dram::default()
+            csr: [0; 4096],
+            bus: Dram::default(),
+            res: vec![]
             
         };
 
@@ -56,6 +58,7 @@ impl SoftThread<u64, Dram> {
 
     pub(crate) fn execute(&mut self) {
         let instruction: Instruction = Instruction::decode(self.fetch(), &self.enc_table);
+        println!("{:?}", instruction);
         match instruction {
             Instruction::Lui { rd, imm } => {
                 //load upper immediate
@@ -191,10 +194,10 @@ impl SoftThread<u64, Dram> {
                 self.registers[rd as usize] = (self.registers[rs1 as usize] as i64).wrapping_shr(shamt) as u64;
             },
             Instruction::Add { rd, rs1, rs2, .. } => {
-                self.registers[rs1 as usize].overflowing_add(self.registers[rs2 as usize])
+                self.registers[rd as usize] = self.registers[rs1 as usize].oflow_add(&self.registers[rs2 as usize])
             },
             Instruction::Sub { rd, rs1, rs2, .. } => {
-                self.registers[rs1 as usize].overflowing_sub(self.registers[rs2 as usize])  
+                self.registers[rd as usize] = self.registers[rs1 as usize].oflow_sub(&self.registers[rs2 as usize]);
             },
             Instruction::Sll { rd, rs1, rs2, .. } => {
                 let shamt = ((self.registers[rs2 as usize] & 0x3f) as u64) as u32;
@@ -287,7 +290,7 @@ impl SoftThread<u64, Dram> {
             Instruction::Csrrw { csr, rs1, rd, .. } => {
                 if rd != Register::X0 {
                     let csr_val = self.csr[csr as usize];
-                    csr_val.zero_extend();
+                    let csr_val = (csr_val as u64).zero_extend(&32);
                     self.registers[rd as usize] = csr_val;
                     self.csr[csr as usize] = self.registers[rs1 as usize]
                 }
@@ -295,7 +298,7 @@ impl SoftThread<u64, Dram> {
             Instruction::Csrrs { csr, rs1, rd, .. } => {
                 if rs1 != Register::X0 {
                     let csr_val = self.csr[csr as usize];
-                    csr_val.zero_extend();
+                    let csr_val = (csr_val as u64).zero_extend(&32);
                     self.registers[rd as usize] = csr_val;
                     self.csr[csr as usize] = self.csr[csr as usize] | self.registers[rs1 as usize];    
                 }                
@@ -303,7 +306,7 @@ impl SoftThread<u64, Dram> {
             Instruction::Csrrc { csr, rs1, rd, .. } => {
                 if rs1 != Register::X0 {
                     let csr_val = self.csr[csr as usize];
-                    csr_val.zero_extend();
+                    let csr_val = (csr_val as u64).zero_extend(&32);
                     self.registers[rd as usize] = csr_val;
                     self.csr[csr as usize] = self.csr[csr as usize] & self.registers[rs1 as usize];
                 }
@@ -311,65 +314,65 @@ impl SoftThread<u64, Dram> {
             Instruction::Csrrwi { rd, csr, uimm, .. } => {
                 if rd != Register::X0 {
                     let csr_val = self.csr[csr as usize];
-                    let imm = uimm.zero_extend();
+                    let imm = (uimm as u64).zero_extend(&32);
                     self.registers[rd as usize] = csr_val;
                     self.csr[csr as usize] = imm;
                 }
             },
             Instruction::Csrrsi { rd, csr, uimm, .. } => {
-                if uimm != Register::X0 {
+                if uimm != Register::X0 as u32 {
                     let csr_val = self.csr[csr as usize];
-                    let imm = uimm.zero_extend();
+                    let imm = (uimm as u64).zero_extend(&32);
                     self.registers[rd as usize] = csr_val;
                     self.csr[csr as usize] = self.csr[csr as usize] | imm;
                 }
             },
             Instruction::Csrrci { rd, csr, uimm, .. } => {
-                if uimm != Register::X0 {
+                if uimm != Register::X0 as u32 {
                     let csr_val = self.csr[csr as usize];
-                    let imm = uimm.zero_extend();
+                    let imm = (uimm as u64).zero_extend(&32);
                     self.registers[rd as usize] = csr_val;
                     self.csr[csr as usize] = self.csr[csr as usize] & imm;
                 }
             },
             Instruction::Mul { rd, rs1, rs2, .. } => {
-                self.registers[rd as usize] = self.registers[rs1 as usize].overflowing_mul(self.registers[rs2 as usize]);
+                self.registers[rd as usize] = self.registers[rs1 as usize].oflow_mul(&self.registers[rs2 as usize]);
             },
             Instruction::Mulh { rd, rs1, rs2, .. } => {
-                self.registers[rd as usize] = self.registers[rs1 as usize].overflowing_mul_high_signed(self.registers[rs2 as usize]);
+                self.registers[rd as usize] = self.registers[rs1 as usize].oflow_mul_high_signed(&self.registers[rs2 as usize]);
             },
             Instruction::Mulhsu { rd, rs1, rs2, .. } => {
-                self.registers[rd as usize] = self.registers[rs1 as usize].overflowing_mul_high_signed_unsigned(self.registers[rs2 as usize]);
+                self.registers[rd as usize] = self.registers[rs1 as usize].oflow_mul_high_signed_unsigned(&self.registers[rs2 as usize]);
             },
             Instruction::Mulhu { rd, rs1, rs2, .. } => {
-                self.registers[rd as usize] = self.registers[rs1 as usize].overflowing_mul_high_unsigned(self.registers[rs2 as usize]);
+                self.registers[rd as usize] = self.registers[rs1 as usize].oflow_mul_high_unsigned(&self.registers[rs2 as usize]);
             },
             Instruction::Div { rd, rs1, rs2, .. } => {
-                self.registers[rd as usize] = self.registers[rs1 as usize].overflowing_div_signed(self.registers[rs2 as usize]);
+                self.registers[rd as usize] = self.registers[rs1 as usize].oflow_div_signed(&self.registers[rs2 as usize]);
             },
             Instruction::Divu { rd, rs1, rs2, .. } => {
-                self.registers[rd as usize] = self.registers[rs1 as usize].overflowing_div(self.registers[rs2 as usize]);
+                self.registers[rd as usize] = self.registers[rs1 as usize].oflow_div(&self.registers[rs2 as usize]);
             },
             Instruction::Rem { rd, rs1, rs2, .. } => {
-                self.registers[rd as usize] = self.registers[rs1 as usize].overflowing_rem_signed(self.registers[rs2 as usize]);
+                self.registers[rd as usize] = self.registers[rs1 as usize].oflow_rem_signed(&self.registers[rs2 as usize]);
             },
             Instruction::Remu { rd, rs1, rs2, .. } => {
-                self.registers[rd as usize] = self.registers[rs1 as usize].overflowing_rem(self.registers[rs2 as usize]);
+                self.registers[rd as usize] = self.registers[rs1 as usize].oflow_rem(&self.registers[rs2 as usize]);
             },
             Instruction::Mulw { rd, rs1, rs2, .. } => {
-                self.registers[rd as usize] = self.registers[rs1 as usize].overflowing_mul(self.registers[rs2 as usize]);
+                self.registers[rd as usize] = self.registers[rs1 as usize].oflow_mul(&self.registers[rs2 as usize]);
             },
             Instruction::Divw { rd, rs1, rs2, .. } => {
-                self.registers[rd as usize] = self.registers[rs1 as usize].overflowing_div_signed(self.registers[rs2 as usize]);
+                self.registers[rd as usize] = self.registers[rs1 as usize].oflow_div_signed(&self.registers[rs2 as usize]);
             },
             Instruction::Divuw { rd, rs1, rs2, .. } => {
-                self.registers[rd as usize] = self.registers[rs1 as usize].overflowing_div(self.registers[rs2 as usize]);
+                self.registers[rd as usize] = self.registers[rs1 as usize].oflow_div(&self.registers[rs2 as usize]);
             },
             Instruction::Remw { rd, rs1, rs2, .. } => {
-                self.registers[rd as usize] = self.registers[rs1 as usize].overflowing_rem_signed(self.registers[rs2 as usize]);
+                self.registers[rd as usize] = self.registers[rs1 as usize].oflow_rem_signed(&self.registers[rs2 as usize]);
             },
             Instruction::RemuW { rd, rs1, rs2, .. } => {
-                self.registers[rd as usize] = self.registers[rs1 as usize].overflowing_rem(self.registers[rs2 as usize]);
+                self.registers[rd as usize] = self.registers[rs1 as usize].oflow_rem(&self.registers[rs2 as usize]);
             },
             // For W instructions below ALL words being read from
             // memory must be naturally aligned to 32 bits
@@ -387,11 +390,12 @@ impl SoftThread<u64, Dram> {
                     todo!();
                 }
                 
-                let val = ((self.bus.read(addr, 32) as i32) as i64) as u64;
-                
-                self.registers[rd as usize] = val;
-                self.reservation.push(self.registers[rs1 as usize]);
-
+                let res = self.bus.read(&addr, 32);
+                if let Ok(val) = res {
+                    let val = ((val as i32) as i64) as u64;
+                    self.registers[rd as usize] = val;
+                    self.res.push(self.registers[rs1 as usize]);
+                }
             },
             Instruction::ScW { rd, rs1, rs2, .. } => {
                 // if an address reservation is still value
@@ -408,13 +412,13 @@ impl SoftThread<u64, Dram> {
                     todo!();
                 }
                     
-                if self.reservation.contains(addr) {
-                    self.reservation.retain(|x| x != addr);
+                if self.res.contains(&addr) {
+                    self.res.retain(|x| *x != addr);
                     let word = self.registers[rs2 as usize];
                     self.bus.write(addr, word, 32);
                     self.registers[rd as usize] = 0;
                 } else {
-                    self.reservation.retain(|x| x != addr);
+                    self.res.retain(|x| *x != addr);
                     self.registers[rd as usize] = 1;
                 }
             },
@@ -430,11 +434,13 @@ impl SoftThread<u64, Dram> {
                     todo!();
                 }
                 
-                let temp = ((self.bus.read(addr, 32) as i32) as i64) as u64;
-                let val = self.registers[rs2 as usize];
-                
-                self.bus.write(addr, val, 32);
-                self.registers[rd as usize] = temp;  
+                if let Ok(temp) = self.bus.read(&addr, 32) {
+                    let temp = ((temp as i32) as i64) as u64;
+                    let val = self.registers[rs2 as usize];                    
+                    let _ = self.bus.write(addr, val, 32);
+                    self.registers[rd as usize] = temp;  
+
+                }
             },
             Instruction::AmoaddW { rd, rs1, rs2, ..} => {
                 // read word from address in rs1
@@ -450,11 +456,13 @@ impl SoftThread<u64, Dram> {
                     todo!();
                 }
                 
-                let temp = ((self.bus.read(addr, 32) as i32) as i64) as u64;
-                let val = self.registers[rs2 as usize];
-                let res = temp + val;
-                self.bus.write(addr, res, 32);
-                self.registers[rd as usize] = temp; 
+                if let Ok(temp) = self.bus.read(&addr, 32) {
+                    let temp = ((temp as i32) as i64) as u64;
+                    let val = self.registers[rs2 as usize];
+                    let res = temp + val;
+                    let _ = self.bus.write(addr, res, 32);
+                    self.registers[rd as usize] = temp; 
+                }
             },
             Instruction::AmoxorW { rd, rs1, rs2, .. } => {
                 // read word from address in rs1
@@ -469,11 +477,13 @@ impl SoftThread<u64, Dram> {
                     todo!();
                 }
                 
-                let temp = ((self.bus.read(addr, 32) as i32) as i64) as u64;
-                let val = self.registers[rs2 as usize];
-                let res = temp ^ val;
-                self.bus.write(addr, res, 32);
-                self.registers[rd as usize] = temp;
+                if let Ok(temp) = self.bus.read(&addr, 32) {
+                    let temp = ((temp as i32) as i64) as u64;
+                    let val = self.registers[rs2 as usize];
+                    let res = temp ^ val;
+                    let _ = self.bus.write(addr, res, 32);
+                    self.registers[rd as usize] = temp;
+                }
             },
             Instruction::AmoandW { rd, rs1, rs2, .. } => {
                 // read word from address in rs1
@@ -488,11 +498,13 @@ impl SoftThread<u64, Dram> {
                     todo!();
                 }
                 
-                let temp = ((self.bus.read(addr, 32) as i32) as i64) as u64;
-                let val = self.registers[rs2 as usize];
-                let res = temp & val;
-                self.bus.write(addr, res, 32);
-                self.registers[rd as usize] = temp;
+                if let Ok(temp) = self.bus.read(&addr, 32) {
+                    let temp = ((temp as i32) as i64) as u64;     
+                    let val = self.registers[rs2 as usize];
+                    let res = temp & val;
+                    let _ = self.bus.write(addr, res, 32);
+                    self.registers[rd as usize] = temp;
+                }
             },
             Instruction::AmoorW { rd, rs1, rs2, .. } => {
                 // read word from address in rs1
@@ -507,11 +519,13 @@ impl SoftThread<u64, Dram> {
                     todo!();
                 }
                 
-                let temp = ((self.bus.read(addr, 32) as i32) as i64) as u64;
-                let val = self.registers[rs2 as usize];
-                let res = temp | val;
-                self.bus.write(addr, res, 32);
-                self.registers[rd as usize] = temp;
+                if let Ok(temp) = self.bus.read(&addr, 32) {
+                    let temp = ((temp as i32) as i64) as u64;
+                    let val = self.registers[rs2 as usize];
+                    let res = temp | val;
+                    let _ = self.bus.write(addr, res, 32);
+                    self.registers[rd as usize] = temp;
+                }
             },
             Instruction::AmominW { rd, rs1, rs2, .. } => {
                 // read word from address in rs1
@@ -527,12 +541,13 @@ impl SoftThread<u64, Dram> {
                     todo!();
                 }
                 
-                let temp = ((self.bus.read(addr, 32) as i32) as i64) as u64;
-                let val = self.registers[rs2 as usize];
-                let res = std::cmp::min(temp, val);
-                
-                self.bus.write(addr, res, 32);
-                self.registers[rd as usize] = temp;
+                if let Ok(temp) = self.bus.read(&addr, 32) {
+                    let temp = ((temp as i32) as i64) as u64;
+                    let val = self.registers[rs2 as usize];
+                    let res = std::cmp::min(temp, val);   
+                    let _ = self.bus.write(addr, res, 32);
+                    self.registers[rd as usize] = temp;
+                }
             },
             Instruction::AmomaxW { rd, rs1, rs2, .. } => {
                 // read word from address in rs1
@@ -548,12 +563,13 @@ impl SoftThread<u64, Dram> {
                     todo!();
                 }
                 
-                let temp = ((self.bus.read(addr, 32) as i32) as i64) as u64;
-                let val = self.registers[rs2 as usize];
-                let res = std::cmp::max(temp, val);
-                
-                self.bus.write(addr, res, 32);
-                self.registers[rd as usize] = temp;
+                if let Ok(temp) = self.bus.read(&addr, 32) {
+                    let temp = ((temp as i32) as i64) as u64;
+                    let val = self.registers[rs2 as usize];
+                    let res = std::cmp::max(temp, val);
+                    let _ = self.bus.write(addr, res, 32);
+                    self.registers[rd as usize] = temp;
+                }
             },
             Instruction::AmominuW { rd, rs1, rs2, .. } => {
                 // read word from address in rs1
@@ -563,15 +579,19 @@ impl SoftThread<u64, Dram> {
                 // store the original word at address in rs1
                 // to rd.
                 let addr = self.registers[rs1 as usize];
+                
                 if addr % 4 != 0 {
                     // Reject
                     todo!();
                 }
-                let temp = self.bus.read(addr, 32) as u64;
-                let val = self.registers[rs2 as usize];
-                let res = std::cmp::min(temp, val);
-                self.bus.write(addr, res, 32);
-                self.registers[rd as usize] = temp;
+
+                if let Ok(temp) = self.bus.read(&addr, 32) {
+                    let temp = temp;
+                    let val = self.registers[rs2 as usize];
+                    let res = std::cmp::min(temp, val);
+                    let _ = self.bus.write(addr, res, 32);
+                    self.registers[rd as usize] = temp;
+                }
             },
             Instruction::AmomaxuW { rd, rs1, rs2, .. } => {
                 // read word from address in rs1
@@ -581,27 +601,34 @@ impl SoftThread<u64, Dram> {
                 // store the original word at address in rs1
                 // to rd.
                 let addr = self.registers[rs1 as usize];
+                
                 if addr % 4 != 0 {
                     // Reject
                     todo!();
                 }
-                let temp = self.bus.read(addr, 32) as u64;
-                let val = self.registers[rs2 as usize];
-                let res = std::cmp::max(temp, val);
-                self.bus.write(addr, res, 32);
-                self.registers[rd as usize] = temp;
+
+                if let Ok(temp) = self.bus.read(&addr, 32) {
+                    let val = self.registers[rs2 as usize];
+                    let res = std::cmp::max(temp, val);
+                    let _ = self.bus.write(addr, res, 32);
+                    self.registers[rd as usize] = temp;
+                }
             },
-            Instruction::LrD { rd, rs1 .. } => {
+            Instruction::LrD { rd, rs1, .. } => {
                 // See LrD, but instead of reading word
                 // from address at rs1, read double word.
                 let addr = self.registers[rs1 as usize];
-                let val = (self.bus.read(addr, 64) as i64) as u64;
+                
                 if addr % 8 != 0 {
                     // TODO: Reject
                     todo!();
                 }
-                self.registers[rd as usize] = val;
-                self.reservation.push(self.registers[rs1 as usize]);
+
+                if let Ok(temp) = self.bus.read(&addr, 64) {
+                    let val = (temp as i64) as u64;    
+                    self.registers[rd as usize] = val;
+                    self.res.push(self.registers[rs1 as usize]);
+                } 
             },
             Instruction::ScD { rd, rs1, rs2, .. } => {
                 // See ScW, but instead of conditionally
@@ -613,13 +640,13 @@ impl SoftThread<u64, Dram> {
                     todo!();
                 }
                     
-                if self.reservation.contains(addr) {
-                    self.reservation.retain(|x| x != addr);
+                if self.res.contains(&addr) {
+                    self.res.retain(|x| *x != addr);
                     let dword = self.registers[rs2 as usize];
-                    self.bus.write(addr, dword, 64);
+                    let _ = self.bus.write(addr, dword, 64);
                     self.registers[rd as usize] = 0;
                 } else {
-                    self.reservation.retain(|x| x != addr);
+                    self.res.retain(|x| *x != addr);
                     self.registers[rd as usize] = 1;
                 }
             },
@@ -635,11 +662,12 @@ impl SoftThread<u64, Dram> {
                     todo!();
                 }
                 
-                let temp = (self.bus.read(addr, 64) as i64) as u64;
-                let val = self.registers[rs2 as usize];
-                
-                self.bus.write(addr, val, 64);
-                self.registers[rd as usize] = temp;
+                if let Ok(temp) = self.bus.read(&addr, 64) {
+                    let temp: u64 = (temp as i64) as u64;
+                    let val = self.registers[rs2 as usize];
+                    let _ = self.bus.write(addr, val, 64);
+                    self.registers[rd as usize] = temp;
+                }
             },
             Instruction::AmoaddD { rd, rs1, rs2, ..} => {
                 // read doubleword from address in rs1
@@ -654,12 +682,14 @@ impl SoftThread<u64, Dram> {
                     // Reject
                     todo!();
                 }
-                
-                let temp = (self.bus.read(addr, 64) as i64) as u64;
-                let val = self.registers[rs2 as usize];
-                let res = temp + val;
-                self.bus.write(addr, res, 64);
-                self.registers[rd as usize] = temp;
+
+                if let Ok(temp) = self.bus.read(&addr, 64) {
+                    let temp = (temp as i64) as u64;
+                    let val = self.registers[rs2 as usize];
+                    let res = temp + val;
+                    let _ = self.bus.write(addr, res, 64);
+                    self.registers[rd as usize] = temp;
+                }
             },
             Instruction::AmoxorD { rd, rs1, rs2, .. } => {
                 // read doubleword from address in rs1
@@ -673,12 +703,14 @@ impl SoftThread<u64, Dram> {
                     // Reject
                     todo!();
                 }
-                
-                let temp = (self.bus.read(addr, 64) as i64) as u64;
-                let val = self.registers[rs2 as usize];
-                let res = temp ^ val;
-                self.bus.write(addr, res, 64);
-                self.registers[rd as usize] = temp;
+
+                if let Ok(temp) = self.bus.read(&addr, 64) {
+                    let temp = (temp as i64) as u64;
+                    let val = self.registers[rs2 as usize];
+                    let res = temp ^ val;
+                    let _ = self.bus.write(addr, res, 64);
+                    self.registers[rd as usize] = temp;
+                }
             },
             Instruction::AmoandD { rd, rs1, rs2, .. } => {
                 // read doubleword from address in rs1
@@ -693,11 +725,14 @@ impl SoftThread<u64, Dram> {
                     todo!();
                 }
                 
-                let temp = (self.bus.read(addr, 64) as i64) as u64;
-                let val = self.registers[rs2 as usize];
-                let res = temp & val;
-                self.bus.write(addr, res, 64);
-                self.registers[rd as usize] = temp;
+                if let Ok(temp) = self.bus.read(&addr, 64) {
+                    let temp = (temp as i64) as u64;
+                    let val = self.registers[rs2 as usize];
+                    let res = temp & val;
+                    let _ = self.bus.write(addr, res, 64);
+                    self.registers[rd as usize] = temp;
+                }
+                
             },
             Instruction::AmoorD { rd, rs1, rs2, .. } => {
                 // read doubleword from address in rs1
@@ -712,11 +747,13 @@ impl SoftThread<u64, Dram> {
                     todo!();
                 }
                 
-                let temp = (self.bus.read(addr, 64) as i64) as u64;
-                let val = self.registers[rs2 as usize];
-                let res = temp | val;
-                self.bus.write(addr, res, 64);
-                self.registers[rd as usize] = temp;
+                if let Ok(temp) = self.bus.read(&addr, 64) {
+                    let temp = (temp as i64) as u64;
+                    let val = self.registers[rs2 as usize];
+                    let res = temp | val;
+                    let _ = self.bus.write(addr, res, 64);
+                    self.registers[rd as usize] = temp;                    
+                }
             },
             Instruction::AmominD { rd, rs1, rs2, .. } => {
                 // read doubleword from address in rs1
@@ -732,12 +769,14 @@ impl SoftThread<u64, Dram> {
                     todo!();
                 }
                 
-                let temp = (self.bus.read(addr, 64) as i64) as u64;
-                let val = self.registers[rs2 as usize];
-                let res = std::cmp::min(temp, val);
-                
-                self.bus.write(addr, res, 64);
-                self.registers[rd as usize] = temp;
+                let res = self.bus.read(&addr, 64);
+                if let Ok(temp) = res {
+                    let temp = (temp as i64) as u64;
+                    let val = self.registers[rs2 as usize];
+                    let fin = std::cmp::min(temp, val);
+                    let _ = self.bus.write(addr, fin, 64);
+                    self.registers[rd as usize] = temp;
+                }
             },
             Instruction::AmomaxD { rd, rs1, rs2, .. } => {
                 let addr = self.registers[rs1 as usize];
@@ -747,12 +786,14 @@ impl SoftThread<u64, Dram> {
                     todo!();
                 }
                 
-                let temp = (self.bus.read(addr, 64) as i64) as u64;
-                let val = self.registers[rs2 as usize];
-                let res = std::cmp::max(temp, val);
-                
-                self.bus.write(addr, res, 64);
-                self.registers[rd as usize] = temp;
+                let res = self.bus.read(&addr, 64);
+                if let Ok(temp) = res {
+                    let temp = (temp as i64) as u64;
+                    let val = self.registers[rs2 as usize];
+                    let fin = std::cmp::max(temp, val);
+                    let _ = self.bus.write(addr, fin, 64);
+                    self.registers[rd as usize] = temp;
+                }
                 
             },
             Instruction::AmominuD { rd, rs1, rs2, .. } => {
@@ -769,12 +810,13 @@ impl SoftThread<u64, Dram> {
                     todo!();
                 }
                 
-                let temp = self.bus.read(addr, 64) as u64;
-                let val = self.registers[rs2 as usize];
-                let res = std::cmp::min(temp, val);
-                
-                self.bus.write(addr, res, 64);
-                self.registers[rd as usize] = temp;
+                let res = self.bus.read(&addr, 64);
+                if let Ok(temp) = res {
+                    let val = self.registers[rs2 as usize];
+                    let fin = std::cmp::min(temp, val);
+                    let _ = self.bus.write(addr, fin, 64);
+                    self.registers[rd as usize] = temp;
+                }
             },
             Instruction::AmomaxuD { rd, rs1, rs2, .. } => {
                 // read doubleword from address in rs1
@@ -790,12 +832,12 @@ impl SoftThread<u64, Dram> {
                     todo!();
                 }
                 
-                let temp = self.bus.read(addr, 64) as u64;
-                let val = self.registers[rs2 as usize];
-                let res = std::cmp::max(temp, val);
-                
-                self.bus.write(addr, res, 64);
-                self.registers[rd as usize] = temp;
+                if let Ok(temp) = self.bus.read(&addr, 64) {
+                    let val = self.registers[rs2 as usize];
+                    let fin = std::cmp::max(temp, val);
+                    let _ = self.bus.write(addr, fin, 64);
+                    self.registers[rd as usize] = temp;
+                }
             },
             _ => {
                 unimplemented!()

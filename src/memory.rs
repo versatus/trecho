@@ -44,6 +44,10 @@ pub trait Memory: Default {
     fn writew(&mut self, addr: Self::RegValue, val: Self::RegValue);
     fn writedw(&mut self, addr: u64, val: u64);
     fn into_u64(&self, val: &Self::RegValue) -> u64;
+    fn into_i64(&self, val: &Self::RegValue) -> i64;
+    fn into_u32(&self, val: &Self::RegValue) -> u32;
+    fn into_i32(&self, val: &Self::RegValue) -> i32;
+
 
  }
 
@@ -65,78 +69,6 @@ impl Dram {
     pub fn init(&mut self, bin: Vec<u8>) {
         self.size = bin.len() as u64;
         self.mem.splice(..bin.len(), bin.iter().cloned());
-    }
-
-    fn read_byte(&self, addr: u64) -> u64 {
-        let idx = (addr - BASE) as usize;
-        self.mem[idx] as u64
-    }
-
-    fn read_halfword(&self, addr: u64) -> u64 {
-        let idx = (addr - BASE) as usize;
-        return (self.mem[idx] as u64) | ((self.mem[idx + 1] as u64) << 8);
-    }
-
-    fn read_word(&self, addr: u64) -> u64 {
-        let idx = (addr - BASE) as usize;
-        return (self.mem[idx] as u64) | 
-            ((self.mem[idx + 1] as u64) << 8) | 
-            ((self.mem[idx + 1] as u64) << 16) | 
-            ((self.mem[idx + 1] as u64) << 24);
-    }
-
-    fn read_doubleword(&self, addr: u64) -> u64 {
-        let idx = (addr - BASE) as usize;
-        return (self.mem[idx] as u64) |
-            ((self.mem[idx + 1] as u64) << 8) |
-            ((self.mem[idx + 2] as u64) << 16) |
-            ((self.mem[idx + 3] as u64) << 24) |
-            ((self.mem[idx + 4] as u64) << 32) |
-            ((self.mem[idx + 5] as u64) << 40) |
-            ((self.mem[idx + 6] as u64) << 48) |
-            ((self.mem[idx + 7] as u64) << 56)
-    }
-
-    pub fn write(&mut self, addr: u64, value: u64, size: u8) -> Result<(), Exception> {
-        match size {
-            BYTE => { self.write_byte(addr, value) },
-            HALFWORD => { self.write_halfword(addr, value) },
-            WORD => { self.write_word(addr, value) },
-            DOUBLEWORD => { self.write_doubleword(addr, value) },
-            _ => return Err(Exception::StoreAMOAccessFault),
-        }
-        Ok(())
-    }
-
-    fn write_byte(&mut self, addr: u64, val: u64) {
-        let idx = (addr - BASE) as usize;
-        self.mem[idx] = val as u8;
-    }
-
-    fn write_halfword(&mut self, addr: u64, val: u64) {
-        let idx = (addr - BASE) as usize;
-        self.mem[idx] = (val & 0xff) as u8;
-        self.mem[idx + 1] = ((val >> 8) & 0xff) as u8;
-    }
-
-    fn write_word(&mut self, addr: u64, val: u64) {
-        let idx = (addr - BASE) as usize;
-        self.mem[idx] = (val & 0xff) as u8;
-        self.mem[idx + 1] = ((val >> 8) & 0xff) as u8;
-        self.mem[idx + 2] = ((val >> 16) & 0xff) as u8;
-        self.mem[idx + 3] = ((val >> 24) & 0xff) as u8;
-    }
-
-    fn write_doubleword(&mut self, addr: u64, val: u64) {
-        let idx = (addr - BASE) as usize;
-        self.mem[idx] = (val & 0xff) as u8;
-        self.mem[idx + 1] = ((val >> 8) & 0xff) as u8;
-        self.mem[idx + 2] = ((val >> 16) & 0xff) as u8;
-        self.mem[idx + 3] = ((val >> 24) & 0xff) as u8;
-        self.mem[idx + 4] = ((val >> 32) & 0xff) as u8;
-        self.mem[idx + 5] = ((val >> 40) & 0xff) as u8;
-        self.mem[idx + 6] = ((val >> 48) & 0xff) as u8;
-        self.mem[idx + 7] = ((val >> 56) & 0xff) as u8;
     }
 }
 
@@ -250,23 +182,23 @@ impl Memory for Dram {
     }
 
     fn readb(&self, addr: &Self::RegValue) -> Self::RegValue {
-        let idx = (addr - BASE) as usize;
+        let idx: usize = *addr as usize;
         self.mem[idx] as u64
     }
     fn readhw(&self, addr: &Self::RegValue) -> Self::RegValue {
-        let idx = (addr - BASE) as usize;
+        let idx: usize = *addr as usize;
         return (self.mem[idx] as u64) | ((self.mem[idx + 1] as u64) << 8);
     }
     fn readw(&self, addr: &Self::RegValue) -> Self::RegValue {
-        let idx = (addr - BASE) as usize;
+        let idx: usize = *addr as usize;
         return (self.mem[idx] as u64) | 
             ((self.mem[idx + 1] as u64) << 8) | 
-            ((self.mem[idx + 1] as u64) << 16) | 
-            ((self.mem[idx + 1] as u64) << 24);
+            ((self.mem[idx + 2] as u64) << 16) | 
+            ((self.mem[idx + 3] as u64) << 24);
     }
 
     fn readdw(&self, addr: &Self::RegValue) -> Self::RegValue {
-        let idx = (addr - BASE) as usize;
+        let idx: usize = *addr as usize;
         return (self.mem[idx] as u64) |
             ((self.mem[idx + 1] as u64) << 8) |
             ((self.mem[idx + 2] as u64) << 16) |
@@ -289,29 +221,29 @@ impl Memory for Dram {
         Ok(())
     }
 
-    fn write(&mut self, addr: u64, value: u64, size: u8) -> Result<(), Self::Error> { 
+    fn write(&mut self, addr: u64, value: u64, size: u8) -> Result<(), Self::Error> {
         match size {
-            BYTE => { self.write_byte(addr, value) },
-            HALFWORD => { self.write_halfword(addr, value) },
-            WORD => { self.write_word(addr, value) },
-            DOUBLEWORD => { self.write_doubleword(addr, value) },
+            BYTE => { self.writeb(addr, value) },
+            HALFWORD => { self.writehw(addr, value) },
+            WORD => { self.writew(addr, value) },
+            DOUBLEWORD => { self.writedw(addr, value) },
             _ => return Err(MemError::StoreAMOAccessFault),
         }
         Ok(())    
     }
     fn writeb(&mut self, addr: u64, val: u64) {
-        let idx = (addr - BASE) as usize;
+        let idx: usize = addr as usize;
         self.mem[idx] = val as u8;
     }
 
     fn writehw(&mut self, addr: u64, val: u64) {
-        let idx = (addr - BASE) as usize;
+        let idx: usize = addr as usize;
         self.mem[idx] = (val & 0xff) as u8;
         self.mem[idx + 1] = ((val >> 8) & 0xff) as u8;
     }
     
     fn writew(&mut self, addr: u64, val: u64) {
-        let idx = (addr - BASE) as usize;
+        let idx: usize = addr as usize;
         self.mem[idx] = (val & 0xff) as u8;
         self.mem[idx + 1] = ((val >> 8) & 0xff) as u8;
         self.mem[idx + 2] = ((val >> 16) & 0xff) as u8;
@@ -319,7 +251,7 @@ impl Memory for Dram {
     }
     
     fn writedw(&mut self, addr: u64, val: u64) {
-        let idx = (addr - BASE) as usize;
+        let idx: usize = addr as usize;
         self.mem[idx] = (val & 0xff) as u8;
         self.mem[idx + 1] = ((val >> 8) & 0xff) as u8;
         self.mem[idx + 2] = ((val >> 16) & 0xff) as u8;
@@ -333,6 +265,18 @@ impl Memory for Dram {
     
     fn into_u64(&self, val: &Self::RegValue) -> u64 {
         *val as u64
+    }
+
+    fn into_i64(&self, val: &Self::RegValue) -> i64 {
+        *val as i64
+    }
+
+    fn into_u32(&self, val: &Self::RegValue) -> u32 {
+        *val as u32
+    }
+
+    fn into_i32(&self, val: &Self::RegValue) -> i32 {
+        *val as i32
     }
 }
 

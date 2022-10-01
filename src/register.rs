@@ -27,22 +27,22 @@ pub trait RegisterValue:
     fn greater_equal_signed(&self, rhs: &Self) -> Self;
     fn logical_not(&self) -> Self;
     fn condition(&self, tval: &Self, fval: &Self) -> Self;
-    fn overflowing_add(&self, rhs: &Self) -> Self;
-    fn overflowing_sub(&self, rhs: &Self) -> Self;
-    fn overflowing_mul(&self, rhs: &Self) -> Self;
-    fn overflowing_div(&self, rhs: &Self) -> Self;
-    fn overflowing_div_euclid(&self, rhs: &Self) -> Self;
-    fn overflowing_rem(&self, rhs: &Self) -> Self;
-    fn overflowing_rem_euclid(&self, rhs: &Self) -> Self;
-    fn overflowing_mul_high_signed(&self, rhs: &Self) -> Self;
-    fn overflowing_mul_high_unsigned(&self, rhs: &Self) -> Self;
-    fn overflowing_mul_high_signed_unsigned(&self, rhs: &Self) -> Self;
-    fn overflowing_div_signed(&self, rhs: &Self) -> Self;
-    fn overflowing_rem_signed(&self, rhs: &Self) -> Self;
-    fn overflowing_neg(&self) -> Self;
-    fn overflowing_pow(&self, exp: u32) -> Self;
-    fn overflowing_shl(&self, bits: u32) -> Self;
-    fn overflowing_shr(&self, bits: u32) -> Self;
+    fn oflow_add(&self, rhs: &Self) -> Self;
+    fn oflow_sub(&self, rhs: &Self) -> Self;
+    fn oflow_mul(&self, rhs: &Self) -> Self;
+    fn oflow_div(&self, rhs: &Self) -> Self;
+    fn oflow_div_euclid(&self, rhs: &Self) -> Self;
+    fn oflow_rem(&self, rhs: &Self) -> Self;
+    fn oflow_rem_euclid(&self, rhs: &Self) -> Self;
+    fn oflow_mul_high_signed(&self, rhs: &Self) -> Self;
+    fn oflow_mul_high_unsigned(&self, rhs: &Self) -> Self;
+    fn oflow_mul_high_signed_unsigned(&self, rhs: &Self) -> Self;
+    fn oflow_div_signed(&self, rhs: &Self) -> Self;
+    fn oflow_rem_signed(&self, rhs: &Self) -> Self;
+    fn oflow_neg(&self) -> Self;
+    fn oflow_pow(&self, exp: u32) -> Self;
+    fn oflow_shl(&self, bits: u32) -> Self;
+    fn oflow_shr(&self, bits: u32) -> Self;
     fn msb_zeros(&self) -> Self;
     fn lsb_zeros(&self) -> Self;
     fn n_ones(&self) -> Self;
@@ -335,19 +335,19 @@ impl RegisterValue for u64 {
         }
     }
     
-    fn overflowing_add(&self, rhs: &Self) -> Self { 
+    fn oflow_add(&self, rhs: &Self) -> Self { 
         (*self).overflowing_add(*rhs).0    
     }
     
-    fn overflowing_sub(&self, rhs: &Self) -> Self { 
+    fn oflow_sub(&self, rhs: &Self) -> Self { 
         (*self).overflowing_sub(*rhs).0
     }
     
-    fn overflowing_mul(&self, rhs: &Self) -> Self {
+    fn oflow_mul(&self, rhs: &Self) -> Self {
         (*self).overflowing_mul(*rhs).0
     }
     
-    fn overflowing_div(&self, rhs: &Self) -> Self {
+    fn oflow_div(&self, rhs: &Self) -> Self {
         if *rhs == 0 {
             Self::max_val()
         } else {
@@ -355,7 +355,7 @@ impl RegisterValue for u64 {
         }
     }
 
-    fn overflowing_div_euclid(&self, rhs: &Self) -> Self {
+    fn oflow_div_euclid(&self, rhs: &Self) -> Self {
         if *rhs == 0 {
             Self::max_val()
         } else {
@@ -363,7 +363,7 @@ impl RegisterValue for u64 {
         }
     }
 
-    fn overflowing_div_signed(&self, rhs: &Self) -> Self {
+    fn oflow_div_signed(&self, rhs: &Self) -> Self {
         if *rhs == 0 {
             (-1i64) as u64
         } else {
@@ -376,7 +376,7 @@ impl RegisterValue for u64 {
         }
     }
     
-    fn overflowing_rem(&self, rhs: &Self) -> Self {
+    fn oflow_rem(&self, rhs: &Self) -> Self {
         if *rhs == 0 {
             *self
         } else {
@@ -384,7 +384,7 @@ impl RegisterValue for u64 {
         }
     }
     
-    fn overflowing_rem_euclid(&self, rhs: &Self) -> Self {
+    fn oflow_rem_euclid(&self, rhs: &Self) -> Self {
         if *rhs == 0 {
             *self
         } else {
@@ -392,7 +392,7 @@ impl RegisterValue for u64 {
         }
     }
 
-    fn overflowing_rem_signed(&self, rhs: &Self) -> Self {
+    fn oflow_rem_signed(&self, rhs: &Self) -> Self {
         if *rhs == 0 {
             *self
         } else {
@@ -405,41 +405,41 @@ impl RegisterValue for u64 {
         }
     }
 
-    fn overflowing_mul_high_signed(&self, rhs: &Self) -> Self {
+    fn oflow_mul_high_signed(&self, rhs: &Self) -> Self {
         let a = i128::from(*self as i64);
         let b = i128::from(*rhs as i64);
         let (val, _) = a.overflowing_mul(b);
-        (val >> 64) as u64
+        val as u64
     }
 
-    fn overflowing_mul_high_unsigned(&self, rhs: &Self) -> Self {
+    fn oflow_mul_high_unsigned(&self, rhs: &Self) -> Self {
         let a = u128::from(*self);
         let b = u128::from(*rhs);
         let (val, _) = a.overflowing_mul(b);
-        (val >> 64) as u64
+        val as u64
     }
 
-    fn overflowing_mul_high_signed_unsigned(&self, rhs: &Self) -> Self {
+    fn oflow_mul_high_signed_unsigned(&self, rhs: &Self) -> Self {
         let a = i128::from(*self as i64);
-        let b = i128::from(*self);
+        let b = i128::from(*rhs);
         let (val, _) = a.overflowing_mul(b);
-        (val >> 64) as u64
+        val as u64
 
     }
     
-    fn overflowing_neg(&self) -> Self { 
+    fn oflow_neg(&self) -> Self { 
         (*self).overflowing_neg().0    
     }
     
-    fn overflowing_pow(&self, exp: u32) -> Self { 
+    fn oflow_pow(&self, exp: u32) -> Self { 
         (*self).overflowing_pow(exp).0    
     }
 
-    fn overflowing_shl(&self, bits: u32) -> Self {
+    fn oflow_shl(&self, bits: u32) -> Self {
         (*self).overflowing_shl(bits).0
     }
 
-    fn overflowing_shr(&self, bits: u32) -> Self {
+    fn oflow_shr(&self, bits: u32) -> Self {
         (*self).overflowing_shr(bits).0
     }
 

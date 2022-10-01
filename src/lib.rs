@@ -15,11 +15,12 @@ pub mod consts;
 mod tests {
     #![allow(unused)]
     use super::*;
+    use crate::memory::Memory;
     use crate::encoding::{InstructionDecoder, OpCodeType, Unpacked, EncodingTable};
     use crate::extensions::{Extension, Base};
     use crate::encoding_types::*;
     use crate::instructions::Instruction;
-    use crate::register::{HardWiredZero, Register, RegisterAbi};
+    use crate::register::{HardWiredZero, Register, RegisterAbi, RegisterValue};
     use crate::soft::SoftThread;
 
     #[test]
@@ -349,7 +350,7 @@ mod tests {
             Instruction::Sb {
                 rs1: Register::X21,
                 rs2: Register::X12,
-                imm: -821,
+                imm: 111,
                 func3: 0
             }
         );
@@ -364,7 +365,7 @@ mod tests {
             Instruction::Sh {
                 rs1: Register::X21,
                 rs2: Register::X12,
-                imm: -821,
+                imm: 111,
                 func3: 1
             }
         );
@@ -379,7 +380,7 @@ mod tests {
             Instruction::Sw {
                 rs1: Register::X21,
                 rs2: Register::X12,
-                imm: -821,
+                imm: 111,
                 func3: 2
             }
         );
@@ -1571,7 +1572,7 @@ mod tests {
             Instruction::Fsw {
                 rs1: Register::X10,
                 rs2: Register::X24,
-                imm: 1446
+                imm: 47
             }
         )
     }
@@ -1985,7 +1986,7 @@ mod tests {
             Instruction::Fsd {
                 rs1: Register::X10,
                 rs2: Register::X24,
-                imm: 1446
+                imm: 47
             }
         )
     }
@@ -2442,7 +2443,7 @@ mod tests {
             Instruction::Fsq {
                 rs1: Register::X10,
                 rs2: Register::X24,
-                imm: 1446
+                imm: 47
             }
         )
     }
@@ -2992,8 +2993,8 @@ mod tests {
         assert_eq!(
             instruction,
             Instruction::Lui {
-                rd: Register::X11,
-                imm: 3435823104,
+                rd: Register::X10,
+                imm: -859144192,
             }
         );
     }
@@ -3004,14 +3005,11 @@ mod tests {
         let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1000_0101 as u8, 0b0011_0111 as u8];
         soft.load_program(program);
         let instruction: Instruction = soft.fetch().into();
-
-        // Load the program code
-        soft.load_program(program);
         soft.execute();
 
         assert_eq!(
-            soft.registers[Register::X11 as usize],
-            3435823104
+            soft.registers[Register::X10 as usize],
+            (-859144192 as i64) as u64
         )
     }
 
@@ -3021,11 +3019,12 @@ mod tests {
         let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1000_0101 as u8, 0b0001_0111 as u8];
         soft.load_program(program);
         let instruction: Instruction = soft.fetch().into();
+        println!("{:?}", instruction);
         assert_eq!(
             instruction,
             Instruction::Auipc {
-                rd: Register::X11,
-                imm: 3435823104,
+                rd: Register::X10,
+                imm: -859144192,
             }
         );
     }
@@ -3036,15 +3035,10 @@ mod tests {
         let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1000_0101 as u8, 0b0001_0111 as u8];
         soft.load_program(program);
         let instruction: Instruction = soft.fetch().into();
-
-        // Load the program code
-        soft.pc = 100;
-        soft.load_program(program);
         soft.execute();
-
         assert_eq!(
-            soft.registers[Register::X11 as usize],
-            3435823204
+            soft.registers[Register::X10 as usize],
+            (-859144192 as i64) as u64
         )
     }
 
@@ -3057,8 +3051,8 @@ mod tests {
         assert_eq!(
             instruction,
             Instruction::Jal {
-                rd: Register::X11,
-                imm: 3435823104,
+                rd: Register::X10,
+                imm: -360112,
             }
         );
     }
@@ -3066,23 +3060,19 @@ mod tests {
     #[test]
     fn test_jal_execution() {
         let mut soft = SoftThread::default();
-        let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1000_0101 as u8, 0b0001_0111 as u8];
+        let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1000_0101 as u8, 0b0110_1111 as u8];
         soft.load_program(program);
         let instruction: Instruction = soft.fetch().into();
-
-        // Load the program code
-        soft.pc = 100;
-        soft.load_program(program);
         soft.execute();
-
+        println!("{}", (-360112i64) as u64);
         assert_eq!(
-            soft.registers[Register::X11 as usize],
-            104
+            soft.registers[Register::X10 as usize],
+            4
         );
 
         assert_eq!(
-            self.pc,
-            3435823104
+            soft.pc,
+            18446744073709191504
         )
     }
 
@@ -3095,7 +3085,7 @@ mod tests {
         assert_eq!(
             instruction,
             Instruction::Jalr {
-                rd: Register::X11,
+                rd: Register::X10,
                 rs1: Register::X21,
                 imm: 3276,
             }
@@ -3108,21 +3098,18 @@ mod tests {
         let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1000_0101 as u8, 0b0110_0111 as u8];
         soft.load_program(program);
         let instruction: Instruction = soft.fetch().into();
-
-        // Load the program code
-        soft.pc = 100;
+        soft.pc = 0;
         soft.registers[Register::X21 as usize] = 1000;
-        soft.load_program(program);
         soft.execute();
 
         assert_eq!(
-            soft.registers[Register::X11 as usize],
-            104
+            soft.registers[Register::X10 as usize],
+            4
         );
 
         assert_eq!(
-            self.pc,
-            (1000 & !1) 
+            soft.pc,
+            ((1000 + 3276) & !1) 
         )
     }
 
@@ -3135,10 +3122,11 @@ mod tests {
         assert_eq!(
             instruction,
             Instruction::Beq {
-                rd: Register::X11,
+                rd: Register::X10,
                 rs1: Register::X21,
-                rs2: Register::X20,
-                imm: 3276,
+                rs2: Register::X12,
+                imm: -2870,
+                func3: 0
             }
         );
     }
@@ -3147,16 +3135,14 @@ mod tests {
     fn test_beq_equal_execution() {
         let mut soft = SoftThread::default();
         let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1000_0101 as u8, 0b0110_0011 as u8];
-        soft.registers[Register::X21] = 100;
-        soft.registers[Register::X20] = 100;
-        soft.pc = 100;
-
         soft.load_program(program);
+        soft.registers[Register::X21 as usize] = 100;
+        soft.registers[Register::X12 as usize] = 100;
         soft.execute();
         
         assert_eq!(
-            self.pc,
-            3376
+            soft.pc,
+            (-2870 as i64) as u64
         )
         
     }
@@ -3165,16 +3151,14 @@ mod tests {
     fn test_beq_not_equal_execution() {
         let mut soft = SoftThread::default();
         let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1000_0101 as u8, 0b0110_0011 as u8];
-        soft.registers[Register::X21] = 100;
-        soft.registers[Register::X20] = 1000;
-        soft.pc = 100;
-
         soft.load_program(program);
+        soft.registers[Register::X21 as usize] = 100;
+        soft.registers[Register::X12 as usize] = 1000;
         soft.execute();
         
         assert_eq!(
-            self.pc,
-            100
+            soft.pc,
+            0
         )
     }
 
@@ -3187,10 +3171,11 @@ mod tests {
         assert_eq!(
             instruction,
             Instruction::Bne {
-                rd: Register::X11,
+                rd: Register::X10,
                 rs1: Register::X21,
-                rs2: Register::X20,
-                imm: 3276,
+                rs2: Register::X12,
+                imm: -2870,
+                func3: 1
             }
         );
     }
@@ -3200,16 +3185,13 @@ mod tests {
         let mut soft = SoftThread::default();
         let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1001_0101 as u8, 0b0110_0011 as u8];
         soft.load_program(program);
-        soft.registers[Register::X21] = 100;
-        soft.registers[Register::X20] = 1000;
-        soft.pc = 100;
-
-        soft.load_program(program);
+        soft.registers[Register::X21 as usize] = 100;
+        soft.registers[Register::X12 as usize] = 1000;
         soft.execute();
 
         assert_eq!(
-            self.pc,
-            3376
+            soft.pc,
+            (-2870 as i64) as u64
         )
     }
 
@@ -3218,16 +3200,13 @@ mod tests {
         let mut soft = SoftThread::default();
         let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1001_0101 as u8, 0b0110_0011 as u8];
         soft.load_program(program);
-        soft.registers[Register::X21] = 100;
-        soft.registers[Register::X20] = 100;
-        soft.pc = 100;
-
-        soft.load_program(program);
+        soft.registers[Register::X21 as usize] = 100;
+        soft.registers[Register::X12 as usize] = 100;
         soft.execute();
 
         assert_eq!(
-            self.pc,
-            100
+            soft.pc,
+            0
         )
     }
 
@@ -3240,10 +3219,11 @@ mod tests {
         assert_eq!(
             instruction,
             Instruction::Blt {
-                rd: Register::X11,
+                rd: Register::X10,
                 rs1: Register::X21,
-                rs2: Register::X20,
-                imm: 3276,
+                rs2: Register::X12,
+                imm: -2870,
+                func3: 4
             }
         );
     }
@@ -3253,16 +3233,13 @@ mod tests {
         let mut soft = SoftThread::default();
         let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1100_0101 as u8, 0b0110_0011 as u8];
         soft.load_program(program);
-        soft.registers[Register::X21] = 100;
-        soft.registers[Register::X20] = 1000;
-        soft.pc = 100;
-
-        soft.load_program(program);
+        soft.registers[Register::X21 as usize] = 100;
+        soft.registers[Register::X12 as usize] = 1000;
         soft.execute();
 
         assert_eq!(
-            self.pc,
-            3376
+            soft.pc,
+            (-2870 as i64) as u64
         )
     }
 
@@ -3271,16 +3248,13 @@ mod tests {
         let mut soft = SoftThread::default();
         let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1100_0101 as u8, 0b0110_0011 as u8];
         soft.load_program(program);
-        soft.registers[Register::X21] = 1000;
-        soft.registers[Register::X20] = 100;
-        soft.pc = 100;
-
-        soft.load_program(program);
+        soft.registers[Register::X21 as usize] = 1000;
+        soft.registers[Register::X12 as usize] = 100;
         soft.execute();
 
         assert_eq!(
-            self.pc,
-            100
+            soft.pc,
+            0
         )
     }
 
@@ -3293,10 +3267,11 @@ mod tests {
         assert_eq!(
             instruction,
             Instruction::Bge {
-                rd: Register::X11,
+                rd: Register::X10,
                 rs1: Register::X21,
-                rs2: Register::X20,
-                imm: 3276,
+                rs2: Register::X12,
+                imm: -2870,
+                func3: 5
             }
         );
     }
@@ -3308,14 +3283,11 @@ mod tests {
         soft.load_program(program);
         soft.registers[Register::X21 as usize] = 1000;
         soft.registers[Register::X20 as usize] = 100;
-        soft.pc = 100;
-
-        soft.load_program(program);
         soft.execute();
 
         assert_eq!(
-            self.pc,
-            3376
+            soft.pc,
+            (-2870 as i64) as u64
         )
     }
 
@@ -3325,15 +3297,12 @@ mod tests {
         let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1101_0101 as u8, 0b0110_0011 as u8];
         soft.load_program(program);
         soft.registers[Register::X21 as usize] = 10;
-        soft.registers[Register::X20 as usize] = 100;
-        soft.pc = 100;
-
-        soft.load_program(program);
+        soft.registers[Register::X12 as usize] = 100;
         soft.execute();
 
         assert_eq!(
-            self.pc,
-            100
+            soft.pc,
+            0
         )
     }
 
@@ -3346,10 +3315,11 @@ mod tests {
         assert_eq!(
             instruction,
             Instruction::Bltu {
-                rd: Register::X11,
+                rd: Register::X10,
                 rs1: Register::X21,
-                rs2: Register::X20,
-                imm: 3276,
+                rs2: Register::X12,
+                imm: -2870,
+                func3: 6
             }
         );
     }
@@ -3359,17 +3329,13 @@ mod tests {
         let mut soft = SoftThread::default();
         let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1110_0101 as u8, 0b0110_0011 as u8];
         soft.load_program(program);
-
         soft.registers[Register::X21 as usize] = 10;
-        soft.registers[Register::X20 as usize] = 100;
-        soft.pc = 100;
-
-        soft.load_program(program);
+        soft.registers[Register::X12 as usize] = 100;
         soft.execute();
 
         assert_eq!(
-            self.pc,
-            3376
+            soft.pc,
+            (-2870 as i64) as u64
         )
     }
 
@@ -3378,17 +3344,13 @@ mod tests {
         let mut soft = SoftThread::default();
         let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1110_0101 as u8, 0b0110_0011 as u8];
         soft.load_program(program);
-
         soft.registers[Register::X21 as usize] = 100;
-        soft.registers[Register::X20 as usize] = 10;
-        soft.pc = 100;
-
-        soft.load_program(program);
+        soft.registers[Register::X12 as usize] = 10;
         soft.execute();
 
         assert_eq!(
-            self.pc,
-            100
+            soft.pc,
+            0
         )
     }
 
@@ -3401,10 +3363,11 @@ mod tests {
         assert_eq!(
             instruction,
             Instruction::Bgeu {
-                rd: Register::X11,
+                rd: Register::X10,
                 rs1: Register::X21,
-                rs2: Register::X20,
-                imm: 3276,
+                rs2: Register::X12,
+                imm: -2870,
+                func3: 7
             }
         );
     }
@@ -3414,16 +3377,13 @@ mod tests {
         let mut soft = SoftThread::default();
         let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1111_0101 as u8, 0b0110_0011 as u8];
         soft.load_program(program);
-        soft.registers[Register::X21 as usize] = 10;
-        soft.registers[Register::X20 as usize] = 100;
-        soft.pc = 100;
-
-        soft.load_program(program);
+        soft.registers[Register::X21 as usize] = 100;
+        soft.registers[Register::X12 as usize] = 10;
         soft.execute();
 
         assert_eq!(
-            self.pc,
-            3376
+            soft.pc,
+            (-2870 as i64) as u64
         )
     }
 
@@ -3432,16 +3392,13 @@ mod tests {
         let mut soft = SoftThread::default();
         let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1111_0101 as u8, 0b0110_0011 as u8];
         soft.load_program(program);
-        soft.registers[Register::X21 as usize] = 100;
-        soft.registers[Register::X20 as usize] = 10;
-        soft.pc = 100;
-
-        soft.load_program(program);
+        soft.registers[Register::X21 as usize] = 10;
+        soft.registers[Register::X12 as usize] = 100;
         soft.execute();
 
         assert_eq!(
-            self.pc,
-            100
+            soft.pc,
+            0
         )
     }
 
@@ -3454,7 +3411,7 @@ mod tests {
         assert_eq!(
             instruction,
             Instruction::Lb {
-                rd: Register::X11,
+                rd: Register::X10,
                 rs1: Register::X21,
                 imm: 3276,
                 func3: 0,
@@ -3468,11 +3425,11 @@ mod tests {
         let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1000_0101 as u8, 0b0000_0011 as u8];
         soft.load_program(program);
         soft.registers[Register::X21 as usize] = 100;
-        soft.bus.mem[3376] = 235;
+        soft.bus.write(3376, 235, 8);
         soft.execute();
 
         assert_eq!(
-            soft.registers[Register::X11],
+            soft.registers[Register::X10 as usize],
             235
         )
     }
@@ -3486,7 +3443,7 @@ mod tests {
         assert_eq!(
             instruction,
             Instruction::Lh {
-                rd: Register::X11,
+                rd: Register::X10,
                 rs1: Register::X21,
                 imm: 3276,
                 func3: 1,
@@ -3500,11 +3457,11 @@ mod tests {
         let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1001_0101 as u8, 0b0000_0011 as u8];
         soft.load_program(program);
         soft.registers[Register::X21 as usize] = 100;
-        soft.bus.mem[3376] = 3000;
+        soft.bus.write(3376, 3000, 16);
         soft.execute();
 
         assert_eq!(
-            soft.registers[Register::X11],
+            soft.registers[Register::X10 as usize],
             3000
         )
     }
@@ -3518,10 +3475,10 @@ mod tests {
         assert_eq!(
             instruction,
             Instruction::Lw {
-                rd: Register::X11,
+                rd: Register::X10,
                 rs1: Register::X21,
                 imm: 3276,
-                func3: 1,
+                func3: 2,
             }
         );
     }
@@ -3532,11 +3489,11 @@ mod tests {
         let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1010_0101 as u8, 0b0000_0011 as u8];
         soft.load_program(program);
         soft.registers[Register::X21 as usize] = 100;
-        soft.bus.mem[3376] = 100000;
+        soft.bus.write(3376, 100000, 32);
         soft.execute();
 
         assert_eq!(
-            soft.registers[Register::X11 as usize],
+            soft.registers[Register::X10 as usize],
             100000
         )
     }
@@ -3550,7 +3507,7 @@ mod tests {
         assert_eq!(
             instruction,
             Instruction::Lbu {
-                rd: Register::X11,
+                rd: Register::X10,
                 rs1: Register::X21,
                 imm: 3276,
                 func3: 4,
@@ -3564,11 +3521,11 @@ mod tests {
         let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1100_0101 as u8, 0b0000_0011 as u8];
         soft.load_program(program);
         soft.registers[Register::X21 as usize] = 100;
-        soft.bus.mem[3376] = 235;
+        soft.bus.write(3376, 235, 8);
         soft.execute();
 
         assert_eq!(
-            soft.registers[Register::X11],
+            soft.registers[Register::X10 as usize],
             235
         )
     }
@@ -3582,7 +3539,7 @@ mod tests {
         assert_eq!(
             instruction,
             Instruction::Lhu {
-                rd: Register::X11,
+                rd: Register::X10,
                 rs1: Register::X21,
                 imm: 3276,
                 func3: 5,
@@ -3593,14 +3550,14 @@ mod tests {
     #[test]
     fn test_lhu_execution() {
         let mut soft = SoftThread::default();
-        let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1100_0101 as u8, 0b0000_0011 as u8];
+        let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1101_0101 as u8, 0b0000_0011 as u8];
         soft.load_program(program);
         soft.registers[Register::X21 as usize] = 100;
-        soft.bus.mem[3376] = 3000;
+        soft.bus.write(3376, 3000, 16);
         soft.execute();
 
         assert_eq!(
-            soft.registers[Register::X11],
+            soft.registers[Register::X10 as usize],
             3000
         )
     }
@@ -3614,10 +3571,9 @@ mod tests {
         assert_eq!(
             instruction,
             Instruction::Sb {
-                rd: Register::X11,
                 rs1: Register::X21,
-                rs2: Register::X12
-                imm: 3276,
+                rs2: Register::X12,
+                imm: 110,
                 func3: 0,
             }
         );
@@ -3633,7 +3589,7 @@ mod tests {
         soft.execute();
 
         assert_eq!(
-            soft.bus.mem[3376],
+            soft.bus.read(&((210 as i64) as u64), 8).unwrap(),
             235
         )
         
@@ -3648,10 +3604,9 @@ mod tests {
         assert_eq!(
             instruction,
             Instruction::Sh {
-                rd: Register::X11,
                 rs1: Register::X21,
-                rs2: Register::X12
-                imm: 3276,
+                rs2: Register::X12,
+                imm: 110,
                 func3: 1,
             }
         );
@@ -3667,7 +3622,7 @@ mod tests {
         soft.execute();
 
         assert_eq!(
-            soft.bus.mem[3376],
+            soft.bus.read(&210, 16).unwrap(),
             3000
         )
     }
@@ -3681,10 +3636,9 @@ mod tests {
         assert_eq!(
             instruction,
             Instruction::Sw {
-                rd: Register::X11,
                 rs1: Register::X21,
-                rs2: Register::X12
-                imm: 3276,
+                rs2: Register::X12,
+                imm: 110,
                 func3: 2,
             }
         );
@@ -3700,7 +3654,7 @@ mod tests {
         soft.execute();
 
         assert_eq!(
-            soft.bus.mem[3376],
+            soft.bus.read(&210, 32).unwrap(),
             100000
         )
     }
@@ -3714,7 +3668,7 @@ mod tests {
         assert_eq!(
             instruction,
             Instruction::Slti {
-                rd: Register::X11,
+                rd: Register::X10,
                 rs1: Register::X21,
                 imm: 3276,
                 func3: 2,
@@ -3727,11 +3681,11 @@ mod tests {
         let mut soft = SoftThread::default();
         let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1010_0101 as u8, 0b0001_0011 as u8];
         soft.load_program(program);
-        self.registers[Register::X21 as usize] = 2;
+        soft.registers[Register::X21 as usize] = 2;
         soft.execute();
 
         assert_eq!(
-            self.registers[Register::X11],
+            soft.registers[Register::X10 as usize],
             1
         )
     }
@@ -3741,11 +3695,11 @@ mod tests {
         let mut soft = SoftThread::default();
         let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1010_0101 as u8, 0b0001_0011 as u8];
         soft.load_program(program);
-        self.registers[Register::X21 as usize] = 100000;
+        soft.registers[Register::X21 as usize] = 100000;
         soft.execute();
 
         assert_eq!(
-            self.registers[Register::X11],
+            soft.registers[Register::X10 as usize],
             0
         )
     }
@@ -3760,7 +3714,7 @@ mod tests {
         assert_eq!(
             instruction,
             Instruction::Xori {
-                rd: Register::X11,
+                rd: Register::X10,
                 rs1: Register::X21,
                 imm: 3276,
                 func3: 4,
@@ -3773,11 +3727,11 @@ mod tests {
         let mut soft = SoftThread::default();
         let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1100_0101 as u8, 0b0001_0011 as u8];
         soft.load_program(program);
-        self.registers[Register::X21 as usize] = 0b1100_1100_1100;
+        soft.registers[Register::X21 as usize] = 0b1100_1100_1100;
         soft.execute();
 
         assert_eq!(
-            self.registers[Register::X11 as usize],
+            soft.registers[Register::X10 as usize],
             0b0000_0000_0000
         )
     }
@@ -3792,7 +3746,7 @@ mod tests {
         assert_eq!(
             instruction,
             Instruction::Ori {
-                rd: Register::X11,
+                rd: Register::X10,
                 rs1: Register::X21,
                 imm: 3276,
                 func3: 6,
@@ -3805,11 +3759,11 @@ mod tests {
         let mut soft = SoftThread::default();
         let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1110_0101 as u8, 0b0001_0011 as u8];
         soft.load_program(program);
-        self.registers[Register::X21 as usize] = 0b0011_0011_0011;
+        soft.registers[Register::X21 as usize] = 0b0011_0011_0011;
         soft.execute();
 
         assert_eq!(
-            self.registers[Register::X11 as usize],
+            soft.registers[Register::X10 as usize],
             0b1111_1111_1111
         )
     }
@@ -3824,10 +3778,10 @@ mod tests {
         assert_eq!(
             instruction,
             Instruction::Andi {
-                rd: Register::X11,
+                rd: Register::X10,
                 rs1: Register::X21,
                 imm: 3276,
-                func3: 6,
+                func3: 7,
             }
         );
     }    
@@ -3837,11 +3791,11 @@ mod tests {
         let mut soft = SoftThread::default();
         let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1111_0101 as u8, 0b0001_0011 as u8];
         soft.load_program(program);
-        self.registers[Register::X21 as usize] = 0b0011_0011_0011;
+        soft.registers[Register::X21 as usize] = 0b0011_0011_0011;
         soft.execute();
 
         assert_eq!(
-            self.registers[Register::X11 as usize],
+            soft.registers[Register::X10 as usize],
             0b0000_0000_0000
         )
     }
@@ -3856,9 +3810,9 @@ mod tests {
         assert_eq!(
             instruction,
             Instruction::Slli {
-                rd: Register::X11,
+                rd: Register::X10,
                 rs1: Register::X21,
-                shamt: 12
+                shamt: 12,
                 func3: 1,
                 func7: 0,
             }
@@ -3873,8 +3827,8 @@ mod tests {
         soft.registers[Register::X21 as usize] = 1000;
         soft.execute();
 
-        assert_eq(
-            soft.registers[Register::X11 as usize],
+        assert_eq!(
+            soft.registers[Register::X10 as usize],
             1000u64.wrapping_shl(12)
         )
     }
@@ -3889,9 +3843,9 @@ mod tests {
         assert_eq!(
             instruction,
             Instruction::Srli {
-                rd: Register::X11,
+                rd: Register::X10,
                 rs1: Register::X21,
-                shamt: 12
+                shamt: 12,
                 func3: 5,
                 func7: 0,
             }
@@ -3906,8 +3860,8 @@ mod tests {
         soft.registers[Register::X21 as usize] = 1000;
         soft.execute();
 
-        assert_eq(
-            soft.registers[Register::X11 as usize],
+        assert_eq!(
+            soft.registers[Register::X10 as usize],
             1000u64.wrapping_shr(12)
         );
     }
@@ -3922,11 +3876,11 @@ mod tests {
         assert_eq!(
             instruction,
             Instruction::Srai {
-                rd: Register::X11,
+                rd: Register::X10,
                 rs1: Register::X21,
                 shamt: 12,
                 func3: 5,
-                func7: 16,
+                func7: 32,
             }
         );
     }
@@ -3939,8 +3893,8 @@ mod tests {
         soft.registers[Register::X21 as usize] = 1000;
         soft.execute();
 
-        assert_eq(
-            soft.registers[Register::X11 as usize],
+        assert_eq!(
+            soft.registers[Register::X10 as usize],
             1000i64.wrapping_shr(12) as u64
         );
     }
@@ -3955,10 +3909,10 @@ mod tests {
         assert_eq!(
             instruction,
             Instruction::Sub {
-                rd: Register::X11,
+                rd: Register::X10,
                 rs1: Register::X21,
                 rs2: Register::X12,
-                func3: 5,
+                func3: 0,
                 func7: 32,
             }
         );
@@ -3973,9 +3927,9 @@ mod tests {
         soft.registers[Register::X12 as usize] = 300;
         soft.execute();
 
-        assert_eq(
-            soft.registers[Register::X11 as usize],
-            700;
+        assert_eq!(
+            soft.registers[Register::X10 as usize],
+            700
         )
     }
 
@@ -3989,7 +3943,7 @@ mod tests {
         assert_eq!(
             instruction,
             Instruction::Sll {
-                rd: Register::X11,
+                rd: Register::X10,
                 rs1: Register::X21,
                 rs2: Register::X12,
                 func3: 1,
@@ -4007,8 +3961,8 @@ mod tests {
         soft.registers[Register::X21 as usize] = 1000;
         soft.execute();
 
-        assert_eq(
-            soft.registers[Register::X11 as usize],
+        assert_eq!(
+            soft.registers[Register::X10 as usize],
             1000 << (((0b1100 & 0x3f) as u64) as u32)
         )
     }
@@ -4023,7 +3977,7 @@ mod tests {
         assert_eq!(
             instruction,
             Instruction::Slt {
-                rd: Register::X11,
+                rd: Register::X10,
                 rs1: Register::X21,
                 rs2: Register::X12,
                 func3: 2,
@@ -4041,8 +3995,8 @@ mod tests {
         soft.registers[Register::X21 as usize] = 10;
         soft.execute();
 
-        assert_eq(
-            soft.registers[Register::X11 as usize],
+        assert_eq!(
+            soft.registers[Register::X10 as usize],
             1
         )
     }
@@ -4057,7 +4011,7 @@ mod tests {
         assert_eq!(
             instruction,
             Instruction::Sltu {
-                rd: Register::X11,
+                rd: Register::X10,
                 rs1: Register::X21,
                 rs2: Register::X12,
                 func3: 3,
@@ -4075,8 +4029,8 @@ mod tests {
         soft.registers[Register::X21 as usize] = 10;
         soft.execute();
 
-        assert_eq(
-            soft.registers[Register::X11 as usize],
+        assert_eq!(
+            soft.registers[Register::X10 as usize],
             1            
         )
     }
@@ -4091,7 +4045,7 @@ mod tests {
         assert_eq!(
             instruction,
             Instruction::Xor {
-                rd: Register::X11,
+                rd: Register::X10,
                 rs1: Register::X21,
                 rs2: Register::X12,
                 func3: 4,
@@ -4110,7 +4064,7 @@ mod tests {
         soft.execute();
         
         assert_eq!(
-            soft.registers[Register::X11 as usize],
+            soft.registers[Register::X10 as usize],
             0b1111_1111_1111
         )
         
@@ -4126,7 +4080,7 @@ mod tests {
         assert_eq!(
             instruction,
             Instruction::Srl {
-                rd: Register::X11,
+                rd: Register::X10,
                 rs1: Register::X21,
                 rs2: Register::X12,
                 func3: 5,
@@ -4146,7 +4100,7 @@ mod tests {
         let shamt = ((12 & 0x3f) as u64) as u32;
 
         assert_eq!(
-            soft.registers[Register::X11 as usize],
+            soft.registers[Register::X10 as usize],
             10u64.wrapping_shr(shamt)
         )
     }
@@ -4161,7 +4115,7 @@ mod tests {
         assert_eq!(
             instruction,
             Instruction::Sra {
-                rd: Register::X11,
+                rd: Register::X10,
                 rs1: Register::X21,
                 rs2: Register::X12,
                 func3: 5,
@@ -4181,7 +4135,7 @@ mod tests {
         let shamt = ((12 & 0x3f) as u64) as u32;
 
         assert_eq!(
-            soft.registers[Register::X11 as usize],
+            soft.registers[Register::X10 as usize],
             (10i64.wrapping_shr(shamt) as u64)
         )
     }
@@ -4196,7 +4150,7 @@ mod tests {
         assert_eq!(
             instruction,
             Instruction::Or {
-                rd: Register::X11,
+                rd: Register::X10,
                 rs1: Register::X21,
                 rs2: Register::X12,
                 func3: 6,
@@ -4215,7 +4169,7 @@ mod tests {
         soft.execute();
         
         assert_eq!(
-            soft.registers[Register::X11 as usize],
+            soft.registers[Register::X10 as usize],
             (0b0000_1010 | 0b0000_1100)
         )
     }
@@ -4230,7 +4184,7 @@ mod tests {
         assert_eq!(
             instruction,
             Instruction::And {
-                rd: Register::X11,
+                rd: Register::X10,
                 rs1: Register::X21,
                 rs2: Register::X12,
                 func3: 7,
@@ -4250,7 +4204,7 @@ mod tests {
         soft.execute();
         
         assert_eq!(
-            soft.registers[Register::X11 as usize],
+            soft.registers[Register::X10 as usize],
             (0b0000_1010 & 0b0000_1100)
         )
     }
@@ -4264,7 +4218,7 @@ mod tests {
         assert_eq!(
             instruction,
             Instruction::Lwu {
-                rd: Register::X11,
+                rd: Register::X10,
                 rs1: Register::X21,
                 imm: 3276,
                 func3: 6,
@@ -4278,11 +4232,11 @@ mod tests {
         let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1110_0101 as u8, 0b0000_0011 as u8];
         soft.load_program(program);
         soft.registers[Register::X21 as usize] = 100;
-        soft.bus.mem[3376] = 100000;
+        soft.bus.write(3376, 100000, 32);
         soft.execute();
 
         assert_eq!(
-            soft.registers[Register::X11 as usize],
+            soft.registers[Register::X10 as usize],
             100000
         )
     }
@@ -4296,7 +4250,7 @@ mod tests {
         assert_eq!(
             instruction,
             Instruction::Ld {
-                rd: Register::X11,
+                rd: Register::X10,
                 rs1: Register::X21,
                 imm: 3276,
                 func3: 3,
@@ -4310,11 +4264,11 @@ mod tests {
         let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1011_0101 as u8, 0b0000_0011 as u8];
         soft.load_program(program);
         soft.registers[Register::X21 as usize] = 100;
-        soft.bus.mem[3376] = 100000;
+        soft.bus.write(3376, 100000, 64);
         soft.execute();
 
         assert_eq!(
-            soft.registers[Register::X11 as usize],
+            soft.registers[Register::X10 as usize],
             100000
         )
     }
@@ -4328,11 +4282,10 @@ mod tests {
         assert_eq!(
             instruction,
             Instruction::Sd {
-                rd: Register::X11,
                 rs1: Register::X21,
-                rs2: Register::X12
-                imm: 3276,
-                func3: 2,
+                rs2: Register::X12,
+                imm: 110,
+                func3: 3,
             }
         );
     }
@@ -4347,7 +4300,7 @@ mod tests {
         soft.execute();
 
         assert_eq!(
-            soft.bus.mem[3376],
+            soft.bus.read(&210, 64).unwrap(),
             100000
         )
     }
@@ -4392,10 +4345,10 @@ mod tests {
         
         assert_eq!(
             instruction,
-            Instruction::Slli {
-                rd: Register::X11,
+            Instruction::Slliw {
+                rd: Register::X10,
                 rs1: Register::X21,
-                shamt: 12
+                shamt: 12,
                 func3: 1,
                 func7: 0,
             }
@@ -4409,11 +4362,11 @@ mod tests {
         soft.load_program(program);
         soft.registers[Register::X21 as usize] = 1000;
         soft.execute();
-        let shamt = ((12i32) as i64) as u64;
+        let shamt: u32 = ((12i32) as u32);
 
-        assert_eq(
-            soft.registers[Register::X11 as usize],
-            (((1000u64.wrapping_shl(shamt) as i32) as i64) as u64)
+        assert_eq!(
+            soft.registers[Register::X10 as usize],
+            (((1000u64.wrapping_shl(shamt.try_into().unwrap()) as i32) as i64) as u64)
         )
     }
 
@@ -4427,11 +4380,11 @@ mod tests {
         assert_eq!(
             instruction,
             Instruction::Sraiw {
-                rd: Register::X11,
+                rd: Register::X10,
                 rs1: Register::X21,
                 shamt: 12,
                 func3: 5,
-                func7: 16,
+                func7: 32,
             }
         );
     }
@@ -4441,12 +4394,13 @@ mod tests {
         let mut soft = SoftThread::default();
         let program = vec![0b0100_0000 as u8, 0b1100_1010 as u8, 0b1101_0101 as u8, 0b0001_1011 as u8];
         soft.load_program(program);
-        soft.load_program(program);
         soft.registers[Register::X21 as usize] = 1000;
+        let shamt = 12;
         soft.execute();
+        
 
-        assert_eq(
-            soft.registers[Register::X11 as usize],
+        assert_eq!(
+            soft.registers[Register::X10 as usize],
             (((1000u64.wrapping_shr(shamt) as i32) as i64) as u64)
         );
     }
@@ -4454,7 +4408,7 @@ mod tests {
     #[test]
     fn fetch_and_decode_addw_instruction() {
         let mut soft = SoftThread::default();
-        let program = vec![0b0000_0000 as u8, 0b1100_1010 as u8, 0b1000_0101 as u8, 0b1001_1011 as u8];
+        let program = vec![0b0000_0000 as u8, 0b1100_1010 as u8, 0b1000_0101 as u8, 0b1011_1011 as u8];
         soft.load_program(program);
         let instruction: Instruction = soft.fetch().into();
         assert_eq!(
@@ -4472,7 +4426,7 @@ mod tests {
     #[test]
     fn test_addw_execution() {
         let mut soft = SoftThread::default();
-        let program = vec![0b0000_0000 as u8, 0b1100_1010 as u8, 0b1000_0101 as u8, 0b1001_1011 as u8];
+        let program = vec![0b0000_0000 as u8, 0b1100_1010 as u8, 0b1000_0101 as u8, 0b1011_1011 as u8];
         soft.load_program(program);
         soft.registers[Register::X21 as usize] = 500;
         soft.registers[Register::X12 as usize] = 1000;
@@ -4487,17 +4441,17 @@ mod tests {
     #[test]
     fn fetch_and_decode_subw_instruction() {
         let mut soft = SoftThread::default();
-        let program = vec![0b0100_0000 as u8, 0b1100_1010 as u8, 0b1000_0101 as u8, 0b0001_1011 as u8];
+        let program = vec![0b0100_0000 as u8, 0b1100_1010 as u8, 0b1000_0101 as u8, 0b0011_1011 as u8];
         soft.load_program(program);
         let instruction: Instruction = soft.fetch().into();
 
         assert_eq!(
             instruction,
             Instruction::Subw {
-                rd: Register::X11,
+                rd: Register::X10,
                 rs1: Register::X21,
                 rs2: Register::X12,
-                func3: 5,
+                func3: 0,
                 func7: 32,
             }
         );
@@ -4506,15 +4460,15 @@ mod tests {
     #[test]
     fn test_subw_execution() {
         let mut soft = SoftThread::default();
-        let program = vec![0b0100_0000 as u8, 0b1100_1010 as u8, 0b1000_0101 as u8, 0b0001_1011 as u8];
+        let program = vec![0b0100_0000 as u8, 0b1100_1010 as u8, 0b1000_0101 as u8, 0b0011_1011 as u8];
         soft.load_program(program);
         soft.registers[Register::X21 as usize] = 1000;
         soft.registers[Register::X12 as usize] = 300;
         soft.execute();
 
-        assert_eq(
-            soft.registers[Register::X11 as usize],
-            700;
+        assert_eq!(
+            soft.registers[Register::X10 as usize],
+            700
         )
     }
 
@@ -4528,7 +4482,7 @@ mod tests {
         assert_eq!(
             instruction,
             Instruction::Sllw {
-                rd: Register::X11,
+                rd: Register::X10,
                 rs1: Register::X21,
                 rs2: Register::X12,
                 func3: 1,
@@ -4548,7 +4502,7 @@ mod tests {
         let shamt = ((0b1000 & 0x3f) as u64) as u32;
 
         assert_eq!(
-            soft.registers[Register::X11 as usize],
+            soft.registers[Register::X10 as usize],
             ((1000u32.wrapping_shl(shamt) as i32) as i64) as u64
         )
     }
@@ -4563,7 +4517,7 @@ mod tests {
         assert_eq!(
             instruction,
             Instruction::Srlw {
-                rd: Register::X11,
+                rd: Register::X10,
                 rs1: Register::X21,
                 rs2: Register::X12,
                 func3: 5,
@@ -4583,7 +4537,7 @@ mod tests {
         let shamt = ((0b1000 & 0x3f) as u64) as u32;
 
         assert_eq!(
-            soft.registers[Register::X11 as usize],
+            soft.registers[Register::X10 as usize],
             ((1000u32.wrapping_shr(shamt) as i32) as i64) as u64
         )
     }
@@ -4597,8 +4551,8 @@ mod tests {
         
         assert_eq!(
             instruction,
-            Instruction::Srlw {
-                rd: Register::X11,
+            Instruction::Sraw {
+                rd: Register::X10,
                 rs1: Register::X21,
                 rs2: Register::X12,
                 func3: 5,
@@ -4618,7 +4572,7 @@ mod tests {
         let shamt = ((0b1000 & 0x3f) as u64) as u32;
 
         assert_eq!(
-            soft.registers[Register::X11 as usize],
+            soft.registers[Register::X10 as usize],
             (((1000u32 >> shamt) as i32) as i64) as u64
         )
     }
@@ -4632,10 +4586,10 @@ mod tests {
         
         assert_eq!(
             instruction,
-            Instruction::Cssrw {
-                rd: Register::X11,
+            Instruction::Csrrw {
+                rd: Register::X10,
                 rs1: Register::X21,
-                csr: 44,
+                csr: 1036,
                 func3: 1
             }
         );
@@ -4646,18 +4600,18 @@ mod tests {
         let mut soft = SoftThread::default();
         let program = vec![0b0100_0000 as u8, 0b1100_1010 as u8, 0b1001_0101 as u8, 0b0111_0011 as u8];
         soft.load_program(program);
-        soft.csr[44usize] = 1000;
+        soft.csr[1036usize] = 1000;
         soft.registers[Register::X21 as usize] = 500;
         soft.execute();
         let csr_val = 0b0011_1110_1000;
         
         assert_eq!(
-            soft.registers[Register::X11 as usize],
-            csr_val.zero_extend()
+            soft.registers[Register::X10 as usize],
+            csr_val.zero_extend(&12)
         );
 
         assert_eq!(
-            soft.csr[44usize],
+            soft.csr[1036usize],
             soft.registers[Register::X21 as usize]
         )
     }
@@ -4671,10 +4625,10 @@ mod tests {
         
         assert_eq!(
             instruction,
-            Instruction::Cssrs {
-                rd: Register::X11,
+            Instruction::Csrrs {
+                rd: Register::X10,
                 rs1: Register::X21,
-                csr: 44,
+                csr: 1036,
                 func3: 2
             }
         );
@@ -4685,19 +4639,19 @@ mod tests {
         let mut soft = SoftThread::default();
         let program = vec![0b0100_0000 as u8, 0b1100_1010 as u8, 0b1010_0101 as u8, 0b0111_0011 as u8];
         soft.load_program(program);
-        soft.csr[44usize] = 1000;
+        soft.csr[1036usize] = 1000;
         soft.registers[Register::X21 as usize] = 500;
         soft.execute();
         let csr_val = 0b0011_1110_1000;
         
         assert_eq!(
-            soft.registers[Register::X11 as usize],
-            csr_val.zero_extend()
+            soft.registers[Register::X10 as usize],
+            csr_val.zero_extend(&12)
         );
 
         assert_eq!(
-            soft.csr[44usize],
-            (csr_val | soft.register[Register::X21 as usize])
+            soft.csr[1036usize],
+            (csr_val | soft.registers[Register::X21 as usize])
         )
     }
 
@@ -4710,10 +4664,10 @@ mod tests {
         
         assert_eq!(
             instruction,
-            Instruction::Cssrc {
-                rd: Register::X11,
+            Instruction::Csrrc {
+                rd: Register::X10,
                 rs1: Register::X21,
-                csr: 44,
+                csr: 1036,
                 func3: 3
             }
         );
@@ -4724,19 +4678,19 @@ mod tests {
         let mut soft = SoftThread::default();
         let program = vec![0b0100_0000 as u8, 0b1100_1010 as u8, 0b1011_0101 as u8, 0b0111_0011 as u8];
         soft.load_program(program);
-        soft.csr[44usize] = 1000;
+        soft.csr[1036usize] = 1000;
         soft.registers[Register::X21 as usize] = 500;
         soft.execute();
         let csr_val = 0b0011_1110_1000;
         
         assert_eq!(
-            soft.registers[Register::X11 as usize],
-            csr_val.zero_extend()
+            soft.registers[Register::X10 as usize],
+            csr_val.zero_extend(&12)
         );
 
         assert_eq!(
-            soft.csr[44usize],
-            (csr_val & soft.register[Register::X21 as usize])
+            soft.csr[1036usize],
+            (csr_val & soft.registers[Register::X21 as usize])
         )
     }
 
@@ -4749,10 +4703,10 @@ mod tests {
         
         assert_eq!(
             instruction,
-            Instruction::Cssrwi {
-                rd: Register::X11,
+            Instruction::Csrrwi {
+                rd: Register::X10,
                 uimm: 21,
-                csr: 44,
+                csr: 1036,
                 func3: 5
             }
         );
@@ -4763,19 +4717,19 @@ mod tests {
         let mut soft = SoftThread::default();
         let program = vec![0b0100_0000 as u8, 0b1100_1010 as u8, 0b1101_0101 as u8, 0b0111_0011 as u8];
         soft.load_program(program);
-        soft.csr[44usize] = 1000;
+        soft.csr[1036usize] = 1000;
         soft.registers[Register::X21 as usize] = 500;
         soft.execute();
         let csr_val = 0b0011_1110_1000;
-        let imm = 21u64.zero_extend();
+        let imm = 21u64.zero_extend(&7);
         
         assert_eq!(
-            soft.registers[Register::X11 as usize],
+            soft.registers[Register::X10 as usize],
             csr_val
         );
 
         assert_eq!(
-            soft.csr[44usize],
+            soft.csr[1036usize],
             imm
         )
     }
@@ -4789,10 +4743,10 @@ mod tests {
         
         assert_eq!(
             instruction,
-            Instruction::Cssrsi {
-                rd: Register::X11,
+            Instruction::Csrrsi {
+                rd: Register::X10,
                 uimm: 21,
-                csr: 44,
+                csr: 1036,
                 func3: 6
             }
         );
@@ -4803,19 +4757,19 @@ mod tests {
         let mut soft = SoftThread::default();
         let program = vec![0b0100_0000 as u8, 0b1100_1010 as u8, 0b1110_0101 as u8, 0b0111_0011 as u8];
         soft.load_program(program);
-        soft.csr[44usize] = 1000;
+        soft.csr[1036usize] = 1000;
         soft.registers[Register::X21 as usize] = 500;
         soft.execute();
         let csr_val = 0b0011_1110_1000;
-        let imm = 21u64.zero_extend();
+        let imm = 21u64.zero_extend(&7);
         
         assert_eq!(
-            soft.registers[Register::X11 as usize],
+            soft.registers[Register::X10 as usize],
             csr_val
         );
 
         assert_eq!(
-            soft.csr[44usize],
+            soft.csr[1036usize],
             imm | csr_val
         )
     }
@@ -4829,11 +4783,11 @@ mod tests {
         
         assert_eq!(
             instruction,
-            Instruction::Cssrci {
-                rd: Register::X11,
+            Instruction::Csrrci {
+                rd: Register::X10,
                 uimm: 21,
-                csr: 44,
-                func3: 6
+                csr: 1036,
+                func3: 7
             }
         );
     }
@@ -4843,19 +4797,19 @@ mod tests {
         let mut soft = SoftThread::default();
         let program = vec![0b0100_0000 as u8, 0b1100_1010 as u8, 0b1111_0101 as u8, 0b0111_0011 as u8];
         soft.load_program(program);
-        soft.csr[44usize] = 1000;
+        soft.csr[1036usize] = 1000;
         soft.registers[Register::X21 as usize] = 500;
         soft.execute();
         let csr_val = 0b0011_1110_1000;
-        let imm = 21u64.zero_extend();
+        let imm = 21u64.zero_extend(&7);
         
         assert_eq!(
-            soft.registers[Register::X11 as usize],
+            soft.registers[Register::X10 as usize],
             csr_val
         );
 
         assert_eq!(
-            soft.csr[44usize],
+            soft.csr[1036usize],
             imm & csr_val
         )
     }
@@ -4953,12 +4907,11 @@ mod tests {
         soft.registers[Register::X21 as usize] = 20u64;
         soft.execute();
 
-        let expected = 20i128.overflowing_mul(25i128).unwrap();
-        let expected = (expected >> 64) as u64;
+        let expected = 20i128.overflowing_mul(25i128).0;
 
         assert_eq!(
             soft.registers[Register::X11 as usize],
-            expected
+            expected as u64
         )
     }
 
@@ -4989,12 +4942,11 @@ mod tests {
         soft.registers[Register::X21 as usize] = 20u64;
         soft.execute();
 
-        let expected = 20u128.overflowing_mul(25u128).unwrap();
-        let expected = (expected >> 64) as u64;
-
+        let expected = 20u128.overflowing_mul(25u128).0;
+        
         assert_eq!(
             soft.registers[Register::X11 as usize],
-            expected
+            expected as u64
         )
     }
 
@@ -5145,12 +5097,13 @@ mod tests {
                 func3: 0,
                 func7: 1
             }
+        )
     }
 
     #[test]
     fn test_mulw_execution() {
         let mut soft = SoftThread::default();
-        let program = vec![0b0000_0010 as u8, 0b1100_1010 as u8, 0b1001_0101 as u8, 0b1011_1011 as u8];
+        let program = vec![0b0000_0010 as u8, 0b1100_1010 as u8, 0b1000_0101 as u8, 0b1011_1011 as u8];
         soft.load_program(program);
         soft.registers[Register::X12 as usize] = 25u64;
         soft.registers[Register::X21 as usize] = 20u64;
@@ -5170,7 +5123,7 @@ mod tests {
         let instruction: Instruction = soft.fetch().into();
         assert_eq!(
             instruction,
-            Instruction::Div {
+            Instruction::Divw {
                 rd: Register::X11,
                 rs1: Register::X21,
                 rs2: Register::X12,
@@ -5203,7 +5156,7 @@ mod tests {
         let instruction: Instruction = soft.fetch().into();
         assert_eq!(
             instruction,
-            Instruction::Divu {
+            Instruction::Divuw {
                 rd: Register::X11,
                 rs1: Register::X21,
                 rs2: Register::X12,

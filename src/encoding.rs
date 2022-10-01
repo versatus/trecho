@@ -355,8 +355,7 @@ impl From<Inst> for Unpacked {
             }
             OpCodeType::S => { 
                 let mut unpacked = Unpacked::default();
-                let imm = (imm_115 << 5) | imm_4;
-                let imm = ((imm as i32) << 20) >> 20;
+                let imm = (imm_115 | imm_4) as i32;
                 unpacked.opcode = opcode;
                 unpacked.imm = Some(imm);
                 unpacked.rs1 = Some(rs1);
