@@ -6158,4 +6158,551 @@ mod tests {
         )
     }
 
+    #[test]
+    fn fetch_and_decode_flw_instruction() {}
+
+    #[test]
+    fn test_flw_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fsw_instruction() {}
+
+    #[test]
+    fn test_fsw_execute() {}
+
+    
+    #[test]
+    fn fetch_and_decode_fmadds_instruction() {}
+
+    #[test]
+    fn test_fmadds_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fmsubs_instruction() {}
+
+    #[test]
+    fn test_fmsubs_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fnmsubs_instruction() {}
+
+    #[test]
+    fn test_fnmsubs_execute() {}
+    
+    #[test]
+    fn fetch_and_decode_fnmadds_instruction() {}
+
+    #[test]
+    fn test_fnmadds_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fadds_instruction() {}
+
+    #[test]
+    fn test_fadds_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fsubs_instruction() {}
+
+    #[test]
+    fn test_fsubs_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fmuls_instruction() {}
+
+    #[test]
+    fn test_fmuls_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fdivs_instruction() {}
+
+    #[test]
+    fn test_fdivs_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fsqrts_instruction() {}
+
+    #[test]
+    fn test_fsqrts_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fsgnjs_instruction() {}
+
+    #[test]
+    fn test_fsgnjs_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fsgnjns_instruction() {}
+
+    #[test]
+    fn test_fsgnjns_execute() {}
+    
+    #[test]
+    fn fetch_and_decode_fsgnjxs_instruction() {}
+
+    #[test]
+    fn test_fsgnjxs_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fmins_instruction() {}
+
+    #[test]
+    fn test_fmins_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fmaxs_instruction() {}
+
+    #[test]
+    fn test_fmaxs_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fcvtws_instruction() {}
+
+    #[test]
+    fn test_fcvtws_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fcvtwus_instruction() {}
+
+    #[test]
+    fn test_fcvtwus_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fmvxw_instruction() {}
+
+    #[test]
+    fn test_fmvxw_execute() {}
+
+    #[test]
+    fn fetch_and_decode_feqs_instruction() {}
+
+    #[test]
+    fn test_feqs_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fles_instruction() {}
+
+    #[test]
+    fn test_fles_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fclasss_instruction() {}
+
+    #[test]
+    fn test_fclasss_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fcvtsw_instruction() {}
+
+    #[test]
+    fn test_fcvtsw_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fcvtswu_instruction() {}
+
+    #[test]
+    fn test_fcvtswu_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fmvwx_instruction() {}
+
+    #[test]
+    fn test_fmvwx_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fcvtls_instruction() {}
+
+    #[test]
+    fn test_fcvtls_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fcvtlus_instruction() {}
+
+    #[test]
+    fn test_fcvtlus_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fcvtsl_instruction() {}
+
+    #[test]
+    fn test_fcvtsl_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fcvtslu_instruction() {}
+
+    #[test]
+    fn test_fcvtslu_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fld_instruction() {}
+
+    #[test]
+    fn test_fld_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fsd_instruction() {}
+
+    #[test]
+    fn test_fsd_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fmaddd_instruction() {}
+
+    #[test]
+    fn test_fmaddd_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fmsubd_instruction() {}
+
+    #[test]
+    fn test_fmsubd_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fnmsubd_instruction() {}
+
+    #[test]
+    fn test_fnmsubd_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fnmaddd_instruction() {}
+
+    #[test]
+    fn test_fnmaddd_execute() {}
+
+    #[test]
+    fn fetch_and_decode_faddd_instruction() {}
+
+    #[test]
+    fn test_faddd_execute() {}
+
+    #[test]
+    fn fetch_and_decode_faddd_instruction() {}
+
+    #[test]
+    fn test_faddd_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fsubd_instruction() {}
+
+    #[test]
+    fn test_fsubd_execute() {}
+    
+    #[test]
+    fn fetch_and_decode_fmuld_instruction() {}
+
+    #[test]
+    fn test_fmuld_execute() {}    
+
+    #[test]
+    fn fetch_and_decode_fdivd_instruction() {}
+
+    #[test]
+    fn test_fdivd_execute() {}    
+
+    #[test]
+    fn fetch_and_decode_fsqrtd_instruction() {}
+
+    #[test]
+    fn test_fsqrtd_execute() {}    
+
+    #[test]
+    fn fetch_and_decode_fsgnjd_instruction() {}
+
+    #[test]
+    fn test_fsgnjd_execute() {}
+    
+    #[test]
+    fn fetch_and_decode_fsgnjnd_instruction() {}
+
+    #[test]
+    fn test_fsgnjnd_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fsgnjxd_instruction() {}
+
+    #[test]
+    fn test_fsgnjxd_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fmind_instruction() {}
+
+    #[test]
+    fn test_fmind_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fmind_instruction() {}
+
+    #[test]
+    fn test_fmind_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fmaxd_instruction() {}
+
+    #[test]
+    fn test_fmaxd_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fcvtsd_instruction() {}
+
+    #[test]
+    fn test_fcvtsd_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fcvtds_instruction() {}
+
+    #[test]
+    fn test_fcvtds_execute() {}
+
+    #[test]
+    fn fetch_and_decode_feqd_instruction() {}
+
+    #[test]
+    fn test_feqd_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fltd_instruction() {}
+
+    #[test]
+    fn test_fltd_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fled_instruction() {}
+
+    #[test]
+    fn test_fled_execute() {}    
+
+    #[test]
+    fn fetch_and_decode_flclassd_instruction() {}
+
+    #[test]
+    fn test_flclassd_execute() {} 
+    
+    #[test]
+    fn fetch_and_decode_fcvtwd_instruction() {}
+
+    #[test]
+    fn test_fcvtwud_execute() {} 
+
+    #[test]
+    fn fetch_and_decode_fcvtdw_instruction() {}
+
+    #[test]
+    fn test_fcvtdw_execute() {} 
+
+    #[test]
+    fn fetch_and_decode_fcvtdwu_instruction() {}
+
+    #[test]
+    fn test_fcvtdwu_execute() {} 
+
+    #[test]
+    fn fetch_and_decode_fcvtld_instruction() {}
+
+    #[test]
+    fn test_fcvtlud_execute() {} 
+
+    #[test]
+    fn fetch_and_decode_fcvtxd_instruction() {}
+
+    #[test]
+    fn test_fcvtxd_execute() {}
+    
+    #[test]
+    fn fetch_and_decode_fcvtdl_instruction() {}
+
+    #[test]
+    fn test_fcvtdl_execute() {}    
+
+    #[test]
+    fn fetch_and_decode_fcvtdlu_instruction() {}
+
+    #[test]
+    fn test_fcvtdlu_execute() {}    
+
+    #[test]
+    fn fetch_and_decode_fcvtdx_instruction() {}
+
+    #[test]
+    fn test_fcvtdx_execute() {}    
+
+    #[test]
+    fn fetch_and_decode_flq_instruction() {}
+
+    #[test]
+    fn test_flq_execute() {} 
+    
+    #[test]
+    fn fetch_and_decode_fsq_instruction() {}
+
+    #[test]
+    fn test_fsq_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fmaddq_instruction() {}
+
+    #[test]
+    fn test_fmaddq_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fmsubq_instruction() {}
+
+    #[test]
+    fn test_fmsubq_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fnmsubq_instruction() {}
+
+    #[test]
+    fn test_fnmsubq_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fnmaddq_instruction() {}
+
+    #[test]
+    fn test_fnmaddq_execute() {}
+
+    #[test]
+    fn fetch_and_decode_faddq_instruction() {}
+
+    #[test]
+    fn test_faddq_execute() {}    
+
+    #[test]
+    fn fetch_and_decode_fsubq_instruction() {}
+
+    #[test]
+    fn test_fsubq_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fmulq_instruction() {}
+
+    #[test]
+    fn test_fmulq_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fdivq_instruction() {}
+
+    #[test]
+    fn test_fdivq_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fsqrtq_instruction() {}
+
+    #[test]
+    fn test_fsqrtq_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fsgnjq_instruction() {}
+
+    #[test]
+    fn test_fsgnjq_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fsgnjnq_instruction() {}
+
+    #[test]
+    fn test_fsgnjnq_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fsgnjxq_instruction() {}
+
+    #[test]
+    fn test_fsgnjxq_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fminq_instruction() {}
+
+    #[test]
+    fn test_fminq_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fmaxq_instruction() {}
+
+    #[test]
+    fn test_fmaxq_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fcvtsq_instruction() {}
+
+    #[test]
+    fn test_fcvtsq_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fcvtqs_instruction() {}
+
+    #[test]
+    fn test_fcvtqs_execute() {}
+    
+    #[test]
+    fn fetch_and_decode_fcvtdq_instruction() {}
+
+    #[test]
+    fn test_fcvtdq_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fcvtqd_instruction() {}
+
+    #[test]
+    fn test_fcvtqd_execute() {}
+
+    #[test]
+    fn fetch_and_decode_feqq_instruction() {}
+
+    #[test]
+    fn test_feqq_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fltq_instruction() {}
+
+    #[test]
+    fn test_fltq_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fleq_instruction() {}
+
+    #[test]
+    fn test_fleq_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fclassq_instruction() {}
+
+    #[test]
+    fn test_fclassq_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fcvtwq_instruction() {}
+
+    #[test]
+    fn test_fcvtwuq_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fcvtqw_instruction() {}
+
+    #[test]
+    fn test_fcvtqwu_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fcvtlq_instruction() {}
+
+    #[test]
+    fn test_fcvtlq_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fcvtluq_instruction() {}
+
+    #[test]
+    fn test_fcvtluq_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fcvtql_instruction() {}
+
+    #[test]
+    fn test_fcvtql_execute() {}
+
+    #[test]
+    fn fetch_and_decode_fcvtqlu_instruction() {}
+
+    #[test]
+    fn test_fcvtqlu_execute() {}
+
 }

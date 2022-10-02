@@ -955,7 +955,9 @@ impl SoftThread<u64, f64, Dram> {
                 let rs2_val = self.f_registers[rs2 as usize];
                 self.registers[rd as usize] = if rs1_val <= rs2_val { 1 } else { 0 };
             },
-            Instruction::FclassS { rd, rs1, .. } => {},
+            Instruction::FclassS { rd, rs1, .. } => {
+                todo!();
+            },
             Instruction::FcvtSW { rd, rs1, rm, .. } => {
                 self.f_registers[rd as usize] = ((self.registers[rs1 as usize] as i32) as f32) as f64;
             },
@@ -978,73 +980,261 @@ impl SoftThread<u64, f64, Dram> {
             Instruction::FcvtSLU { rd, rs1, rm, .. } => {
                 self.f_registers[rd as usize] = ((self.registers[rs1 as usize] as u64) as f32) as f64;
             },
-            Instruction::Fld { rd, rs1, imm, .. } => {},
-            Instruction::Fsd { rs1, rs2, imm, .. } => {},
-            Instruction::FmaddD { rd, rs1, rs2, rs3, rm, .. } => {},
-            Instruction::FmsubD { rd, rs1, rs2, rs3, rm, .. } => {},
-            Instruction::FnmsubD { rd, rs1, rs2, rs3, rm, .. } => {},
-            Instruction::FnmaddD { rd, rs1, rs2, rs3, rm, .. } => {},
-            Instruction::FaddD { rd, rs1, rs2, rm, .. } => {},
-            Instruction::FsubD { rd, rs1, rs2, rm, .. } => {},
-            Instruction::FmulD { rd, rs1, rs2, rm, .. } => {},
-            Instruction::FdivD { rd, rs1, rs2, rm, .. } => {},
-            Instruction::FsqrtD { rd, rs1, rs2, rm, .. } => {},
-            Instruction::FsgnjD { rd, rs1, rs2, .. } => {},
-            Instruction::FsgnjnD { rd, rs1, rs2, .. } => {},
-            Instruction::FsgnjxD { rd, rs1, rs2, .. } => {},
-            Instruction::FminD { rd, rs1, rs2, .. } => {},
-            Instruction::FmaxD { rd, rs1, rs2, .. } => {},
-            Instruction::FcvtSD { rd, rs1, rm, .. } => {},
-            Instruction::FcvtDS { rd, rs1, rm, .. } => {},
-            Instruction::FeqD { rd, rs1, rs2 .. } => {},
-            Instruction::FltD { rd, rs1, rs2, .. } => {},
-            Instruction::FleD { rd, rs1, rs2, .. } => {},
+            Instruction::Fld { rd, rs1, imm, .. } => {
+                let addr = self.registers[rs1 as usize];
+                let val = f64::from_bits(self.bus.read(&addr, 64));
+                self.f_registers[rd as usize] = val;
+            },
+            Instruction::Fsd { rs1, rs2, imm, .. } => {
+                let addr = self.registers[rs1 as usize];
+                let val = self.f_registers[rs2 as usize];
+                self.bus.write(addr, val.to_bits() as u64, 64);
+            },
+            Instruction::FmaddD { rd, rs1, rs2, rs3, rm, .. } => {
+                let rs1_val = self.f_registers[rs1 as usize];
+                let rs2_val = self.f_registers[rs2 as usize];
+                let rs3_val = self.f_registers[rs3 as usize];
+                self.f_registers[rd as usize] = rs1_val.mul_add(rs2_val, rs3_val);
+            },
+            Instruction::FmsubD { rd, rs1, rs2, rs3, rm, .. } => {
+                let rs1_val = self.f_registers[rs1 as usize];
+                let rs2_val = self.f_registers[rs2 as usize];
+                let rs3_val = -self.f_registers[rs3 as usize];
+                self.f_registers[rd as usize] = rs1_val.mul_add(rs2_val, rs3_val);
+            },
+            Instruction::FnmsubD { rd, rs1, rs2, rs3, rm, .. } => {
+                let rs1_val = -self.f_registers[rs1 as usize];
+                let rs2_val = self.f_registers[rs2 as usize];
+                let rs3_val = -self.f_registers[rs3 as usize];
+                self.f_registers[rd as usize] = rs1_val.mul_add(rs2_val, rs3_val);
+            },
+            Instruction::FnmaddD { rd, rs1, rs2, rs3, rm, .. } => {
+                let rs1_val = -self.f_registers[rs1 as usize];
+                let rs2_val = self.f_registers[rs2 as usize];
+                let rs3_val = self.f_registers[rs3 as usize];
+                self.f_registers[rd as usize] = rs1_val.mul_add(rs2_val, rs3_val);
+            },
+            Instruction::FaddD { rd, rs1, rs2, rm, .. } => {
+                self.f_registers[rd as usize] = self.f_registers[rs1 as usize] + self.f_registers[rs2 as usize]; 
+            },
+            Instruction::FsubD { rd, rs1, rs2, rm, .. } => {
+                self.f_registers[rd as usize] = self.f_registers[rs1 as usize] - self.f_registers[rs2 as usize];
+            },
+            Instruction::FmulD { rd, rs1, rs2, rm, .. } => {
+                self.f_registers[rd as usize] = self.f_registers[rs1 as usize] * self.f_registers[rs2 as usize];
+            },
+            Instruction::FdivD { rd, rs1, rs2, rm, .. } => {
+                self.f_registers[rd as usize] = self.f_registers[rs1 as usize] / self.f_registers[rs2 as usize];
+            },
+            Instruction::FsqrtD { rd, rs1, rs2, rm, .. } => {
+                self.f_registers[rd as usize] = self.f_registers[rs1 as usize].sqrt(self.f_registers[rs2 as usize]);
+            },
+            Instruction::FsgnjD { rd, rs1, rs2, .. } => {
+                self.f_registers[rd as usize] = self.f_registers[rs1 as usize].copysign(self.f_registers[rs2 as usize]);
+            },
+            Instruction::FsgnjnD { rd, rs1, rs2, .. } => {
+                self.f_registers[rd as usize] = self.f_registers[rs1 as usize].copysign(-self.f_registers[rs2 as usize]);
+            },
+            Instruction::FsgnjxD { rd, rs1, rs2, .. } => {
+                let sign_1 = self.f_registers[rs1 as usize].to_bits() & 0x8000_0000_0000_0000;
+                let sign_2 = self.f_registers[rs1 as usize].to_bits() & 0x8000_0000_0000_0000;
+                let other = self.f_registers[rs1 as usize].to_bits() & 0x7fff_ffff_ffff_ffff;
+                self.f_registers[rd as usize] = f64::from_bits((sign_1 ^ sign_2) | other);
+            },
+            Instruction::FminD { rd, rs1, rs2, .. } => {
+                self.f_registers[rd as usize] = self.f_registers[rs1 as usize].min(self.f_registers[rs2 as usize]);
+            },
+            Instruction::FmaxD { rd, rs1, rs2, .. } => {
+                self.f_registers[rd as usize] = self.f_registers[rs1 as usize].max(self.f_registers[rs2 as usize]);
+            },
+            Instruction::FcvtSD { rd, rs1, rm, .. } => {
+                self.f_registers[rd as usize] = self.f_registers[rs1 as usize];
+            },
+            Instruction::FcvtDS { rd, rs1, rm, .. } => {
+                self.f_registers[rd as usize] = (self.f_registers[rs1 as usize] as f32) as f64;
+            },
+            Instruction::FeqD { rd, rs1, rs2 .. } => {
+                let rs1_val = self.f_registers[rs1 as usize];
+                let rs2_val = self.f_registers[rs2 as usize];
+                self.f_registers[rs1 as usize] = if  rs1_val == rs2_val { 1 } else { 0 };
+            },
+            Instruction::FltD { rd, rs1, rs2, .. } => {
+                let rs1_val = self.f_registers[rs1 as usize];
+                let rs2_val = self.f_registers[rs2 as usize];
+                self.f_registers[rs1 as usize] = if  rs1_val < rs2_val { 1 } else { 0 };
+            },
+            Instruction::FleD { rd, rs1, rs2, .. } => {
+                let rs1_val = self.f_registers[rs1 as usize];
+                let rs2_val = self.f_registers[rs2 as usize];
+                self.f_registers[rs1 as usize] = if  rs1_val <= rs2_val { 1 } else { 0 };
+            },
             Instruction::FclassD { rd, rs1, rm, ..} => {},
-            Instruction::FcvtWD { rd, rs1, rm, .. } => {},
-            Instruction::FcvtWUD { rd, rs1, rm, .. } => {},
-            Instruction::FcvtDW { rd, rs1, rm, .. } => {},
-            Instruction::FcvtDWU { rd, rs1, rm, .. } => {},
-            Instruction::FcvtLD { rd, rs1, rm, .. } => {},
-            Instruction::FcvtLUD { rd, rs1, rm, .. } => {},
-            Instruction::FmvXD { rd, rs1, .. } => {},
-            Instruction::FcvtDL { rd, rs1, .. } => {},
-            Instruction::FcvtDLU { rd, rs1, rm, .. } => {},
-            Instruction::FmvDX { rd, rs1, .. } => {},
-            Instruction::Flq { rd, rs1, imm, .. } => {},
-            Instruction::Fsq { rd, rs1, rs2, imm, .. } => {},
-            Instruction::FmaddQ { rd, rs1, rs2, rs3, rm, .. } => {},
-            Instruction::FmsubQ { rd, rs1, rs2, rs3, rm, .. } => {},
-            Instruction::FnmsubQ { rd, rs1, rs2, rs3, rm, .. } => {},
-            Instruction::FnmaddQ { rd, rs1, rs2, rs3, rm, .. } => {},
-            Instruction::FaddQ { rd, rs1, rs2, rm, .. } => {},
-            Instruction::FsubQ { rd, rs1, rs2, rm, .. } => {},
-            Instruction::FmulQ { rd, rs1, rs2, rm, .. } => {},
-            Instruction::FdivQ { rd, rs1, rs2, rm, .. } => {},
-            Instruction::FsqrtQ { rd, rs1, rm, .. } => {},
-            Instruction::FsgnjQ { rd, rs1, rs2, .. } => {},
-            Instruction::FsgnjnQ { rd, rs1, rs2, .. } => {},
-            Instruction::FsgnjxQ { rd, rs1, rs2, .. } => {},
-            Instruction::FminQ { rd, rs1, rs2, .. } => {},
-            Instruction::FmaxQ { rd, rs1, rs2, .. } => {},
-            Instruction::FcvtSQ { rd, rs1, rm, .. } => {},
-            Instruction::FcvtQS { rd, rs1, rm, .. } => {},
-            Instruction::FcvtDQ { rd, rs1, rm, .. } => {},
-            Instruction::FcvtQD { rd, rs1, rm, .. } => {},
-            Instruction::FeqQ { rd, rs1, rs2, .. } => {},
-            Instruction::FltQ { rd, rs1, rs2, .. } => {},
-            Instruction::FleQ { rd, rs1, rs2, .. } => {},
-            Instruction::FclassQ { rd, rs1, .. } => {},
-            Instruction::FcvtWQ { rd, rs1, rm, .. } => {},
-            Instruction::FcvtWUQ { rd, rs1, rm, .. } => {},
-            Instruction::FcvtQW { rd, rs1, rm, .. } => {},
-            Instruction::FcvtQWU { rd, rs1, rm, .. } => {},
-            Instruction::FcvtLQ { rd, rs1, rm, .. } => {},
-            Instruction::FcvtLUQ { rd, rs1, rm, .. } => {},
-            Instruction::FcvtQL { rd, rs1, rm, .. } => {},
-            Instruction::FcvtQLU { rd, rs1, rm, .. } => {},
-            _ => {
-                unimplemented!()
-            }
+            Instruction::FcvtWD { rd, rs1, rm, .. } => {
+                self.registers[rd as usize] = (self.f_registers[rs1 as usize].round() as i32) as u64;
+            },
+            Instruction::FcvtWUD { rd, rs1, rm, .. } => {
+                self.registers[rd as usize] = ((self.f_registers[rs1 as usize].round() as u32) as i32) as u64;
+            },
+            Instruction::FcvtDW { rd, rs1, rm, .. } => {
+                self.f_registers[rd as usize] = (self.registers[rs1 as usize] as i32) as f64;
+            },
+            Instruction::FcvtDWU { rd, rs1, rm, .. } => {
+                self.f_registers[rd as usize] = (self.registers[rs1 as usize] as u32) as f64;
+            },
+            Instruction::FcvtLD { rd, rs1, rm, .. } => {
+                self.registers[rd as usize] = (self.f_registers[rs1 as usize].round()) as u64;
+            },
+            Instruction::FcvtLUD { rd, rs1, rm, .. } => {
+                self.registers[rd as usize] = (self.f_registers[rs1 as usize].round()) as u64;
+            },
+            Instruction::FmvXD { rd, rs1, .. } => {
+                self.registers[rd as usize] = (self.f_registers[rs1 as usize].to_bits());
+            },
+            Instruction::FcvtDL { rd, rs1, .. } => {
+                self.f_registers[rd as usize] = self.registers[rs1 as usize] as f64;
+            },
+            Instruction::FcvtDLU { rd, rs1, rm, .. } => {
+                self.f_registers[rd as usize] = self.registers[rs1 as usize] as f64;
+            },
+            Instruction::FmvDX { rd, rs1, .. } => {
+                self.registers[rd as usize] = self.f_registers[rs1 as usize].to_bits();
+            },
+            Instruction::Flq { rd, rs1, imm, .. } => {
+                let addr = self.registers[rs1 as usize];
+                let val = f64::from_bits(self.bus.read(&addr, 64));
+                self.f_registers[rd as usize] = val;
+            },
+            Instruction::Fsq { rd, rs1, rs2, imm, .. } => {
+                let addr = self.registers[rs1 as usize];
+                let val = self.f_registers[rs2 as usize].to_bits() as u64;
+                self.bus.write(addr, val, 64);
+            },
+            Instruction::FmaddQ { rd, rs1, rs2, rs3, rm, .. } => {
+                let rs1_val = self.f_registers[rs1 as usize];
+                let rs2_val = self.f_registers[rs2 as usize];
+                let rs3_val = self.f_registers[rs3 as usize];
+                self.f_registers[rd as usize] = rs1_val.mul_add(rs2_val, rs3_val);
+            },
+            Instruction::FmsubQ { rd, rs1, rs2, rs3, rm, .. } => {
+                let rs1_val = self.f_registers[rs1 as usize];
+                let rs2_val = self.f_registers[rs2 as usize];
+                let rs3_val = -self.f_registers[rs3 as usize];
+                self.f_registers[rd as usize] = rs1_val.mul_add(rs2_val, rs3_val);
+            },
+            Instruction::FnmsubQ { rd, rs1, rs2, rs3, rm, .. } => {
+                let rs1_val = -self.f_registers[rs1 as usize];
+                let rs2_val = self.f_registers[rs2 as usize];
+                let rs3_val = -self.f_registers[rs3 as usize];
+                self.f_registers[rd as usize] = rs1.mul_add(rs2_val, rs3_val);
+            },
+            Instruction::FnmaddQ { rd, rs1, rs2, rs3, rm, .. } => {
+                let rs1_val = -self.f_registers[rs1 as usize];
+                let rs2_val = self.f_registers[rs2 as usize];
+                let rs3_val = self.f_registers[rs3 as usize];
+                self.f_registers[rd as usize] = rs1_val.mul_add(rs2_val, rs3_val);
+            },
+            Instruction::FaddQ { rd, rs1, rs2, rm, .. } => {
+                let rs1_val = self.f_registers[rs1 as usize];
+                let rs2_val = self.f_registers[rs2 as usize];
+                self.f_registers[rd as usize] = rs1_val + rs2_val;
+            },
+            Instruction::FsubQ { rd, rs1, rs2, rm, .. } => {
+                let rs1_val = self.f_registers[rs1 as usize];
+                let rs2_val = self.f_registers[rs2 as usize];
+                self.f_registers[rd as usize] = rs1_val - rs2_val;
+            },
+            Instruction::FmulQ { rd, rs1, rs2, rm, .. } => {
+                let rs1_val = self.f_registers[rs1 as usize];
+                let rs2_val = self.f_registers[rs2 as usize];
+                self.f_registers[rd as usize] = rs1_val * rs2_val;
+            },
+            Instruction::FdivQ { rd, rs1, rs2, rm, .. } => {
+                let rs1_val = self.f_registers[rs1 as usize];
+                let rs2_val = self.f_registers[rs2 as usize];
+                self.f_registers[rd as usize] = rs1_val / rs2_val;
+            },
+            Instruction::FsqrtQ { rd, rs1, rm, .. } => {
+                let rs1_val = self.f_registers[rs1 as usize];
+                let rs2_val = self.f_registers[rs2 as usize];
+                self.f_registers[rd as usize] = rs1_val.sqrt(rs2_val);
+            },
+            Instruction::FsgnjQ { rd, rs1, rs2, .. } => {
+                let rs1_val = self.f_registers[rs1 as usize];
+                let rs2_val = self.f_registers[rs2 as usize];
+                self.f_registers[rd as usize] = rs1_val.copysign(rs2_val);
+            },
+            Instruction::FsgnjnQ { rd, rs1, rs2, .. } => {
+                let rs1_val = self.f_registers[rs1 as usize];
+                let rs2_val = -self.f_registers[rs2 as usize];
+                self.f_registers[rd as usize] = rs1_val.copysign(rs2_val);
+            },
+            Instruction::FsgnjxQ { rd, rs1, rs2, .. } => {
+                let sign_1 = self.f_registers[rs1 as usize].to_bits() & 0x8000_0000_0000_0000;
+                let sign_2 = self.f_registers[rs2 as usize].to_bits() & 0x8000_0000_0000_0000;
+                let other = self.f_registers[rs1 as usize].to_bits() & 0x7fff_ffff_ffff_ffff;
+                self.f_registers[rd as usize] = f64::from_bits((sign_1 ^ sign_2) | other);
+            },
+            Instruction::FminQ { rd, rs1, rs2, .. } => {
+                self.f_registers[rd as usize] = self.f_registers[rs1 as usize].min(self.f_registers[rs2 as usize]);
+            },
+            Instruction::FmaxQ { rd, rs1, rs2, .. } => {
+                self.f_registers[rd as usize] = self.f_registers[rs1 as usize].max(self.f_registers[rs2 as usize]);
+            },
+            Instruction::FcvtSQ { rd, rs1, rm, .. } => {
+                self.f_registers[rd as usize] = self.f_registers[rs1 as usize];
+            },
+            Instruction::FcvtQS { rd, rs1, rm, .. } => {
+                self.f_registers[rd as usize] = (self.f_registers[rs1 as usize]);
+            },
+            Instruction::FcvtDQ { rd, rs1, rm, .. } => {
+                self.f_registers[rd as usize] = (self.f_registers[rs1 as usize] as f32) as f64;
+            },
+            Instruction::FcvtQD { rd, rs1, rm, .. } => {
+                self.f_registers[rd as usize] = (self.f_registers[rs1 as usize] as f32) as f64;
+            },
+            Instruction::FeqQ { rd, rs1, rs2, .. } => {
+                let rs1_val = self.f_registers[rs1 as usize];
+                let rs2_val = self.f_registers[rs2 as usize];
+                self.f_registers[rd as usize] = if rs1_val == rs2_val { 1 } else { 0 };
+            },
+            Instruction::FltQ { rd, rs1, rs2, .. } => {
+                let rs1_val = self.f_registers[rs1 as usize];
+                let rs2_val = self.f_registers[rs2 as usize];
+                self.f_registers[rd as usize] = if rs1_val < rs2_val { 1 } else { 0 };
+            },
+            Instruction::FleQ { rd, rs1, rs2, .. } => {
+                let rs1_val = self.f_registers[rs1 as usize];
+                let rs2_val = self.f_registers[rs2 as usize];
+                self.f_registers[rd as usize] = if rs1_val <= rs2_val { 1 } else { 0 };
+            },
+            Instruction::FclassQ { rd, rs1, .. } => {
+                todo!();
+            },
+            Instruction::FcvtWQ { rd, rs1, rm, .. } => {
+                self.registers[rd as usize] = (self.f_registers[rs1 as usize].round() as i32) as u64;
+            },
+            Instruction::FcvtWUQ { rd, rs1, rm, .. } => {
+                self.registers[rd as usize] = ((self.f_registers[rs1 as usize].round() as u32) as i32) as u64;
+            },
+            Instruction::FcvtQW { rd, rs1, rm, .. } => {
+                self.f_registers[rd as usize] = (self.registers[rs1 as usize] as i32) as f64;
+            },
+            Instruction::FcvtQWU { rd, rs1, rm, .. } => {
+                self.f_registers[rd as usize] = (self.registers[rs1 as usize] as u32) as f64;
+            },
+            Instruction::FcvtLQ { rd, rs1, rm, .. } => {
+                self.registers[rd as usize] = (self.f_registers[rs1 as usize].round()) as u64;
+            },
+            Instruction::FcvtLUQ { rd, rs1, rm, .. } => {
+                self.registers[rd as usize] = (self.f_registers[rs1 as usize].round()) as u64;
+            },
+            Instruction::FcvtQL { rd, rs1, rm, .. } => {
+                self.f_registers[rd as usize] = self.registers[rs1 as usize] as f64;
+            },
+            Instruction::FcvtQLU { rd, rs1, rm, .. } => {
+                self.f_registers[rd as usize] = self.registers[rs1 as usize] as f64;
+            },
+            _ => { /* Return an error here, and some other places */ }
         }
     }
 
