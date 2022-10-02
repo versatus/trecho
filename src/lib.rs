@@ -5248,123 +5248,914 @@ mod tests {
     }
 
     #[test]
-    fn fetch_and_decode_lrw_instruction() {}
+    fn fetch_and_decode_lrw_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0001_0010 as u8, 0b0000_1010 as u8, 0b1010_0101 as u8, 0b1010_1111 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+        assert_eq!(
+            instruction,
+            Instruction::LrW {
+                rd: Register::X11,
+                rs1: Register::X21,
+                aq: 0,
+                rl: 1,
+            }
+        )
+    }
 
     #[test]
-    fn test_lrw_execution() {}
+    fn test_lrw_execution() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0001_0010 as u8, 0b0000_1010 as u8, 0b1010_0101 as u8, 0b1010_1111 as u8];
+        soft.load_program(program);
+        soft.registers[Register::X21 as usize] = 200;
+        soft.bus.write(200, 1000, 32);
+        soft.execute();
+        
+        assert_eq!(
+            soft.registers[Register::X11 as usize],
+            1000
+        );
+
+        assert!(
+            soft.res.contains(&200)
+        );
+    }
 
     #[test]
-    fn fetch_and_decode_scw_instruction() {}
+    fn fetch_and_decode_scw_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0001_1011 as u8, 0b1011_1010 as u8, 0b1010_0101 as u8, 0b1010_1111 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+        assert_eq!(
+            instruction,
+            Instruction::ScW {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X27,
+                aq: 0,
+                rl: 1,
+            }
+        )
+    }
 
     #[test]
-    fn test_scw_execution() {}
+    fn test_scw_execution_addr_reserved() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0001_1011 as u8, 0b1011_1010 as u8, 0b1010_0101 as u8, 0b1010_1111 as u8];
+        soft.load_program(program);
+        soft.registers[Register::X21 as usize] = 200;
+        soft.registers[Register::X27 as usize] = 1000;
+        soft.res.push(200);
+        soft.execute();
+
+        assert_eq!(
+            soft.registers[Register::X11 as usize],
+            0
+        );
+
+        assert_eq!(
+            soft.bus.read(&200, 32).unwrap(),
+            soft.registers[Register::X27 as usize]
+        );
+
+        assert!(
+            !soft.res.contains(&200)
+        );
+    }
 
     #[test]
-    fn fetch_and_decode_amoswapw_instruction() {}
+    fn test_scw_execution_addr_not_reserved() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0001_1011 as u8, 0b1011_1010 as u8, 0b1010_0101 as u8, 0b1010_1111 as u8];
+        soft.load_program(program);
+        soft.registers[Register::X21 as usize] = 200;
+        soft.registers[Register::X27 as usize] = 1000;
+        soft.execute();
+
+        assert_eq!(
+            soft.registers[Register::X11 as usize],
+            1
+        );
+
+        assert_ne!(
+            soft.bus.read(&200, 32).unwrap(),
+            soft.registers[Register::X27 as usize]
+        );
+
+        assert!(
+            !soft.res.contains(&200)
+        );
+    }
 
     #[test]
-    fn test_amoswapw_execution() {}
+    fn fetch_and_decode_amoswapw_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0000_1011 as u8, 0b1011_1010 as u8, 0b1010_0101 as u8, 0b1010_1111 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+        assert_eq!(
+            instruction,
+            Instruction::AmoswapW {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X27,
+                aq: 0,
+                rl: 1,
+            }
+        )
+    }
 
     #[test]
-    fn fetch_and_decode_amoxorw_instruction() {}
+    fn test_amoswapw_execution() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0000_1011 as u8, 0b1011_1010 as u8, 0b1010_0101 as u8, 0b1010_1111 as u8];
+        soft.load_program(program);
+        soft.registers[Register::X21 as usize] = 200;
+        soft.registers[Register::X27 as usize] = 1000;
+        soft.bus.write(200, 5000, 32);
+        soft.execute();
+
+        assert_eq!(
+            soft.bus.read(&200, 32).unwrap(),
+            soft.registers[Register::X27 as usize]
+        );
+        
+        assert_eq!(
+            soft.registers[Register::X11 as usize],
+            5000
+        );
+    }
 
     #[test]
-    fn test_amoxorw_execution() {}
+    fn fetch_and_decode_amoaddw_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0000_0011 as u8, 0b1011_1010 as u8, 0b1010_0101 as u8, 0b1010_1111 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+        assert_eq!(
+            instruction,
+            Instruction::AmoaddW {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X27,
+                aq: 0,
+                rl: 1,
+            }
+        )
+    }
 
     #[test]
-    fn fetch_and_decode_amoandw_instruction() {}
+    fn test_amoaddw_execution() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0000_0011 as u8, 0b1011_1010 as u8, 0b1010_0101 as u8, 0b1010_1111 as u8];
+        soft.load_program(program);
+        
+        soft.registers[Register::X21 as usize] = 200;
+        soft.registers[Register::X27 as usize] = 1000;
+        soft.bus.write(200, 5000, 32);
+        soft.execute();
+        
+        // assert the value in rd == value in address at rs1
+        assert_eq!(
+            soft.registers[Register::X11 as usize],
+            5000
+        );
+
+        // assert the value in memory at address in rs1 is equal to prev value + val in rs2
+        assert_eq!(
+            soft.bus.read(&200, 32).unwrap(),
+            6000
+        )
+
+    }
 
     #[test]
-    fn test_amoandw_execution() {}
+    fn fetch_and_decode_amoxorw_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0010_0011 as u8, 0b1011_1010 as u8, 0b1010_0101 as u8, 0b1010_1111 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+        assert_eq!(
+            instruction,
+            Instruction::AmoxorW {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X27,
+                aq: 0,
+                rl: 1,
+            }
+        )
+    }
 
     #[test]
-    fn fetch_and_decode_amoorw_instruction() {}
+    fn test_amoxorw_execution() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0010_0011 as u8, 0b1011_1010 as u8, 0b1010_0101 as u8, 0b1010_1111 as u8];
+        soft.load_program(program);
+        
+        soft.registers[Register::X21 as usize] = 200;
+        soft.registers[Register::X27 as usize] = 1000;
+        soft.bus.write(200, 5000, 32);
+        soft.execute();
+        
+        // assert the value in rd == value in address at rs1
+        assert_eq!(
+            soft.registers[Register::X11 as usize],
+            5000
+        );
+
+        // assert the value in memory at address in rs1 is equal to prev value + val in rs2
+        assert_eq!(
+            soft.bus.read(&200, 32).unwrap(),
+            0b1000001100000
+        )
+    }
 
     #[test]
-    fn test_amoorw_execution() {}
+    fn fetch_and_decode_amoandw_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0110_0011 as u8, 0b1011_1010 as u8, 0b1010_0101 as u8, 0b1010_1111 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+        assert_eq!(
+            instruction,
+            Instruction::AmoandW {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X27,
+                aq: 0,
+                rl: 1,
+            }
+        )
+    }
 
     #[test]
-    fn fetch_and_decode_amominw_instruction() {}
+    fn test_amoandw_execution() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0110_0011 as u8, 0b1011_1010 as u8, 0b1010_0101 as u8, 0b1010_1111 as u8];
+        soft.load_program(program);
+        soft.registers[Register::X21 as usize] = 200;
+        soft.registers[Register::X27 as usize] = 1000;
+        soft.bus.write(200, 5000, 32);
+        soft.execute();
+        
+        // assert the value in rd == value in address at rs1
+        assert_eq!(
+            soft.registers[Register::X11 as usize],
+            5000
+        );
+
+        // assert the value in memory at address in rs1 is equal to prev value + val in rs2
+        assert_eq!(
+            soft.bus.read(&200, 32).unwrap(),
+            0b1110001000
+        )
+    }
 
     #[test]
-    fn test_amominw_execution() {}
+    fn fetch_and_decode_amoorw_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0100_0011 as u8, 0b1011_1010 as u8, 0b1010_0101 as u8, 0b1010_1111 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+        assert_eq!(
+            instruction,
+            Instruction::AmoorW {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X27,
+                aq: 0,
+                rl: 1,
+            }
+        )
+    }
 
     #[test]
-    fn fetch_and_decode_amomaxw_instruction() {}
+    fn test_amoorw_execution() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0100_0011 as u8, 0b1011_1010 as u8, 0b1010_0101 as u8, 0b1010_1111 as u8];
+        soft.load_program(program);
+        soft.registers[Register::X21 as usize] = 200;
+        soft.registers[Register::X27 as usize] = 1000;
+        soft.bus.write(200, 5000, 32);
+        soft.execute();
+        
+        // assert the value in rd == value in address at rs1
+        assert_eq!(
+            soft.registers[Register::X11 as usize],
+            5000
+        );
+
+        // assert the value in memory at address in rs1 is equal to prev value + val in rs2
+        assert_eq!(
+            soft.bus.read(&200, 32).unwrap(),
+            0b1001111101000
+        )
+    }
 
     #[test]
-    fn test_amomaxw_execution() {}
+    fn fetch_and_decode_amominw_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b1000_0011 as u8, 0b1011_1010 as u8, 0b1010_0101 as u8, 0b1010_1111 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+        assert_eq!(
+            instruction,
+            Instruction::AmominW {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X27,
+                aq: 0,
+                rl: 1,
+            }
+        )
+    }
 
     #[test]
-    fn fetch_and_decode_amominuw_instruction() {}
+    fn test_amominw_execution() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b1000_0011 as u8, 0b1011_1010 as u8, 0b1010_0101 as u8, 0b1010_1111 as u8];
+        soft.load_program(program);
+        soft.registers[Register::X21 as usize] = 200;
+        soft.registers[Register::X27 as usize] = 1000;
+        soft.bus.write(200, 5000, 32);
+        soft.execute();
+        
+        // assert the value in rd == value in address at rs1
+        assert_eq!(
+            soft.registers[Register::X11 as usize],
+            5000
+        );
+
+        // assert the value in memory at address in rs1 is equal to prev value + val in rs2
+        assert_eq!(
+            soft.bus.read(&200, 32).unwrap(),
+            1000
+        )
+    }
 
     #[test]
-    fn test_amominuw_execution() {}
+    fn fetch_and_decode_amomaxw_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b1010_0011 as u8, 0b1011_1010 as u8, 0b1010_0101 as u8, 0b1010_1111 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+        assert_eq!(
+            instruction,
+            Instruction::AmomaxW {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X27,
+                aq: 0,
+                rl: 1,
+            }
+        )
+    }
 
     #[test]
-    fn fetch_and_decode_amomaxuw_instruction() {}
+    fn test_amomaxw_execution() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b1010_0011 as u8, 0b1011_1010 as u8, 0b1010_0101 as u8, 0b1010_1111 as u8];
+        soft.load_program(program);
+        soft.registers[Register::X21 as usize] = 200;
+        soft.registers[Register::X27 as usize] = 1000;
+        soft.bus.write(200, 5000, 32);
+        soft.execute();
+        
+        // assert the value in rd == value in address at rs1
+        assert_eq!(
+            soft.registers[Register::X11 as usize],
+            5000
+        );
+
+        // assert the value in memory at address in rs1 is equal to prev value + val in rs2
+        assert_eq!(
+            soft.bus.read(&200, 32).unwrap(),
+            5000
+        )
+    }
 
     #[test]
-    fn test_amomaxuw_execution() {}
+    fn fetch_and_decode_amominuw_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b1100_0011 as u8, 0b1011_1010 as u8, 0b1010_0101 as u8, 0b1010_1111 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+        assert_eq!(
+            instruction,
+            Instruction::AmominuW {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X27,
+                aq: 0,
+                rl: 1,
+            }
+        )
+    }
 
     #[test]
-    fn fetch_and_decode_lrd_instruction() {}
+    fn test_amominuw_execution() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b1100_0011 as u8, 0b1011_1010 as u8, 0b1010_0101 as u8, 0b1010_1111 as u8];
+        soft.load_program(program);
+        soft.registers[Register::X21 as usize] = 200;
+        soft.registers[Register::X27 as usize] = 1000;
+        soft.bus.write(200, 5000, 32);
+        soft.execute();
+        
+        // assert the value in rd == value in address at rs1
+        assert_eq!(
+            soft.registers[Register::X11 as usize],
+            5000
+        );
+
+        // assert the value in memory at address in rs1 is equal to prev value + val in rs2
+        assert_eq!(
+            soft.bus.read(&200, 32).unwrap(),
+            1000
+        )
+    }
 
     #[test]
-    fn test_lrd_execution() {}
+    fn fetch_and_decode_amomaxuw_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b1110_0011 as u8, 0b1011_1010 as u8, 0b1010_0101 as u8, 0b1010_1111 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+        assert_eq!(
+            instruction,
+            Instruction::AmomaxuW {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X27,
+                aq: 0,
+                rl: 1,
+            }
+        )
+        
+    }
 
     #[test]
-    fn fetch_and_decode_scd_instruction() {}
+    fn test_amomaxuw_execution() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b1110_0011 as u8, 0b1011_1010 as u8, 0b1010_0101 as u8, 0b1010_1111 as u8];
+        soft.load_program(program);
+        soft.registers[Register::X21 as usize] = 200;
+        soft.registers[Register::X27 as usize] = 1000;
+        soft.bus.write(200, 5000, 32);
+        soft.execute();
+        
+        // assert the value in rd == value in address at rs1
+        assert_eq!(
+            soft.registers[Register::X11 as usize],
+            5000
+        );
+
+        // assert the value in memory at address in rs1 is equal to prev value + val in rs2
+        assert_eq!(
+            soft.bus.read(&200, 32).unwrap(),
+            5000
+        )
+    }
 
     #[test]
-    fn test_scd_execution() {}
+    fn fetch_and_decode_lrd_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0001_0010 as u8, 0b0000_1010 as u8, 0b1011_0101 as u8, 0b1010_1111 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+        assert_eq!(
+            instruction,
+            Instruction::LrD {
+                rd: Register::X11,
+                rs1: Register::X21,
+                aq: 0,
+                rl: 1,
+            }
+        )
+    }
 
     #[test]
-    fn fetch_and_decode_amoswapd_instruction() {}
+    fn test_lrd_execution() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0001_0010 as u8, 0b0000_1010 as u8, 0b1011_0101 as u8, 0b1010_1111 as u8];
+        soft.load_program(program);
+        soft.registers[Register::X21 as usize] = 200;
+        soft.bus.write(200, 1000, 64);
+        soft.execute();
+        
+        assert_eq!(
+            soft.registers[Register::X11 as usize],
+            1000
+        );
+
+        assert!(
+            soft.res.contains(&200)
+        );
+    }
 
     #[test]
-    fn test_amoswapd_execution() {}
+    fn fetch_and_decode_scd_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0001_1011 as u8, 0b1011_1010 as u8, 0b1011_0101 as u8, 0b1010_1111 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+        assert_eq!(
+            instruction,
+            Instruction::ScD {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X27,
+                aq: 0,
+                rl: 1,
+            }
+        )
+    }
 
     #[test]
-    fn fetch_and_decode_amoxord_instruction() {}
+    fn test_scd_execution_address_reserved() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0001_1011 as u8, 0b1011_1010 as u8, 0b1011_0101 as u8, 0b1010_1111 as u8];
+        soft.load_program(program);
+        soft.registers[Register::X21 as usize] = 200;
+        soft.registers[Register::X27 as usize] = 1000;
+        soft.res.push(200);
+        soft.execute();
+
+        assert_eq!(
+            soft.registers[Register::X11 as usize],
+            0
+        );
+
+        assert_eq!(
+            soft.bus.read(&200, 64).unwrap(),
+            soft.registers[Register::X27 as usize]
+        );
+
+        assert!(
+            !soft.res.contains(&200)
+        );
+        
+    }
 
     #[test]
-    fn test_amoxord_execution() {}
+    fn test_scd_execution_address_not_reserved() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0001_1011 as u8, 0b1011_1010 as u8, 0b1011_0101 as u8, 0b1010_1111 as u8];
+        soft.load_program(program);
+        soft.registers[Register::X21 as usize] = 200;
+        soft.registers[Register::X27 as usize] = 1000;
+        soft.execute();
+
+        assert_eq!(
+            soft.registers[Register::X11 as usize],
+            1
+        );
+
+        assert_ne!(
+            soft.bus.read(&200, 64).unwrap(),
+            soft.registers[Register::X27 as usize]
+        );
+
+        assert!(
+            !soft.res.contains(&200)
+        );
+        
+    }
 
     #[test]
-    fn fetch_and_decode_amoandd_instruction() {}
+    fn fetch_and_decode_amoswapd_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0000_1011 as u8, 0b1011_1010 as u8, 0b1011_0101 as u8, 0b1010_1111 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+        assert_eq!(
+            instruction,
+            Instruction::AmoswapD {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X27,
+                aq: 0,
+                rl: 1,
+            }
+        )
+    }
 
     #[test]
-    fn test_amoandd_execution() {}
+    fn test_amoswapd_execution() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0000_1011 as u8, 0b1011_1010 as u8, 0b1011_0101 as u8, 0b1010_1111 as u8];
+        soft.load_program(program);
+        soft.registers[Register::X21 as usize] = 200;
+        soft.registers[Register::X27 as usize] = 1000;
+        soft.bus.write(200, 5000, 64);
+        soft.execute();
+
+        assert_eq!(
+            soft.bus.read(&200, 64).unwrap(),
+            soft.registers[Register::X27 as usize]
+        );
+        
+        assert_eq!(
+            soft.registers[Register::X11 as usize],
+            5000
+        );
+    }
 
     #[test]
-    fn fetch_and_decode_amoord_instruction() {}
+    fn fetch_and_decode_amoxord_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0000_0011 as u8, 0b1011_1010 as u8, 0b1011_0101 as u8, 0b1010_1111 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+        assert_eq!(
+            instruction,
+            Instruction::AmoaddD {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X27,
+                aq: 0,
+                rl: 1,
+            }
+        )
+    }
 
     #[test]
-    fn test_amoord_execution() {}
+    fn test_amoxord_execution() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0000_0011 as u8, 0b1011_1010 as u8, 0b1011_0101 as u8, 0b1010_1111 as u8];
+        soft.load_program(program);
+        let mut soft = SoftThread::default();
+        let program = vec![0b0010_0011 as u8, 0b1011_1010 as u8, 0b1010_0101 as u8, 0b1010_1111 as u8];
+        soft.load_program(program);
+        
+        soft.registers[Register::X21 as usize] = 200;
+        soft.registers[Register::X27 as usize] = 1000;
+        soft.bus.write(200, 5000, 64);
+        soft.execute();
+        
+        // assert the value in rd == value in address at rs1
+        assert_eq!(
+            soft.registers[Register::X11 as usize],
+            5000
+        );
+
+        // assert the value in memory at address in rs1 is equal to prev value + val in rs2
+        assert_eq!(
+            soft.bus.read(&200, 64).unwrap(),
+            0b1000001100000
+        )
+    }
 
     #[test]
-    fn fetch_and_decode_amomind_instruction() {}
+    fn fetch_and_decode_amoandd_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0110_0011 as u8, 0b1011_1010 as u8, 0b1011_0101 as u8, 0b1010_1111 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+        assert_eq!(
+            instruction,
+            Instruction::AmoandD {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X27,
+                aq: 0,
+                rl: 1,
+            }
+        )
+    }
 
     #[test]
-    fn test_amomind_execution() {}
+    fn test_amoandd_execution() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0110_0011 as u8, 0b1011_1010 as u8, 0b1011_0101 as u8, 0b1010_1111 as u8];
+        soft.load_program(program);
+        soft.registers[Register::X21 as usize] = 200;
+        soft.registers[Register::X27 as usize] = 1000;
+        soft.bus.write(200, 5000, 64);
+        soft.execute();
+        
+        // assert the value in rd == value in address at rs1
+        assert_eq!(
+            soft.registers[Register::X11 as usize],
+            5000
+        );
+
+        // assert the value in memory at address in rs1 is equal to prev value + val in rs2
+        assert_eq!(
+            soft.bus.read(&200, 64).unwrap(),
+            0b1110001000
+        )
+        
+    }
 
     #[test]
-    fn fetch_and_decode_amomaxd_instruction() {}
+    fn fetch_and_decode_amoord_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0100_0011 as u8, 0b1011_1010 as u8, 0b1011_0101 as u8, 0b1010_1111 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+        assert_eq!(
+            instruction,
+            Instruction::AmoorD {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X27,
+                aq: 0,
+                rl: 1,
+            }
+        )
+    }
 
     #[test]
-    fn test_amomaxd_execution() {}
+    fn test_amoord_execution() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b0100_0011 as u8, 0b1011_1010 as u8, 0b1011_0101 as u8, 0b1010_1111 as u8];
+        soft.load_program(program);
+        
+        soft.registers[Register::X21 as usize] = 200;
+        soft.registers[Register::X27 as usize] = 1000;
+        soft.bus.write(200, 5000, 64);
+        soft.execute();
+        
+        // assert the value in rd == value in address at rs1
+        assert_eq!(
+            soft.registers[Register::X11 as usize],
+            5000
+        );
+
+        // assert the value in memory at address in rs1 is equal to prev value + val in rs2
+        assert_eq!(
+            soft.bus.read(&200, 64).unwrap(),
+            0b1001111101000
+        )
+    }
 
     #[test]
-    fn fetch_and_decode_amominud_instruction() {}
+    fn fetch_and_decode_amomind_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b1000_0011 as u8, 0b1011_1010 as u8, 0b1011_0101 as u8, 0b1010_1111 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+        assert_eq!(
+            instruction,
+            Instruction::AmominD {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X27,
+                aq: 0,
+                rl: 1,
+            }
+        )
+    }
 
     #[test]
-    fn test_amominud_execution() {}
+    fn test_amomind_execution() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b1000_0011 as u8, 0b1011_1010 as u8, 0b1011_0101 as u8, 0b1010_1111 as u8];
+        soft.load_program(program);
+        soft.registers[Register::X21 as usize] = 200;
+        soft.registers[Register::X27 as usize] = 1000;
+        soft.bus.write(200, 5000, 64);
+        soft.execute();
+        
+        // assert the value in rd == value in address at rs1
+        assert_eq!(
+            soft.registers[Register::X11 as usize],
+            5000
+        );
+
+        // assert the value in memory at address in rs1 is equal to prev value + val in rs2
+        assert_eq!(
+            soft.bus.read(&200, 64).unwrap(),
+            1000
+        )
+    }
 
     #[test]
-    fn fetch_and_decode_amomaxud_instruction() {}
+    fn fetch_and_decode_amomaxd_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b1010_0011 as u8, 0b1011_1010 as u8, 0b1011_0101 as u8, 0b1010_1111 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+        assert_eq!(
+            instruction,
+            Instruction::AmomaxD {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X27,
+                aq: 0,
+                rl: 1,
+            }
+        )
+    }
 
     #[test]
-    fn test_amomaxud_execution() {}
+    fn test_amomaxd_execution() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b1010_0011 as u8, 0b1011_1010 as u8, 0b1011_0101 as u8, 0b1010_1111 as u8];
+        soft.load_program(program);
+        soft.registers[Register::X21 as usize] = 200;
+        soft.registers[Register::X27 as usize] = 1000;
+        soft.bus.write(200, 5000, 64);
+        soft.execute();
+        
+        // assert the value in rd == value in address at rs1
+        assert_eq!(
+            soft.registers[Register::X11 as usize],
+            5000
+        );
+
+        // assert the value in memory at address in rs1 is equal to prev value + val in rs2
+        assert_eq!(
+            soft.bus.read(&200, 64).unwrap(),
+            5000
+        )
+    }
+
+    #[test]
+    fn fetch_and_decode_amominud_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b1100_0011 as u8, 0b1011_1010 as u8, 0b1011_0101 as u8, 0b1010_1111 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+        assert_eq!(
+            instruction,
+            Instruction::AmominuD {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X27,
+                aq: 0,
+                rl: 1,
+            }
+        )
+    }
+
+    #[test]
+    fn test_amominud_execution() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b1100_0011 as u8, 0b1011_1010 as u8, 0b1011_0101 as u8, 0b1010_1111 as u8];
+        soft.load_program(program);
+        soft.registers[Register::X21 as usize] = 200;
+        soft.registers[Register::X27 as usize] = 1000;
+        soft.bus.write(200, 5000, 64);
+        soft.execute();
+        
+        // assert the value in rd == value in address at rs1
+        assert_eq!(
+            soft.registers[Register::X11 as usize],
+            5000
+        );
+
+        // assert the value in memory at address in rs1 is equal to prev value + val in rs2
+        assert_eq!(
+            soft.bus.read(&200, 64).unwrap(),
+            1000
+        )
+    }
+
+    #[test]
+    fn fetch_and_decode_amomaxud_instruction() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b1110_0011 as u8, 0b1011_1010 as u8, 0b1011_0101 as u8, 0b1010_1111 as u8];
+        soft.load_program(program);
+        let instruction: Instruction = soft.fetch().into();
+        assert_eq!(
+            instruction,
+            Instruction::AmomaxuD {
+                rd: Register::X11,
+                rs1: Register::X21,
+                rs2: Register::X27,
+                aq: 0,
+                rl: 1,
+            }
+        )
+    }
+
+    #[test]
+    fn test_amomaxud_execution() {
+        let mut soft = SoftThread::default();
+        let program = vec![0b1110_0011 as u8, 0b1011_1010 as u8, 0b1011_0101 as u8, 0b1010_1111 as u8];
+        soft.load_program(program);
+        soft.registers[Register::X21 as usize] = 200;
+        soft.registers[Register::X27 as usize] = 1000;
+        soft.bus.write(200, 5000, 64);
+        soft.execute();
+        
+        // assert the value in rd == value in address at rs1
+        assert_eq!(
+            soft.registers[Register::X11 as usize],
+            5000
+        );
+
+        // assert the value in memory at address in rs1 is equal to prev value + val in rs2
+        assert_eq!(
+            soft.bus.read(&200, 64).unwrap(),
+            5000
+        )
+    }
 
 }
