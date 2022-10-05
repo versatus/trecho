@@ -4,7 +4,7 @@ use crate::extensions::{Extension};
 use crate::memory::Memory;
 use crate::register::RegisterValue;
 
-pub struct Cpu<R: RegisterValue, M: Memory> {
-    pub cores: Vec<SoftThread<R, M>>,
+pub struct Cpu<R: RegisterValue, F, M: Memory> {
+    pub cores: Vec<SoftThread<R, F, M>>,
     ext: Extension,
 }

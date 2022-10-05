@@ -25,7 +25,7 @@ impl SoftThread<u64, f64, Dram> {
     pub fn new(enc_table: EncodingTable) -> SoftThread<u64, f64, Dram> {
         let mut soft = SoftThread {
             registers: [0; 33],
-            f_registers: [0.0; 33]
+            f_registers: [0.0; 33],
             pc: 0,
             program: vec![],
             remainder: 0,
@@ -841,17 +841,17 @@ impl SoftThread<u64, f64, Dram> {
                 }
             },
             Instruction::Flw { rd, rs1, imm, .. } => {
-                let addr = self.registers[rs1 as usize].wrapping_add(imm);
-                if let Some(bits) = self.bus.read(&addr, 32) {
-                    let val = f32::from_bits(bits);
+                let addr = self.registers[rs1 as usize].wrapping_add((imm as u32) as u64);
+                if let Ok(bits) = self.bus.read(&addr, 32) {
+                    let val = f32::from_bits((bits as u32));
                     self.f_registers[rd as usize] = val as f64;
                 }
             },
-            Instruction::Fsw { rd, rs1, rs2, imm, .. } => {
+            Instruction::Fsw { rs1, rs2, imm, .. } => {
                 // store value in f_register rs2 as bits into memory at address in rs1 + imm
-                let addr = self.registers[rs1 as usize].wrapping_add(imm);
-                let val = self.f_registers[rs2 as usize].to_bits() as u64;
-                self.bus.write(addr, val, 32);
+                let addr = self.registers[rs1 as usize].wrapping_add((imm as u32) as u64);
+                let val = (self.f_registers[rs2 as usize] as f32).to_bits() as u64;
+                let _ = self.bus.write(addr, val, 32);
             },
             Instruction::FmaddS { rd, rs1, rs2, rs3, rm, .. } => {
                 // multiply value in f_register[rs1] by value in f_register[rs2]
@@ -867,7 +867,7 @@ impl SoftThread<u64, f64, Dram> {
                 let rs1_val = self.f_registers[rs1 as usize];
                 let rs2_val = self.f_registers[rs2 as usize];
                 let rs3_val = -self.f_registers[rs3 as usize];
-                self.f_registers[rd as usize] = rs1_val.mul_add(rs2_val, -rs3_val);
+                self.f_registers[rd as usize] = rs1_val.mul_add(rs2_val, rs3_val);
             },
             Instruction::FnmsubS { rd, rs1, rs2, rs3, rm, .. } => {
                 let rs1_val = -self.f_registers[rs1 as usize];
@@ -902,7 +902,7 @@ impl SoftThread<u64, f64, Dram> {
                 self.f_registers[rd as usize] = rs1_val / rs2_val;
             },
             Instruction::FsqrtS { rd, rs1, rm, .. } => {
-                self.f_registers[rd as usize] = (self.f_registers[rd as usize].sqrt());
+                self.f_registers[rd as usize] = (self.f_registers[rs1 as usize].sqrt());
             },
             Instruction::FsgnjS { rd, rs1, rs2, .. } => {
                 let rs1_val = self.f_registers[rs1 as usize];
@@ -953,6 +953,7 @@ impl SoftThread<u64, f64, Dram> {
             Instruction::FleS { rd, rs1, rs2, .. } => {
                 let rs1_val = self.f_registers[rs1 as usize];
                 let rs2_val = self.f_registers[rs2 as usize];
+                println!("{:?} == {:?}: {:?}", rs1_val, rs2_val, rs1_val <= rs2_val);
                 self.registers[rd as usize] = if rs1_val <= rs2_val { 1 } else { 0 };
             },
             Instruction::FclassS { rd, rs1, .. } => {
@@ -982,8 +983,10 @@ impl SoftThread<u64, f64, Dram> {
             },
             Instruction::Fld { rd, rs1, imm, .. } => {
                 let addr = self.registers[rs1 as usize];
-                let val = f64::from_bits(self.bus.read(&addr, 64));
-                self.f_registers[rd as usize] = val;
+                if let Ok(val) = self.bus.read(&addr, 64) {
+                    let f_val = f64::from_bits(val);
+                    self.f_registers[rd as usize] = f_val;
+                }
             },
             Instruction::Fsd { rs1, rs2, imm, .. } => {
                 let addr = self.registers[rs1 as usize];
@@ -1026,8 +1029,8 @@ impl SoftThread<u64, f64, Dram> {
             Instruction::FdivD { rd, rs1, rs2, rm, .. } => {
                 self.f_registers[rd as usize] = self.f_registers[rs1 as usize] / self.f_registers[rs2 as usize];
             },
-            Instruction::FsqrtD { rd, rs1, rs2, rm, .. } => {
-                self.f_registers[rd as usize] = self.f_registers[rs1 as usize].sqrt(self.f_registers[rs2 as usize]);
+            Instruction::FsqrtD { rd, rs1, rm, .. } => {
+                self.f_registers[rd as usize] = self.f_registers[rs1 as usize].sqrt();
             },
             Instruction::FsgnjD { rd, rs1, rs2, .. } => {
                 self.f_registers[rd as usize] = self.f_registers[rs1 as usize].copysign(self.f_registers[rs2 as usize]);
@@ -1053,22 +1056,22 @@ impl SoftThread<u64, f64, Dram> {
             Instruction::FcvtDS { rd, rs1, rm, .. } => {
                 self.f_registers[rd as usize] = (self.f_registers[rs1 as usize] as f32) as f64;
             },
-            Instruction::FeqD { rd, rs1, rs2 .. } => {
+            Instruction::FeqD { rd, rs1, rs2, .. } => {
                 let rs1_val = self.f_registers[rs1 as usize];
                 let rs2_val = self.f_registers[rs2 as usize];
-                self.f_registers[rs1 as usize] = if  rs1_val == rs2_val { 1 } else { 0 };
+                self.registers[rd as usize] = if  rs1_val == rs2_val { 1 } else { 0 };
             },
             Instruction::FltD { rd, rs1, rs2, .. } => {
                 let rs1_val = self.f_registers[rs1 as usize];
                 let rs2_val = self.f_registers[rs2 as usize];
-                self.f_registers[rs1 as usize] = if  rs1_val < rs2_val { 1 } else { 0 };
+                self.registers[rs1 as usize] = if  rs1_val < rs2_val { 1 } else { 0 };
             },
             Instruction::FleD { rd, rs1, rs2, .. } => {
                 let rs1_val = self.f_registers[rs1 as usize];
                 let rs2_val = self.f_registers[rs2 as usize];
-                self.f_registers[rs1 as usize] = if  rs1_val <= rs2_val { 1 } else { 0 };
+                self.registers[rs1 as usize] = if  rs1_val <= rs2_val { 1 } else { 0 };
             },
-            Instruction::FclassD { rd, rs1, rm, ..} => {},
+            Instruction::FclassD { rd, rs1, ..} => {},
             Instruction::FcvtWD { rd, rs1, rm, .. } => {
                 self.registers[rd as usize] = (self.f_registers[rs1 as usize].round() as i32) as u64;
             },
@@ -1101,10 +1104,12 @@ impl SoftThread<u64, f64, Dram> {
             },
             Instruction::Flq { rd, rs1, imm, .. } => {
                 let addr = self.registers[rs1 as usize];
-                let val = f64::from_bits(self.bus.read(&addr, 64));
-                self.f_registers[rd as usize] = val;
+                if let Ok(val) = self.bus.read(&addr, 64) {
+                    let val = f64::from_bits(val);
+                    self.f_registers[rd as usize] = val;
+                }
             },
-            Instruction::Fsq { rd, rs1, rs2, imm, .. } => {
+            Instruction::Fsq { rs1, rs2, imm, .. } => {
                 let addr = self.registers[rs1 as usize];
                 let val = self.f_registers[rs2 as usize].to_bits() as u64;
                 self.bus.write(addr, val, 64);
@@ -1125,7 +1130,7 @@ impl SoftThread<u64, f64, Dram> {
                 let rs1_val = -self.f_registers[rs1 as usize];
                 let rs2_val = self.f_registers[rs2 as usize];
                 let rs3_val = -self.f_registers[rs3 as usize];
-                self.f_registers[rd as usize] = rs1.mul_add(rs2_val, rs3_val);
+                self.f_registers[rd as usize] = rs1_val.mul_add(rs2_val, rs3_val);
             },
             Instruction::FnmaddQ { rd, rs1, rs2, rs3, rm, .. } => {
                 let rs1_val = -self.f_registers[rs1 as usize];
@@ -1155,8 +1160,7 @@ impl SoftThread<u64, f64, Dram> {
             },
             Instruction::FsqrtQ { rd, rs1, rm, .. } => {
                 let rs1_val = self.f_registers[rs1 as usize];
-                let rs2_val = self.f_registers[rs2 as usize];
-                self.f_registers[rd as usize] = rs1_val.sqrt(rs2_val);
+                self.f_registers[rd as usize] = rs1_val.sqrt();
             },
             Instruction::FsgnjQ { rd, rs1, rs2, .. } => {
                 let rs1_val = self.f_registers[rs1 as usize];
@@ -1195,17 +1199,17 @@ impl SoftThread<u64, f64, Dram> {
             Instruction::FeqQ { rd, rs1, rs2, .. } => {
                 let rs1_val = self.f_registers[rs1 as usize];
                 let rs2_val = self.f_registers[rs2 as usize];
-                self.f_registers[rd as usize] = if rs1_val == rs2_val { 1 } else { 0 };
+                self.registers[rd as usize] = if rs1_val == rs2_val { 1 } else { 0 };
             },
             Instruction::FltQ { rd, rs1, rs2, .. } => {
                 let rs1_val = self.f_registers[rs1 as usize];
                 let rs2_val = self.f_registers[rs2 as usize];
-                self.f_registers[rd as usize] = if rs1_val < rs2_val { 1 } else { 0 };
+                self.registers[rd as usize] = if rs1_val < rs2_val { 1 } else { 0 };
             },
             Instruction::FleQ { rd, rs1, rs2, .. } => {
                 let rs1_val = self.f_registers[rs1 as usize];
                 let rs2_val = self.f_registers[rs2 as usize];
-                self.f_registers[rd as usize] = if rs1_val <= rs2_val { 1 } else { 0 };
+                self.registers[rd as usize] = if rs1_val <= rs2_val { 1 } else { 0 };
             },
             Instruction::FclassQ { rd, rs1, .. } => {
                 todo!();
@@ -1247,9 +1251,9 @@ impl SoftThread<u64, f64, Dram> {
 
 
 
-impl Default for SoftThread<u64, Dram> {
-    fn default() -> SoftThread<u64, Dram> {
+impl Default for SoftThread<u64, f64, Dram> {
+    fn default() -> SoftThread<u64, f64, Dram> {
         let enc_table = EncodingTable::default();
-        SoftThread::<u64, Dram>::new(enc_table)
+        SoftThread::<u64, f64, Dram>::new(enc_table)
     }
 }
