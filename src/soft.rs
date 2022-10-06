@@ -8,6 +8,23 @@ use crate::memory::{Dram, MEM_SIZE};
 use crate::machine::{Machine, Support};
 use crate::memory::Memory;
 
+/// The software represeentation of the RISC-V HART aka Hardware Thread
+/// This is separated from the VM itself so that a VM with multiple SOFT's
+/// i.e. a multithread/concurrent/parallel VM can be created and opearted
+/// 
+/// # Example
+/// ```
+/// use trecho::encoding::{EncodingTable, InstructionDecoder};
+/// use trecho::register::{Register, RegisterValue};
+/// use trecho::memory::{Dram, MEM_SIZE, Memory};
+/// use trecho::machine::{Machine, Support};
+///
+/// let mut soft: SoftThread = Soft::<u64, f64, Dram>::default();
+/// let program = vec![0b1110_0000 as u8, 0b0000_1010 as u8, 0b1001_0101 as u8, 0b1101_0011 as u8];
+/// soft.load_program();
+/// soft.execute();
+/// ```
+
 pub struct SoftThread<R, F, M> {
     pub registers: [R; 33],
     pub f_registers: [F; 33],
@@ -1040,7 +1057,7 @@ impl SoftThread<u64, f64, Dram> {
             },
             Instruction::FsgnjxD { rd, rs1, rs2, .. } => {
                 let sign_1 = self.f_registers[rs1 as usize].to_bits() & 0x8000_0000_0000_0000;
-                let sign_2 = self.f_registers[rs1 as usize].to_bits() & 0x8000_0000_0000_0000;
+                let sign_2 = self.f_registers[rs2 as usize].to_bits() & 0x8000_0000_0000_0000;
                 let other = self.f_registers[rs1 as usize].to_bits() & 0x7fff_ffff_ffff_ffff;
                 self.f_registers[rd as usize] = f64::from_bits((sign_1 ^ sign_2) | other);
             },
@@ -1059,17 +1076,17 @@ impl SoftThread<u64, f64, Dram> {
             Instruction::FeqD { rd, rs1, rs2, .. } => {
                 let rs1_val = self.f_registers[rs1 as usize];
                 let rs2_val = self.f_registers[rs2 as usize];
-                self.registers[rd as usize] = if  rs1_val == rs2_val { 1 } else { 0 };
+                self.registers[rd as usize] = if rs1_val == rs2_val { 1 } else { 0 };
             },
             Instruction::FltD { rd, rs1, rs2, .. } => {
                 let rs1_val = self.f_registers[rs1 as usize];
                 let rs2_val = self.f_registers[rs2 as usize];
-                self.registers[rs1 as usize] = if  rs1_val < rs2_val { 1 } else { 0 };
+                self.registers[rd as usize] = if  rs1_val < rs2_val { 1 } else { 0 };
             },
             Instruction::FleD { rd, rs1, rs2, .. } => {
                 let rs1_val = self.f_registers[rs1 as usize];
                 let rs2_val = self.f_registers[rs2 as usize];
-                self.registers[rs1 as usize] = if  rs1_val <= rs2_val { 1 } else { 0 };
+                self.registers[rd as usize] = if  rs1_val <= rs2_val { 1 } else { 0 };
             },
             Instruction::FclassD { rd, rs1, ..} => {},
             Instruction::FcvtWD { rd, rs1, rm, .. } => {
