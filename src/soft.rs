@@ -18,10 +18,11 @@ use crate::memory::Memory;
 /// use trecho::register::{Register, RegisterValue};
 /// use trecho::memory::{Dram, MEM_SIZE, Memory};
 /// use trecho::machine::{Machine, Support};
+/// use trecho::soft::SoftThread;
 ///
-/// let mut soft: SoftThread = Soft::<u64, f64, Dram>::default();
-/// let program = vec![0b1110_0000 as u8, 0b0000_1010 as u8, 0b1001_0101 as u8, 0b1101_0011 as u8];
-/// soft.load_program();
+/// let mut soft = SoftThread::<u64, f64, Dram>::default();
+/// let program = vec![0b1100_1100 as u8, 0b1100_1010 as u8, 0b1000_0101 as u8, 0b1001_0011 as u8];
+/// soft.load_program(program);
 /// soft.execute();
 /// ```
 
@@ -74,7 +75,7 @@ impl SoftThread<u64, f64, Dram> {
         return inst;
     }
 
-    pub(crate) fn execute(&mut self) {
+    pub fn execute(&mut self) {
         let instruction: Instruction = Instruction::decode(self.fetch(), &self.enc_table);
         println!("{:?}", instruction);
         match instruction {
