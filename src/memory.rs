@@ -49,8 +49,11 @@ pub trait Memory: Default {
     fn into_i32(&self, val: &Self::RegValue) -> i32;
 
 
- }
+}
 
+pub trait ReadOnlyMemory: Default {}
+
+#[derive(Debug, Clone)]
 pub struct Dram {
     pub mem: Vec<u8>,
     flags: Vec<u8>,

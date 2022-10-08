@@ -8,6 +8,8 @@ use crate::memory::{Dram, MEM_SIZE};
 use crate::machine::{Machine, Support};
 use crate::memory::Memory;
 
+pub const INST_LEN: u64 = 4u64;
+
 /// The software represeentation of the RISC-V HART aka Hardware Thread
 /// This is separated from the VM itself so that a VM with multiple SOFT's
 /// i.e. a multithread/concurrent/parallel VM can be created and opearted
@@ -26,6 +28,7 @@ use crate::memory::Memory;
 /// soft.execute();
 /// ```
 
+#[derive(Debug)]
 pub struct SoftThread<R, F, M> {
     pub registers: [R; 33],
     pub f_registers: [F; 33],
@@ -60,8 +63,16 @@ impl SoftThread<u64, f64, Dram> {
         soft
     }
 
-    pub(crate) fn read_reg(&self, idx: u64) -> u64 {
-        self.registers[idx as usize]
+    pub(crate) fn read_xreg(&self, idx: usize) -> u64 {
+        self.registers[idx]
+    }
+
+    pub(crate) fn read_freg(&self, idx: usize) -> f64 {
+        self.f_registers[idx]
+    } 
+
+    pub(crate) fn advance(&mut self) {
+        self.pc += INST_LEN;
     }
 
     pub(crate) fn fetch(&self) -> Inst {
@@ -77,17 +88,18 @@ impl SoftThread<u64, f64, Dram> {
 
     pub fn execute(&mut self) {
         let instruction: Instruction = Instruction::decode(self.fetch(), &self.enc_table);
-        println!("{:?}", instruction);
         match instruction {
             Instruction::Lui { rd, imm } => {
                 //load upper immediate
-                self.registers[rd as usize] = (imm as i64) as u64
+                self.registers[rd as usize] = (imm as i64) as u64;
+                self.advance();
             },
             Instruction::Auipc { rd, imm } => {
                 //add upper immediate to program counter
                 if let Some(res) = self.pc.checked_add((imm as i64) as u64) {
                     self.registers[rd as usize] = res
                 }
+                self.advance();
             },
             Instruction::Jal { rd, imm } => {
                 // Jump and link
@@ -104,36 +116,48 @@ impl SoftThread<u64, f64, Dram> {
                 // Branch if equal
                 if self.registers[rs1 as usize] == self.registers[rs2 as usize] {
                     self.pc = self.pc.wrapping_add((imm as i64) as u64);
+                } else {
+                    self.advance();
                 }
             },
             Instruction::Bne { rs1, rs2, imm, .. } => {
                 // Branch if not equal
                 if self.registers[rs1 as usize] != self.registers[rs2 as usize] {
                     self.pc = self.pc.wrapping_add((imm as i64) as u64);
+                } else {
+                    self.advance();
                 }
             },
             Instruction::Blt { rs1, rs2, imm, .. } => {
                 // Branch if less than
                 if (self.registers[rs1 as usize] as i64) < (self.registers[rs2 as usize] as i64) {
                     self.pc = self.pc.wrapping_add((imm as i64) as u64);
+                } else {
+                    self.advance();
                 }
             },
             Instruction::Bge { rs1, rs2, imm, .. } => {
                 // Branch if greater or equal
                 if (self.registers[rs1 as usize] as i64) >= (self.registers[rs2 as usize] as i64) {
                     self.pc = self.pc.wrapping_add((imm as i64) as u64);
+                } else {
+                    self.advance();
                 }
             },
             Instruction::Bltu { rs1, rs2, imm, .. } => {
                 // Branch if less than unsigned
                 if self.registers[rs1 as usize] < self.registers[rs2 as usize] {
                     self.pc = self.pc.wrapping_add((imm as i64) as u64);
+                } else { 
+                    self.advance(); 
                 }
             },
             Instruction::Bgeu { rs1, rs2, imm, .. } => {
                 // Branch if greater than unsigned
                 if self.registers[rs1 as usize] >= self.registers[rs2 as usize] {
                     self.pc = self.pc.wrapping_add((imm as i64) as u64);
+                } else {
+                    self.advance();
                 }
             },
             Instruction::Lb { rd, rs1, imm, .. } => {
@@ -141,48 +165,62 @@ impl SoftThread<u64, f64, Dram> {
                 if let Ok(val) = self.bus.read(&addr.into(), 8) {
                     self.registers[rd as usize] = ((self.bus.into_u64(&val)) as i64) as u64;
                 }
+
+                self.advance();
             },
             Instruction::Lh { rd, rs1, imm, .. } => {
                 let addr = self.registers[rs1 as usize].wrapping_add((imm as i64) as u64);
                 if let Ok(val) = self.bus.read(&addr.into(), 16) {
                     self.registers[rd as usize] = ((self.bus.into_u64(&val)) as i64) as u64;
                 }
+                
+                self.advance();
             },
             Instruction::Lw { rd, rs1, imm, .. } => {
                 let addr = self.registers[rs1 as usize].wrapping_add((imm as i64) as u64);
                 if let Ok(val) = self.bus.read(&addr.into(), 32) {
                     self.registers[rd as usize] = ((self.bus.into_u64(&val) as i32) as i64) as u64
                 }
+
+                self.advance();
             },
             Instruction::Lbu { rd, rs1, imm, .. } => {
                 let addr = self.registers[rs1 as usize].wrapping_add((imm as i64) as u64);
                 if let Ok(val) = self.bus.read(&addr.into(), 8) {
                     self.registers[rd as usize] = self.bus.into_u64(&val);
                 }
+
+                self.advance();
             },
             Instruction::Lhu { rd, rs1, imm, .. } => {
                 let addr = self.registers[rs1 as usize].wrapping_add((imm as i64) as u64);
                 if let Ok(val) = self.bus.read(&addr.into(), 16) {
                     self.registers[rd as usize] = self.bus.into_u64(&val);
                 }
+
+                self.advance();
             },
             Instruction::Sb { rs1, rs2, imm, .. } => {
                 let addr = self.registers[rs1 as usize].wrapping_add((imm as i64) as u64);
                 let _ = self.bus.write(addr, self.registers[rs2 as usize], 8);
+                self.advance();
             },
             Instruction::Sh { rs1, rs2, imm, .. } => {
                 let addr = self.registers[rs1 as usize].wrapping_add((imm as i64) as u64);
                 let _ = self.bus.write(addr, self.registers[rs2 as usize], 16);
+                self.advance();
             },
             Instruction::Sw { rs1, rs2, imm, .. } => {
                 let addr = self.registers[rs1 as usize].wrapping_add((imm as i64) as u64);
                 let _ = self.bus.write(addr, self.registers[rs2 as usize], 32);
+                self.advance();
             },
             Instruction::Addi { rd, rs1, imm, .. } => {
                 let imm = (imm as i64) as u64;
                 if let Some(res) = self.registers[rs1 as usize].checked_add(imm) {
                     self.registers[rd as usize] = res;
                 }
+                self.advance();
             },
             Instruction::Slti { rd, rs1, imm, .. } => {
                 self.registers[rd as usize] = if (self.registers[rs1 as usize] as i64) < (imm as i64) {
@@ -190,37 +228,48 @@ impl SoftThread<u64, f64, Dram> {
                 } else {
                     0
                 };
+                self.advance();
             },
             Instruction::Sltiu { rd, rs1, imm, .. } => {
                 self.registers[rd as usize] = if self.registers[rs1 as usize] < ((imm as i64) as u64) { 1 } else { 0 };
+                self.advance();
             },
             Instruction::Xori { rd, rs1, imm, .. } => {
                 self.registers[rd as usize] = self.registers[rs1 as usize] ^ ((imm as i64) as u64);
+                self.advance();
             },
             Instruction::Ori { rd, rs1, imm, .. } => {
                 self.registers[rd as usize] = self.registers[rs1 as usize] | ((imm as i64) as u64);
+                self.advance();
             },
             Instruction::Andi { rd, rs1, imm, .. } => {
                 self.registers[rd as usize] = self.registers[rs1 as usize] & ((imm as i64) as u64);
+                self.advance();
             },
             Instruction::Slli { rd, rs1, shamt, .. } => {
                 self.registers[rd as usize] = self.registers[rs1 as usize].wrapping_shl(shamt);
+                self.advance();
             },
             Instruction::Srli { rd, rs1, shamt, .. } => {
                 self.registers[rd as usize] = self.registers[rs1 as usize].wrapping_shr(shamt);
+                self.advance();
             },
             Instruction::Srai { rd, rs1, shamt, .. } => {
                 self.registers[rd as usize] = (self.registers[rs1 as usize] as i64).wrapping_shr(shamt) as u64;
+                self.advance();
             },
             Instruction::Add { rd, rs1, rs2, .. } => {
-                self.registers[rd as usize] = self.registers[rs1 as usize].oflow_add(&self.registers[rs2 as usize])
+                self.registers[rd as usize] = self.registers[rs1 as usize].oflow_add(&self.registers[rs2 as usize]);
+                self.advance();
             },
             Instruction::Sub { rd, rs1, rs2, .. } => {
                 self.registers[rd as usize] = self.registers[rs1 as usize].oflow_sub(&self.registers[rs2 as usize]);
+                self.advance();
             },
             Instruction::Sll { rd, rs1, rs2, .. } => {
                 let shamt = ((self.registers[rs2 as usize] & 0x3f) as u64) as u32;
                 self.registers[rd as usize] = self.registers[rs1 as usize].wrapping_shl(shamt);
+                self.advance();
             },
             Instruction::Slt { rd, rs1, rs2, .. } => {
                 self.registers[rd as usize] = if ((self.registers[rs1 as usize] as i64) < (self.registers[rs2 as usize] as i64)) {
@@ -228,6 +277,7 @@ impl SoftThread<u64, f64, Dram> {
                 } else {
                     0
                 };
+                self.advance();
             },
             Instruction::Sltu { rd, rs1, rs2, .. } => {
                 self.registers[rd as usize] = if self.registers[rs1 as usize] < self.registers[rs2 as usize] {
@@ -235,23 +285,29 @@ impl SoftThread<u64, f64, Dram> {
                 } else {
                     0
                 };
+                self.advance();
             },
             Instruction::Xor { rd, rs1, rs2, .. } => {
-                self.registers[rd as usize] = self.registers[rs1 as usize] ^ self.registers[rs2 as usize]
+                self.registers[rd as usize] = self.registers[rs1 as usize] ^ self.registers[rs2 as usize];
+                self.advance();
             },
             Instruction::Srl { rd, rs1, rs2, .. } => {
                 let shamt = ((self.registers[rs2 as usize] & 0x3f) as u64) as u32;
                 self.registers[rd as usize] = self.registers[rs1 as usize].wrapping_shr(shamt);
+                self.advance();
             },
             Instruction::Sra { rd, rs1, rs2, .. } => {
                 let shamt = ((self.registers[rs2 as usize] & 0x3f) as u64) as u32;
                 self.registers[rd as usize] = (self.registers[rs1 as usize] as i64).wrapping_shr(shamt) as u64;
+                self.advance();
             },
             Instruction::Or { rd, rs1, rs2, .. } => {
                 self.registers[rd as usize] = self.registers[rs1 as usize] | self.registers[rs2 as usize];
+                self.advance();
             },
             Instruction::And { rd, rs1, rs2, .. } => {
                 self.registers[rd as usize] = self.registers[rs1 as usize] & self.registers[rs2 as usize];
+                self.advance();
             },
             Instruction::Fence { .. } => { todo!() }
             Instruction::ECall => { 
@@ -267,43 +323,54 @@ impl SoftThread<u64, f64, Dram> {
                 if let Ok(val) = self.bus.read(&addr.into(), 32) {
                     self.registers[rd as usize] = self.bus.into_u64(&val);
                 }
+                self.advance();
             },
             Instruction::Ld { rd, rs1, imm, .. } => {
                 let addr = self.registers[rs1 as usize].wrapping_add((imm as i64) as u64);
                 if let Ok(val) = self.bus.read(&addr.into(), 64) {
                     self.registers[rd as usize] = self.bus.into_u64(&val);
                 }
+                self.advance();
             },
             Instruction::Sd { rs1, rs2, imm, .. } => {
                 let addr = self.registers[rs1 as usize].wrapping_add((imm as i64) as u64);
                 let _ = self.bus.write(addr, self.registers[rs2 as usize], 64);
+                self.advance();
             },
             Instruction::Addiw { rd, rs1, imm, .. } => {
                 self.registers[rd as usize] = ((self.registers[rs1 as usize].wrapping_add(((imm as i64) as u64)) as i32) as i64) as u64;
+                self.advance();
             },
             Instruction::Slliw { rd, rs1, shamt, .. } => {
                 self.registers[rd as usize] = ((self.registers[rs1 as usize].wrapping_shl(shamt) as i32) as i64) as u64;
+                self.advance();
             },
             Instruction::Sraiw { rd, rs1, shamt, .. } => {
                 self.registers[rd as usize] = ((self.registers[rs1 as usize] as i32).wrapping_shr(shamt) as i64) as u64;
+                self.advance();
             },
             Instruction::Addw { rd, rs1, rs2, .. } => {
                 self.registers[rd as usize] = ((self.registers[rs1 as usize].wrapping_add(self.registers[rs2 as usize]) as i32) as i64) as u64;
+                self.advance();
             },
             Instruction::Subw { rd, rs1, rs2, .. } => {
                 self.registers[rd as usize] = ((self.registers[rs1 as usize].wrapping_sub(self.registers[rs2 as usize]) as i32) as i64) as u64;
+                self.advance()
             },
             Instruction::Sllw { rd, rs1, rs2, .. } => {
                 let shamt = ((self.registers[rs2 as usize] & 0x3f) as u64) as u32;
                 self.registers[rd as usize] = ((self.registers[rs1 as usize] as u32).wrapping_shl(shamt) as i32) as u64;
+                self.advance();
             },
             Instruction::Srlw { rd, rs1, rs2, .. } => {
                 let shamt = ((self.registers[rs2 as usize] & 0x3f) as u64) as u32;
                 self.registers[rd as usize] = ((self.registers[rs1 as usize] as u32).wrapping_shr(shamt) as i32) as u64;
+                self.advance();
             },
             Instruction::Sraw { rd, rs1, rs2, .. } => {
                 let shamt = ((self.registers[rs2 as usize] & 0x3f) as u64) as u32;
                 self.registers[rd as usize] = ((self.registers[rs1 as usize] as i32) >> (shamt as i32)) as u64;
+                self.advance();
             },
             Instruction::FenceI { .. } => { todo!() },
             Instruction::Csrrw { csr, rs1, rd, .. } => {
@@ -313,6 +380,7 @@ impl SoftThread<u64, f64, Dram> {
                     self.registers[rd as usize] = csr_val;
                     self.csr[csr as usize] = self.registers[rs1 as usize]
                 }
+                self.advance();
             },
             Instruction::Csrrs { csr, rs1, rd, .. } => {
                 if rs1 != Register::X0 {
@@ -320,7 +388,8 @@ impl SoftThread<u64, f64, Dram> {
                     let csr_val = (csr_val as u64).zero_extend(&32);
                     self.registers[rd as usize] = csr_val;
                     self.csr[csr as usize] = self.csr[csr as usize] | self.registers[rs1 as usize];    
-                }                
+                }
+                self.advance();
             },
             Instruction::Csrrc { csr, rs1, rd, .. } => {
                 if rs1 != Register::X0 {
@@ -329,6 +398,7 @@ impl SoftThread<u64, f64, Dram> {
                     self.registers[rd as usize] = csr_val;
                     self.csr[csr as usize] = self.csr[csr as usize] & self.registers[rs1 as usize];
                 }
+                self.advance();
             },
             Instruction::Csrrwi { rd, csr, uimm, .. } => {
                 if rd != Register::X0 {
@@ -337,6 +407,7 @@ impl SoftThread<u64, f64, Dram> {
                     self.registers[rd as usize] = csr_val;
                     self.csr[csr as usize] = imm;
                 }
+                self.advance();
             },
             Instruction::Csrrsi { rd, csr, uimm, .. } => {
                 if uimm != Register::X0 as u32 {
@@ -345,6 +416,7 @@ impl SoftThread<u64, f64, Dram> {
                     self.registers[rd as usize] = csr_val;
                     self.csr[csr as usize] = self.csr[csr as usize] | imm;
                 }
+                self.advance();
             },
             Instruction::Csrrci { rd, csr, uimm, .. } => {
                 if uimm != Register::X0 as u32 {
@@ -353,45 +425,59 @@ impl SoftThread<u64, f64, Dram> {
                     self.registers[rd as usize] = csr_val;
                     self.csr[csr as usize] = self.csr[csr as usize] & imm;
                 }
+                self.advance();
             },
             Instruction::Mul { rd, rs1, rs2, .. } => {
                 self.registers[rd as usize] = self.registers[rs1 as usize].oflow_mul(&self.registers[rs2 as usize]);
+                self.advance();
             },
             Instruction::Mulh { rd, rs1, rs2, .. } => {
                 self.registers[rd as usize] = self.registers[rs1 as usize].oflow_mul_high_signed(&self.registers[rs2 as usize]);
+                self.advance();
             },
             Instruction::Mulhsu { rd, rs1, rs2, .. } => {
                 self.registers[rd as usize] = self.registers[rs1 as usize].oflow_mul_high_signed_unsigned(&self.registers[rs2 as usize]);
+                self.advance();
             },
             Instruction::Mulhu { rd, rs1, rs2, .. } => {
                 self.registers[rd as usize] = self.registers[rs1 as usize].oflow_mul_high_unsigned(&self.registers[rs2 as usize]);
+                self.advance();
             },
             Instruction::Div { rd, rs1, rs2, .. } => {
                 self.registers[rd as usize] = self.registers[rs1 as usize].oflow_div_signed(&self.registers[rs2 as usize]);
+                self.advance();
             },
             Instruction::Divu { rd, rs1, rs2, .. } => {
                 self.registers[rd as usize] = self.registers[rs1 as usize].oflow_div(&self.registers[rs2 as usize]);
+                self.advance();
             },
             Instruction::Rem { rd, rs1, rs2, .. } => {
                 self.registers[rd as usize] = self.registers[rs1 as usize].oflow_rem_signed(&self.registers[rs2 as usize]);
+                self.advance();
             },
             Instruction::Remu { rd, rs1, rs2, .. } => {
                 self.registers[rd as usize] = self.registers[rs1 as usize].oflow_rem(&self.registers[rs2 as usize]);
+                self.advance();
             },
             Instruction::Mulw { rd, rs1, rs2, .. } => {
                 self.registers[rd as usize] = self.registers[rs1 as usize].oflow_mul(&self.registers[rs2 as usize]);
+                self.advance();
             },
             Instruction::Divw { rd, rs1, rs2, .. } => {
                 self.registers[rd as usize] = self.registers[rs1 as usize].oflow_div_signed(&self.registers[rs2 as usize]);
+                self.advance();
             },
             Instruction::Divuw { rd, rs1, rs2, .. } => {
                 self.registers[rd as usize] = self.registers[rs1 as usize].oflow_div(&self.registers[rs2 as usize]);
+                self.advance();
             },
             Instruction::Remw { rd, rs1, rs2, .. } => {
                 self.registers[rd as usize] = self.registers[rs1 as usize].oflow_rem_signed(&self.registers[rs2 as usize]);
+                self.advance();
             },
             Instruction::RemuW { rd, rs1, rs2, .. } => {
                 self.registers[rd as usize] = self.registers[rs1 as usize].oflow_rem(&self.registers[rs2 as usize]);
+                self.advance();
             },
             // For W instructions below ALL words being read from
             // memory must be naturally aligned to 32 bits
@@ -415,6 +501,8 @@ impl SoftThread<u64, f64, Dram> {
                     self.registers[rd as usize] = val;
                     self.res.push(self.registers[rs1 as usize]);
                 }
+
+                self.advance();
             },
             Instruction::ScW { rd, rs1, rs2, .. } => {
                 // if an address reservation is still value
@@ -440,6 +528,7 @@ impl SoftThread<u64, f64, Dram> {
                     self.res.retain(|x| *x != addr);
                     self.registers[rd as usize] = 1;
                 }
+                self.advance();
             },
             Instruction::AmoswapW { rd, rs1, rs2, ..} => {
                 // read a word from the address in rs1
@@ -460,6 +549,8 @@ impl SoftThread<u64, f64, Dram> {
                     self.registers[rd as usize] = temp;  
 
                 }
+                
+                self.advance();
             },
             Instruction::AmoaddW { rd, rs1, rs2, ..} => {
                 // read word from address in rs1
@@ -482,6 +573,7 @@ impl SoftThread<u64, f64, Dram> {
                     let _ = self.bus.write(addr, res, 32);
                     self.registers[rd as usize] = temp; 
                 }
+                self.advance();
             },
             Instruction::AmoxorW { rd, rs1, rs2, .. } => {
                 // read word from address in rs1
@@ -503,6 +595,8 @@ impl SoftThread<u64, f64, Dram> {
                     let _ = self.bus.write(addr, res, 32);
                     self.registers[rd as usize] = temp;
                 }
+
+                self.advance();
             },
             Instruction::AmoandW { rd, rs1, rs2, .. } => {
                 // read word from address in rs1
@@ -524,6 +618,8 @@ impl SoftThread<u64, f64, Dram> {
                     let _ = self.bus.write(addr, res, 32);
                     self.registers[rd as usize] = temp;
                 }
+
+                self.advance();
             },
             Instruction::AmoorW { rd, rs1, rs2, .. } => {
                 // read word from address in rs1
@@ -545,6 +641,7 @@ impl SoftThread<u64, f64, Dram> {
                     let _ = self.bus.write(addr, res, 32);
                     self.registers[rd as usize] = temp;
                 }
+                self.advance();
             },
             Instruction::AmominW { rd, rs1, rs2, .. } => {
                 // read word from address in rs1
@@ -567,6 +664,7 @@ impl SoftThread<u64, f64, Dram> {
                     let _ = self.bus.write(addr, res, 32);
                     self.registers[rd as usize] = temp;
                 }
+                self.advance();
             },
             Instruction::AmomaxW { rd, rs1, rs2, .. } => {
                 // read word from address in rs1
@@ -589,6 +687,7 @@ impl SoftThread<u64, f64, Dram> {
                     let _ = self.bus.write(addr, res, 32);
                     self.registers[rd as usize] = temp;
                 }
+                self.advance();
             },
             Instruction::AmominuW { rd, rs1, rs2, .. } => {
                 // read word from address in rs1
@@ -611,6 +710,8 @@ impl SoftThread<u64, f64, Dram> {
                     let _ = self.bus.write(addr, res, 32);
                     self.registers[rd as usize] = temp;
                 }
+
+                self.advance();
             },
             Instruction::AmomaxuW { rd, rs1, rs2, .. } => {
                 // read word from address in rs1
@@ -632,6 +733,7 @@ impl SoftThread<u64, f64, Dram> {
                     let _ = self.bus.write(addr, res, 32);
                     self.registers[rd as usize] = temp;
                 }
+                self.advance();
             },
             Instruction::LrD { rd, rs1, .. } => {
                 // See LrD, but instead of reading word
@@ -648,6 +750,7 @@ impl SoftThread<u64, f64, Dram> {
                     self.registers[rd as usize] = val;
                     self.res.push(self.registers[rs1 as usize]);
                 } 
+                self.advance();
             },
             Instruction::ScD { rd, rs1, rs2, .. } => {
                 // See ScW, but instead of conditionally
@@ -668,6 +771,8 @@ impl SoftThread<u64, f64, Dram> {
                     self.res.retain(|x| *x != addr);
                     self.registers[rd as usize] = 1;
                 }
+
+                self.advance();
             },
             Instruction::AmoswapD { rd, rs1, rs2, ..} => {
                 // read a doubleword from the address in rs1
@@ -687,6 +792,7 @@ impl SoftThread<u64, f64, Dram> {
                     let _ = self.bus.write(addr, val, 64);
                     self.registers[rd as usize] = temp;
                 }
+                self.advance();
             },
             Instruction::AmoaddD { rd, rs1, rs2, ..} => {
                 // read doubleword from address in rs1
@@ -709,6 +815,7 @@ impl SoftThread<u64, f64, Dram> {
                     let _ = self.bus.write(addr, res, 64);
                     self.registers[rd as usize] = temp;
                 }
+                self.advance();
             },
             Instruction::AmoxorD { rd, rs1, rs2, .. } => {
                 // read doubleword from address in rs1
@@ -730,6 +837,7 @@ impl SoftThread<u64, f64, Dram> {
                     let _ = self.bus.write(addr, res, 64);
                     self.registers[rd as usize] = temp;
                 }
+                self.advance();
             },
             Instruction::AmoandD { rd, rs1, rs2, .. } => {
                 // read doubleword from address in rs1
@@ -751,7 +859,7 @@ impl SoftThread<u64, f64, Dram> {
                     let _ = self.bus.write(addr, res, 64);
                     self.registers[rd as usize] = temp;
                 }
-                
+                self.advance();
             },
             Instruction::AmoorD { rd, rs1, rs2, .. } => {
                 // read doubleword from address in rs1
@@ -773,6 +881,7 @@ impl SoftThread<u64, f64, Dram> {
                     let _ = self.bus.write(addr, res, 64);
                     self.registers[rd as usize] = temp;                    
                 }
+                self.advance();
             },
             Instruction::AmominD { rd, rs1, rs2, .. } => {
                 // read doubleword from address in rs1
@@ -796,6 +905,7 @@ impl SoftThread<u64, f64, Dram> {
                     let _ = self.bus.write(addr, fin, 64);
                     self.registers[rd as usize] = temp;
                 }
+                self.advance();
             },
             Instruction::AmomaxD { rd, rs1, rs2, .. } => {
                 let addr = self.registers[rs1 as usize];
@@ -813,7 +923,7 @@ impl SoftThread<u64, f64, Dram> {
                     let _ = self.bus.write(addr, fin, 64);
                     self.registers[rd as usize] = temp;
                 }
-                
+                self.advance();
             },
             Instruction::AmominuD { rd, rs1, rs2, .. } => {
                 // read doubleword from address in rs1
@@ -836,6 +946,7 @@ impl SoftThread<u64, f64, Dram> {
                     let _ = self.bus.write(addr, fin, 64);
                     self.registers[rd as usize] = temp;
                 }
+                self.advance();
             },
             Instruction::AmomaxuD { rd, rs1, rs2, .. } => {
                 // read doubleword from address in rs1
@@ -857,6 +968,7 @@ impl SoftThread<u64, f64, Dram> {
                     let _ = self.bus.write(addr, fin, 64);
                     self.registers[rd as usize] = temp;
                 }
+                self.advance();
             },
             Instruction::Flw { rd, rs1, imm, .. } => {
                 let addr = self.registers[rs1 as usize].wrapping_add((imm as u32) as u64);
@@ -864,12 +976,14 @@ impl SoftThread<u64, f64, Dram> {
                     let val = f32::from_bits((bits as u32));
                     self.f_registers[rd as usize] = val as f64;
                 }
+                self.advance();
             },
             Instruction::Fsw { rs1, rs2, imm, .. } => {
                 // store value in f_register rs2 as bits into memory at address in rs1 + imm
                 let addr = self.registers[rs1 as usize].wrapping_add((imm as u32) as u64);
                 let val = (self.f_registers[rs2 as usize] as f32).to_bits() as u64;
                 let _ = self.bus.write(addr, val, 32);
+                self.advance();
             },
             Instruction::FmaddS { rd, rs1, rs2, rs3, rm, .. } => {
                 // multiply value in f_register[rs1] by value in f_register[rs2]
@@ -878,6 +992,7 @@ impl SoftThread<u64, f64, Dram> {
                 let rs2_val = self.f_registers[rs2 as usize];
                 let rs3_val = self.f_registers[rs3 as usize];
                 self.f_registers[rd as usize] = rs1_val.mul_add(rs2_val, rs3_val);
+                self.advance();
             },
             Instruction::FmsubS { rd, rs1, rs2, rs3, rm, .. } => {
                 // multiply value in f_register[rs1] by value in f_register[rs2]
@@ -886,118 +1001,144 @@ impl SoftThread<u64, f64, Dram> {
                 let rs2_val = self.f_registers[rs2 as usize];
                 let rs3_val = -self.f_registers[rs3 as usize];
                 self.f_registers[rd as usize] = rs1_val.mul_add(rs2_val, rs3_val);
+                self.advance();
             },
             Instruction::FnmsubS { rd, rs1, rs2, rs3, rm, .. } => {
                 let rs1_val = -self.f_registers[rs1 as usize];
                 let rs2_val = self.f_registers[rs2 as usize];
                 let rs3_val = -self.f_registers[rs3 as usize];
                 self.f_registers[rd as usize] = rs1_val.mul_add(rs2_val, rs3_val);
+                self.advance();
             },
             Instruction::FnmaddS { rd, rs1, rs2, rs3, rm, .. } => {
                 let rs1_val = -self.f_registers[rs1 as usize];
                 let rs2_val = self.f_registers[rs2 as usize];
                 let rs3_val = self.f_registers[rs3 as usize];
                 self.f_registers[rd as usize] = rs1_val.mul_add(rs2_val, rs3_val);
+                self.advance();
             },
             Instruction::FaddS { rd, rs1, rs2, rm, .. } => {
                 let rs1_val = self.f_registers[rs1 as usize];
                 let rs2_val = self.f_registers[rs2 as usize];
                 self.f_registers[rd as usize] = rs1_val + rs2_val;
+                self.advance();
             },
             Instruction::FsubS { rd, rs1, rs2, rm, .. } => {
                 let rs1_val = self.f_registers[rs1 as usize];
                 let rs2_val = self.f_registers[rs2 as usize];
                 self.f_registers[rd as usize] = rs1_val - rs2_val;
+                self.advance();
             },
             Instruction::FmulS { rd, rs1, rs2, rm, .. } => {
                 let rs1_val = self.f_registers[rs1 as usize];
                 let rs2_val = self.f_registers[rs2 as usize];
                 self.f_registers[rd as usize] = rs1_val * rs2_val;
+                self.advance();
             },
             Instruction::FdivS { rd, rs1, rs2, rm, .. } => {
                 let rs1_val = self.f_registers[rs1 as usize];
                 let rs2_val = self.f_registers[rs2 as usize];
                 self.f_registers[rd as usize] = rs1_val / rs2_val;
+                self.advance();
             },
             Instruction::FsqrtS { rd, rs1, rm, .. } => {
                 self.f_registers[rd as usize] = (self.f_registers[rs1 as usize].sqrt());
+                self.advance();
             },
             Instruction::FsgnjS { rd, rs1, rs2, .. } => {
                 let rs1_val = self.f_registers[rs1 as usize];
                 let rs2_val = self.f_registers[rs2 as usize];
                 self.f_registers[rd as usize] = rs1_val.copysign(rs2_val);
+                self.advance();
             },
             Instruction::FsgnjnS { rd, rs1, rs2, .. } => {
                 let rs1_val = self.f_registers[rs1 as usize];
                 let rs2_val = -self.f_registers[rs2 as usize];
                 self.f_registers[rd as usize] = rs1_val.copysign(rs2_val);
+                self.advance();
             },
             Instruction::FsgnjxS { rd, rs1, rs2, .. } => {
                 let sign_1 = (self.f_registers[rs1 as usize] as f32).to_bits() & 0x8000_0000;
                 let sign_2 = (self.f_registers[rs2 as usize] as f32).to_bits() & 0x8000_0000;
                 let other = (self.f_registers[rs1 as usize] as f32).to_bits() & 0x7fff_ffff;
                 self.f_registers[rd as usize] = (f32::from_bits((sign_1 ^ sign_2) | other)) as f64;
+                self.advance();
             },
             Instruction::FminS { rd, rs1, rs2, .. } => {
                 let rs1_val = self.f_registers[rs1 as usize];
                 let rs2_val = self.f_registers[rs2 as usize];
                 self.f_registers[rd as usize] = rs1_val.min(rs2_val);
+                self.advance();
             },
             Instruction::FmaxS { rd, rs1, rs2, .. } => {
                 let rs1_val = self.f_registers[rs1 as usize];
                 let rs2_val = self.f_registers[rs2 as usize];
                 self.f_registers[rd as usize] = rs1_val.max(rs2_val);
+                self.advance();
             },
             Instruction::FcvtWS { rd, rs1, rm, .. } => {
                 self.registers[rd as usize] = (self.f_registers[rs1 as usize].round() as i32) as u64;
+                self.advance();
             },
             Instruction::FcvtWUS { rd, rs1, rm, .. } => {
                 self.registers[rd as usize] = ((self.f_registers[rs1 as usize].round() as u32) as i32) as u64;
+                self.advance();
             },
             Instruction::FmvXW { rd, rs1, .. } => {
                 let rs1_val = (((self.f_registers[rs1 as usize].to_bits() & 0xffffffff) as i32) as i64) as u64;
                 self.registers[rd as usize] = rs1_val;
+                self.advance();
             },
             Instruction::FeqS { rd, rs1, rs2, .. } => {
                 let rs1_val = self.f_registers[rs1 as usize];
                 let rs2_val = self.f_registers[rs2 as usize];
                 self.registers[rd as usize] = if rs1_val == rs2_val { 1 } else { 0 };
+                self.advance();
             },
             Instruction::FltS { rd, rs1, rs2, .. } => {
                 let rs1_val = self.f_registers[rs1 as usize];
                 let rs2_val = self.f_registers[rs2 as usize];
                 self.registers[rd as usize] = if rs1_val < rs2_val { 1 } else { 0 };
+                self.advance();
             },
             Instruction::FleS { rd, rs1, rs2, .. } => {
                 let rs1_val = self.f_registers[rs1 as usize];
                 let rs2_val = self.f_registers[rs2 as usize];
                 println!("{:?} == {:?}: {:?}", rs1_val, rs2_val, rs1_val <= rs2_val);
                 self.registers[rd as usize] = if rs1_val <= rs2_val { 1 } else { 0 };
+                self.advance();
             },
             Instruction::FclassS { rd, rs1, .. } => {
                 todo!();
             },
             Instruction::FcvtSW { rd, rs1, rm, .. } => {
                 self.f_registers[rd as usize] = ((self.registers[rs1 as usize] as i32) as f32) as f64;
+                self.advance();
             },
             Instruction::FcvtSWU { rd, rs1, rm, .. } => {
                 self.f_registers[rd as usize] = ((self.registers[rs1 as usize] as u32) as f32) as f64;
+                self.advance();
             },
             Instruction::FmvWX { rd, rs1, .. } => {
                 let rs1_val = self.registers[rs1 as usize];
                 self.f_registers[rd as usize] = f64::from_bits(self.registers[rs1 as usize] & 0xffff_ffff);
+                self.advance();
             },
             Instruction::FcvtLS { rd, rs1, rm, ..} => {
                 self.registers[rd as usize] = (self.f_registers[rs1 as usize] as f32).round() as u64;
+                self.advance();
             },
             Instruction::FcvtLUS { rd, rs1, rm, .. } => {
                 self.registers[rd as usize] = (self.f_registers[rs1 as usize] as f32).round() as u64;
+                self.advance();
             },
             Instruction::FcvtSL { rd, rs1, rm, .. } => {
                 self.f_registers[rd as usize] = (self.registers[rs1 as usize] as f32) as f64;
+                self.advance();
             },
             Instruction::FcvtSLU { rd, rs1, rm, .. } => {
                 self.f_registers[rd as usize] = ((self.registers[rs1 as usize] as u64) as f32) as f64;
+                self.advance();
             },
             Instruction::Fld { rd, rs1, imm, .. } => {
                 let addr = self.registers[rs1 as usize];
@@ -1005,120 +1146,151 @@ impl SoftThread<u64, f64, Dram> {
                     let f_val = f64::from_bits(val);
                     self.f_registers[rd as usize] = f_val;
                 }
+                self.advance();
             },
             Instruction::Fsd { rs1, rs2, imm, .. } => {
                 let addr = self.registers[rs1 as usize];
                 let val = self.f_registers[rs2 as usize];
                 self.bus.write(addr, val.to_bits() as u64, 64);
+                self.advance();
             },
             Instruction::FmaddD { rd, rs1, rs2, rs3, rm, .. } => {
                 let rs1_val = self.f_registers[rs1 as usize];
                 let rs2_val = self.f_registers[rs2 as usize];
                 let rs3_val = self.f_registers[rs3 as usize];
                 self.f_registers[rd as usize] = rs1_val.mul_add(rs2_val, rs3_val);
+                self.advance();
             },
             Instruction::FmsubD { rd, rs1, rs2, rs3, rm, .. } => {
                 let rs1_val = self.f_registers[rs1 as usize];
                 let rs2_val = self.f_registers[rs2 as usize];
                 let rs3_val = -self.f_registers[rs3 as usize];
                 self.f_registers[rd as usize] = rs1_val.mul_add(rs2_val, rs3_val);
+                self.advance();
             },
             Instruction::FnmsubD { rd, rs1, rs2, rs3, rm, .. } => {
                 let rs1_val = -self.f_registers[rs1 as usize];
                 let rs2_val = self.f_registers[rs2 as usize];
                 let rs3_val = -self.f_registers[rs3 as usize];
                 self.f_registers[rd as usize] = rs1_val.mul_add(rs2_val, rs3_val);
+                self.advance();
             },
             Instruction::FnmaddD { rd, rs1, rs2, rs3, rm, .. } => {
                 let rs1_val = -self.f_registers[rs1 as usize];
                 let rs2_val = self.f_registers[rs2 as usize];
                 let rs3_val = self.f_registers[rs3 as usize];
                 self.f_registers[rd as usize] = rs1_val.mul_add(rs2_val, rs3_val);
+                self.advance();
             },
             Instruction::FaddD { rd, rs1, rs2, rm, .. } => {
                 self.f_registers[rd as usize] = self.f_registers[rs1 as usize] + self.f_registers[rs2 as usize]; 
+                self.advance();
             },
             Instruction::FsubD { rd, rs1, rs2, rm, .. } => {
                 self.f_registers[rd as usize] = self.f_registers[rs1 as usize] - self.f_registers[rs2 as usize];
+                self.advance();
             },
             Instruction::FmulD { rd, rs1, rs2, rm, .. } => {
                 self.f_registers[rd as usize] = self.f_registers[rs1 as usize] * self.f_registers[rs2 as usize];
+                self.advance();
             },
             Instruction::FdivD { rd, rs1, rs2, rm, .. } => {
                 self.f_registers[rd as usize] = self.f_registers[rs1 as usize] / self.f_registers[rs2 as usize];
+                self.advance();
             },
             Instruction::FsqrtD { rd, rs1, rm, .. } => {
                 self.f_registers[rd as usize] = self.f_registers[rs1 as usize].sqrt();
+                self.advance();
             },
             Instruction::FsgnjD { rd, rs1, rs2, .. } => {
                 self.f_registers[rd as usize] = self.f_registers[rs1 as usize].copysign(self.f_registers[rs2 as usize]);
+                self.advance();   
             },
             Instruction::FsgnjnD { rd, rs1, rs2, .. } => {
                 self.f_registers[rd as usize] = self.f_registers[rs1 as usize].copysign(-self.f_registers[rs2 as usize]);
+                self.advance();
             },
             Instruction::FsgnjxD { rd, rs1, rs2, .. } => {
                 let sign_1 = self.f_registers[rs1 as usize].to_bits() & 0x8000_0000_0000_0000;
                 let sign_2 = self.f_registers[rs2 as usize].to_bits() & 0x8000_0000_0000_0000;
                 let other = self.f_registers[rs1 as usize].to_bits() & 0x7fff_ffff_ffff_ffff;
                 self.f_registers[rd as usize] = f64::from_bits((sign_1 ^ sign_2) | other);
+                self.advance();
             },
             Instruction::FminD { rd, rs1, rs2, .. } => {
                 self.f_registers[rd as usize] = self.f_registers[rs1 as usize].min(self.f_registers[rs2 as usize]);
+                self.advance();
             },
             Instruction::FmaxD { rd, rs1, rs2, .. } => {
                 self.f_registers[rd as usize] = self.f_registers[rs1 as usize].max(self.f_registers[rs2 as usize]);
+                self.advance();
             },
             Instruction::FcvtSD { rd, rs1, rm, .. } => {
                 self.f_registers[rd as usize] = self.f_registers[rs1 as usize];
+                self.advance();
             },
             Instruction::FcvtDS { rd, rs1, rm, .. } => {
                 self.f_registers[rd as usize] = (self.f_registers[rs1 as usize] as f32) as f64;
+                self.advance();
             },
             Instruction::FeqD { rd, rs1, rs2, .. } => {
                 let rs1_val = self.f_registers[rs1 as usize];
                 let rs2_val = self.f_registers[rs2 as usize];
                 self.registers[rd as usize] = if rs1_val == rs2_val { 1 } else { 0 };
+                self.advance();
             },
             Instruction::FltD { rd, rs1, rs2, .. } => {
                 let rs1_val = self.f_registers[rs1 as usize];
                 let rs2_val = self.f_registers[rs2 as usize];
                 self.registers[rd as usize] = if  rs1_val < rs2_val { 1 } else { 0 };
+                self.advance();
             },
             Instruction::FleD { rd, rs1, rs2, .. } => {
                 let rs1_val = self.f_registers[rs1 as usize];
                 let rs2_val = self.f_registers[rs2 as usize];
                 self.registers[rd as usize] = if  rs1_val <= rs2_val { 1 } else { 0 };
+                self.advance();
             },
             Instruction::FclassD { rd, rs1, ..} => {},
             Instruction::FcvtWD { rd, rs1, rm, .. } => {
                 self.registers[rd as usize] = (self.f_registers[rs1 as usize].round() as i32) as u64;
+                self.advance();
             },
             Instruction::FcvtWUD { rd, rs1, rm, .. } => {
                 self.registers[rd as usize] = ((self.f_registers[rs1 as usize].round() as u32) as i32) as u64;
+                self.advance();
             },
             Instruction::FcvtDW { rd, rs1, rm, .. } => {
                 self.f_registers[rd as usize] = (self.registers[rs1 as usize] as i32) as f64;
+                self.advance();
             },
             Instruction::FcvtDWU { rd, rs1, rm, .. } => {
                 self.f_registers[rd as usize] = (self.registers[rs1 as usize] as u32) as f64;
+                self.advance();
             },
             Instruction::FcvtLD { rd, rs1, rm, .. } => {
                 self.registers[rd as usize] = (self.f_registers[rs1 as usize].round()) as u64;
+                self.advance();
             },
             Instruction::FcvtLUD { rd, rs1, rm, .. } => {
                 self.registers[rd as usize] = (self.f_registers[rs1 as usize].round()) as u64;
+                self.advance();
             },
             Instruction::FmvXD { rd, rs1, .. } => {
                 self.registers[rd as usize] = (self.f_registers[rs1 as usize].to_bits());
+                self.advance();
             },
             Instruction::FcvtDL { rd, rs1, .. } => {
                 self.f_registers[rd as usize] = self.registers[rs1 as usize] as f64;
+                self.advance();
             },
             Instruction::FcvtDLU { rd, rs1, rm, .. } => {
                 self.f_registers[rd as usize] = self.registers[rs1 as usize] as f64;
+                self.advance();
             },
             Instruction::FmvDX { rd, rs1, .. } => {
                 self.registers[rd as usize] = self.f_registers[rs1 as usize].to_bits();
+                self.advance();
             },
             Instruction::Flq { rd, rs1, imm, .. } => {
                 let addr = self.registers[rs1 as usize];
@@ -1126,135 +1298,167 @@ impl SoftThread<u64, f64, Dram> {
                     let val = f64::from_bits(val);
                     self.f_registers[rd as usize] = val;
                 }
+                self.advance();
             },
             Instruction::Fsq { rs1, rs2, imm, .. } => {
                 let addr = self.registers[rs1 as usize];
                 let val = self.f_registers[rs2 as usize].to_bits() as u64;
                 self.bus.write(addr, val, 64);
+                self.advance();
             },
             Instruction::FmaddQ { rd, rs1, rs2, rs3, rm, .. } => {
                 let rs1_val = self.f_registers[rs1 as usize];
                 let rs2_val = self.f_registers[rs2 as usize];
                 let rs3_val = self.f_registers[rs3 as usize];
                 self.f_registers[rd as usize] = rs1_val.mul_add(rs2_val, rs3_val);
+                self.advance();
             },
             Instruction::FmsubQ { rd, rs1, rs2, rs3, rm, .. } => {
                 let rs1_val = self.f_registers[rs1 as usize];
                 let rs2_val = self.f_registers[rs2 as usize];
                 let rs3_val = -self.f_registers[rs3 as usize];
                 self.f_registers[rd as usize] = rs1_val.mul_add(rs2_val, rs3_val);
+                self.advance();
             },
             Instruction::FnmsubQ { rd, rs1, rs2, rs3, rm, .. } => {
                 let rs1_val = -self.f_registers[rs1 as usize];
                 let rs2_val = self.f_registers[rs2 as usize];
                 let rs3_val = -self.f_registers[rs3 as usize];
                 self.f_registers[rd as usize] = rs1_val.mul_add(rs2_val, rs3_val);
+                self.advance();
             },
             Instruction::FnmaddQ { rd, rs1, rs2, rs3, rm, .. } => {
                 let rs1_val = -self.f_registers[rs1 as usize];
                 let rs2_val = self.f_registers[rs2 as usize];
                 let rs3_val = self.f_registers[rs3 as usize];
                 self.f_registers[rd as usize] = rs1_val.mul_add(rs2_val, rs3_val);
+                self.advance();
             },
             Instruction::FaddQ { rd, rs1, rs2, rm, .. } => {
                 let rs1_val = self.f_registers[rs1 as usize];
                 let rs2_val = self.f_registers[rs2 as usize];
                 self.f_registers[rd as usize] = rs1_val + rs2_val;
+                self.advance();
             },
             Instruction::FsubQ { rd, rs1, rs2, rm, .. } => {
                 let rs1_val = self.f_registers[rs1 as usize];
                 let rs2_val = self.f_registers[rs2 as usize];
                 self.f_registers[rd as usize] = rs1_val - rs2_val;
+                self.advance();
             },
             Instruction::FmulQ { rd, rs1, rs2, rm, .. } => {
                 let rs1_val = self.f_registers[rs1 as usize];
                 let rs2_val = self.f_registers[rs2 as usize];
                 self.f_registers[rd as usize] = rs1_val * rs2_val;
+                self.advance();
             },
             Instruction::FdivQ { rd, rs1, rs2, rm, .. } => {
                 let rs1_val = self.f_registers[rs1 as usize];
                 let rs2_val = self.f_registers[rs2 as usize];
                 self.f_registers[rd as usize] = rs1_val / rs2_val;
+                self.advance();
             },
             Instruction::FsqrtQ { rd, rs1, rm, .. } => {
                 let rs1_val = self.f_registers[rs1 as usize];
                 self.f_registers[rd as usize] = rs1_val.sqrt();
+                self.advance();
             },
             Instruction::FsgnjQ { rd, rs1, rs2, .. } => {
                 let rs1_val = self.f_registers[rs1 as usize];
                 let rs2_val = self.f_registers[rs2 as usize];
                 self.f_registers[rd as usize] = rs1_val.copysign(rs2_val);
+                self.advance();
             },
             Instruction::FsgnjnQ { rd, rs1, rs2, .. } => {
                 let rs1_val = self.f_registers[rs1 as usize];
                 let rs2_val = -self.f_registers[rs2 as usize];
                 self.f_registers[rd as usize] = rs1_val.copysign(rs2_val);
+                self.advance();
             },
             Instruction::FsgnjxQ { rd, rs1, rs2, .. } => {
                 let sign_1 = self.f_registers[rs1 as usize].to_bits() & 0x8000_0000_0000_0000;
                 let sign_2 = self.f_registers[rs2 as usize].to_bits() & 0x8000_0000_0000_0000;
                 let other = self.f_registers[rs1 as usize].to_bits() & 0x7fff_ffff_ffff_ffff;
                 self.f_registers[rd as usize] = f64::from_bits((sign_1 ^ sign_2) | other);
+                self.advance();
             },
             Instruction::FminQ { rd, rs1, rs2, .. } => {
                 self.f_registers[rd as usize] = self.f_registers[rs1 as usize].min(self.f_registers[rs2 as usize]);
+                self.advance();
             },
             Instruction::FmaxQ { rd, rs1, rs2, .. } => {
                 self.f_registers[rd as usize] = self.f_registers[rs1 as usize].max(self.f_registers[rs2 as usize]);
+                self.advance();
             },
             Instruction::FcvtSQ { rd, rs1, rm, .. } => {
                 self.f_registers[rd as usize] = self.f_registers[rs1 as usize];
+                self.advance();
             },
             Instruction::FcvtQS { rd, rs1, rm, .. } => {
                 self.f_registers[rd as usize] = (self.f_registers[rs1 as usize]);
+                self.advance();
             },
             Instruction::FcvtDQ { rd, rs1, rm, .. } => {
                 self.f_registers[rd as usize] = (self.f_registers[rs1 as usize] as f32) as f64;
+                self.advance();
             },
             Instruction::FcvtQD { rd, rs1, rm, .. } => {
                 self.f_registers[rd as usize] = (self.f_registers[rs1 as usize] as f32) as f64;
+                self.advance();
             },
             Instruction::FeqQ { rd, rs1, rs2, .. } => {
                 let rs1_val = self.f_registers[rs1 as usize];
                 let rs2_val = self.f_registers[rs2 as usize];
                 self.registers[rd as usize] = if rs1_val == rs2_val { 1 } else { 0 };
+                self.advance();
             },
             Instruction::FltQ { rd, rs1, rs2, .. } => {
                 let rs1_val = self.f_registers[rs1 as usize];
                 let rs2_val = self.f_registers[rs2 as usize];
                 self.registers[rd as usize] = if rs1_val < rs2_val { 1 } else { 0 };
+                self.advance();
             },
             Instruction::FleQ { rd, rs1, rs2, .. } => {
                 let rs1_val = self.f_registers[rs1 as usize];
                 let rs2_val = self.f_registers[rs2 as usize];
                 self.registers[rd as usize] = if rs1_val <= rs2_val { 1 } else { 0 };
+                self.advance();
             },
             Instruction::FclassQ { rd, rs1, .. } => {
-                todo!();
+                //TODO: Need to add classes enum and class logic execution
+                self.advance();
             },
             Instruction::FcvtWQ { rd, rs1, rm, .. } => {
                 self.registers[rd as usize] = (self.f_registers[rs1 as usize].round() as i32) as u64;
+                self.advance();
             },
             Instruction::FcvtWUQ { rd, rs1, rm, .. } => {
                 self.registers[rd as usize] = ((self.f_registers[rs1 as usize].round() as u32) as i32) as u64;
+                self.advance();
             },
             Instruction::FcvtQW { rd, rs1, rm, .. } => {
                 self.f_registers[rd as usize] = (self.registers[rs1 as usize] as i32) as f64;
+                self.advance();
             },
             Instruction::FcvtQWU { rd, rs1, rm, .. } => {
                 self.f_registers[rd as usize] = (self.registers[rs1 as usize] as u32) as f64;
+                self.advance();
             },
             Instruction::FcvtLQ { rd, rs1, rm, .. } => {
                 self.registers[rd as usize] = (self.f_registers[rs1 as usize].round()) as u64;
+                self.advance();
             },
             Instruction::FcvtLUQ { rd, rs1, rm, .. } => {
                 self.registers[rd as usize] = (self.f_registers[rs1 as usize].round()) as u64;
+                self.advance();    
             },
             Instruction::FcvtQL { rd, rs1, rm, .. } => {
                 self.f_registers[rd as usize] = self.registers[rs1 as usize] as f64;
+                self.advance();
             },
             Instruction::FcvtQLU { rd, rs1, rm, .. } => {
                 self.f_registers[rd as usize] = self.registers[rs1 as usize] as f64;
+                self.advance();
             },
             _ => { /* Return an error here, and some other places */ }
         }

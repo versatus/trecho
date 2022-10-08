@@ -3158,7 +3158,7 @@ mod tests {
         
         assert_eq!(
             soft.pc,
-            0
+            4
         )
     }
 
@@ -3206,7 +3206,7 @@ mod tests {
 
         assert_eq!(
             soft.pc,
-            0
+            4
         )
     }
 
@@ -3254,7 +3254,7 @@ mod tests {
 
         assert_eq!(
             soft.pc,
-            0
+            4
         )
     }
 
@@ -3302,7 +3302,7 @@ mod tests {
 
         assert_eq!(
             soft.pc,
-            0
+            4
         )
     }
 
@@ -3350,7 +3350,7 @@ mod tests {
 
         assert_eq!(
             soft.pc,
-            0
+            4
         )
     }
 
@@ -3398,7 +3398,7 @@ mod tests {
 
         assert_eq!(
             soft.pc,
-            0
+            4
         )
     }
 
