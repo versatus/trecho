@@ -2,11 +2,13 @@
 use crate::encoding::{EncodingTable, InstructionDecoder};
 use crate::encoding_types::Inst;
 use crate::extensions::{Base, Extension};
+use crate::exceptions::Exception;
 use crate::instructions::Instruction;
 use crate::register::{Register, RegisterValue};
 use crate::memory::{Dram, MEM_SIZE};
 use crate::machine::{Machine, Support};
 use crate::memory::Memory;
+use std::error::Error;
 
 pub const INST_LEN: u64 = 4u64;
 
@@ -1464,12 +1466,17 @@ impl SoftThread<u64, f64, Dram> {
         }
     }
 
-    pub fn load_program(&mut self, code: Vec<u8>) {
+    pub fn load_program(&mut self, code: Vec<u8>) -> Result<(), Exception> {
+        if code.len() > 4096usize {
+            return Err(Exception::StackSizeExceeded);
+        }
+
         self.program = code;
-        //TODO: Need to check size of program.
-        // Need to be able to load from file
+        
+        Ok(())
     }
 }
+
 
 
 

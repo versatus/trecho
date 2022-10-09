@@ -17,6 +17,8 @@ pub enum Exception {
     InstructionPageFault(u64),
     LoadPageFault(u64),
     StoreAMOPageFault(u64),
+    StackSizeExceeded,
+    InvalidAddr,
     General,
 }
 

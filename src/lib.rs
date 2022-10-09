@@ -9,7 +9,7 @@ pub mod memory;
 pub mod exceptions;
 pub mod machine;
 pub mod consts;
-
+pub mod state;
 
 #[cfg(test)]
 mod tests {
