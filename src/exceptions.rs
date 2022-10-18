@@ -19,6 +19,7 @@ pub enum Exception {
     StoreAMOPageFault(u64),
     StackSizeExceeded,
     InvalidAddr,
+    LoadFromBuffer,
     General,
 }
 
