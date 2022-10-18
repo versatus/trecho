@@ -5,16 +5,19 @@ use crate::exceptions::Exception;
 use crate::memory::{Memory, Dram};
 use crate::register::RegisterValue;
 use crate::state::StateObject;
+use crate::scheduler::Scheduler;
 use std::fmt::{Display, Formatter};
 use std::error::Error;
 use std::hash::Hash;
 use std::fs::{File, metadata};
 use std::io::Read;
-
+use std::collections::VecDeque;
+use std::fmt;
 
 pub const STACKSIZE: u64 = 4096u64;
 pub const INST_LEN: u64 = 4u64;
 pub type CpuResult = Result<(), Exception>;
+
 
 #[derive(Debug)]
 pub struct ProgramBuffer {
@@ -22,22 +25,27 @@ pub struct ProgramBuffer {
     pub buf: Vec<u8>
 }
 
-#[derive(Debug)]
-pub struct Cpu {
+pub struct Cpu<S: Scheduler> {
     pub core: SoftThread<u64, f64, Dram>,
     ext: Extension,
     pb: ProgramBuffer,
-    //TODO: Add queue so that the VM can run programs sequentially.
+    queue: VecDeque<Box<dyn Fn() -> Vec<u8>>>,
+    scheduler: S
     //TODO: Replace core with multi core structure
     //TODO: Add task scheduler to communicate tasks to multiple cores from queue.
 }
 
-impl Cpu {
-    pub fn new() -> Cpu {
+impl<S: Scheduler> Cpu<S> {
+    pub fn new() -> Cpu<S> {
         Cpu::default()    
     }
 
     pub fn run(&mut self) -> CpuResult {
+        //TODO: Check if there's anything in ProgramBuffer if so we need
+        //to load from the cursor position, to the either the end of the program
+        //or the max stack size, move the cursor forward to the next starting position
+        //if there's anything remaining, if not then run to end of program before loading
+        //next program.
         while self.core.pc < (self.core.program.len() as u64) {
             self.core.execute();
         }
@@ -61,7 +69,7 @@ impl Cpu {
         Ok(())
     }
 
-    pub fn load_from_state<S: StateObject>(&mut self, state: S, addr: S::Address) -> CpuResult {
+    pub fn load_from_state<T: StateObject>(&mut self, state: T, addr: T::Address) -> CpuResult {
         if let Ok(program) = state.get_code(&addr) {
             let program: Vec<u8> = program.into();
             if program.len() > ((STACKSIZE * INST_LEN) as usize) {
@@ -87,16 +95,43 @@ impl Default for ProgramBuffer {
     }
 }
 
-
-impl Default for Cpu {
-    fn default() -> Cpu {
+impl<S: Scheduler> Default for Cpu<S> {
+    fn default() -> Cpu<S> {
         let mut softs = SoftThread::<u64, f64, Dram>::default(); 
         Cpu {
             core: softs,
             ext: Extension::G,
-            pb: ProgramBuffer::default()
+            pb: ProgramBuffer::default(),
+            queue: VecDeque::new(),
+            scheduler: S::default(),
         }
     }
+}
+
+impl<S: Scheduler> fmt::Display for Cpu<S> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        writeln!(f, "Cpu {{")?;
+        writeln!(f, "core: {:?},", self.core)?;
+        writeln!(f, "ext: {:?},", self.ext)?;
+        writeln!(f, "pb: {:?},", self.pb)?;
+        writeln!(f, "queue {:?}", self.queue.len())?;
+        writeln!(f, "}}")?;
+
+        Ok(())
+    }     
+}
+
+impl<S: Scheduler> fmt::Debug for Cpu<S> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        writeln!(f, "Cpu {{")?;
+        writeln!(f, "core: {:?},", self.core)?;
+        writeln!(f, "ext: {:?},", self.ext)?;
+        writeln!(f, "pb: {:?},", self.pb)?;
+        writeln!(f, "queue {:?}", self.queue.len())?;
+        writeln!(f, "}}")?;
+
+        Ok(())
+    }     
 }
 
 
