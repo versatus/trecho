@@ -47,8 +47,6 @@ pub trait Memory: Default {
     fn into_i64(&self, val: &Self::RegValue) -> i64;
     fn into_u32(&self, val: &Self::RegValue) -> u32;
     fn into_i32(&self, val: &Self::RegValue) -> i32;
-
-
 }
 
 pub trait ReadOnlyMemory: Default {}

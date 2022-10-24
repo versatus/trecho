@@ -17,22 +17,21 @@ use std::fmt;
 pub const STACKSIZE: u64 = 4096u64;
 pub const INST_LEN: u64 = 4u64;
 pub type CpuResult = Result<(), Exception>;
-
+pub type Program = Vec<u8>;
 
 #[derive(Debug)]
 pub struct ProgramBuffer {
     pub cursor: usize,
-    pub buf: Vec<u8>
+    pub buf: Program
 }
 
 pub struct Cpu<S: Scheduler> {
     pub core: SoftThread<u64, f64, Dram>,
     ext: Extension,
     pb: ProgramBuffer,
-    queue: VecDeque<Box<dyn Fn() -> Vec<u8>>>,
+    queue: VecDeque<Box<dyn Fn() -> Program>>, 
     scheduler: S
     //TODO: Replace core with multi core structure
-    //TODO: Add task scheduler to communicate tasks to multiple cores from queue.
 }
 
 impl<S: Scheduler> Cpu<S> {
@@ -71,7 +70,7 @@ impl<S: Scheduler> Cpu<S> {
 
     pub fn load_from_state<T: StateObject>(&mut self, state: T, addr: T::Address) -> CpuResult {
         if let Ok(program) = state.get_code(&addr) {
-            let program: Vec<u8> = program.into();
+            let program: Program = program.into();
             if program.len() > ((STACKSIZE * INST_LEN) as usize) {
                 self.core.load_program(program[..(STACKSIZE * INST_LEN) as usize].into());
                 self.pb.buf = program[((STACKSIZE * INST_LEN) as usize)..].to_vec();

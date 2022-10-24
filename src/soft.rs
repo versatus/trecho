@@ -41,6 +41,7 @@ pub struct SoftThread<R, F, M> {
     enc_table: EncodingTable,
     pub bus: M,
     pub csr: [R; 4096],
+    // Reservations for atomic operations
     pub res: Vec<u64>,
 }
 
@@ -56,7 +57,7 @@ impl SoftThread<u64, f64, Dram> {
             enc_table,
             csr: [0; 4096],
             bus: Dram::default(),
-            res: vec![]
+            res: vec![],
         };
 
         soft.registers[2] = MEM_SIZE;
