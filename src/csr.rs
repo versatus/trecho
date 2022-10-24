@@ -45,6 +45,16 @@ impl CsrRegister {
     /*  Supervisor CSR Addresses */
     /*===========================*/
     /// Supervisor trap hanlding Addresses
+    /// Supervisor Status Registers
+    pub const SUPER_STATUS: Self::Address = 0x100;
+    /// Supervisor Exception delegation register
+    pub const SUPER_EXCEPTION_DELEGATION: Self::Address = 0x102;
+    /// Supervisor Interrupt Delegation Register 
+    pub const SUPER_INT_DELEGATION: Self::Address = 0x103;
+    /// Supervisor Interrupt-Enable Register 
+    pub const SUPER_INT_ENABLE: Self::Address = 0x104;
+    /// Supervisor trap handler base address 
+    pub const SUPER_TRAP_HANDLER_BASE: Self::Address = 0x105;
     /// Scratch register for supervisor trap handling
     pub const SUPER_SCRATCH: Self::Address = 0x140;
     /// Supervisor Exception PC 
@@ -172,5 +182,29 @@ impl CsrRegister {
     /// Machine external interrupt 
     pub const MACHINE_EXT_INTERRUPT: u64 = 1 << 11;
 
+
+    pub fn new() -> Self {
+        let mut register = [0; Self::CSR_SIZE];
+        let misa = (2 << 62) | (1 << 20) | (1 < 18) | (1 << 12) |
+            (1 << 8) | (1 << 5) | (1 << 3) | (1 << 2) | 1;
+        registers[Self::MACHINE_ISA_EXT as usize] = misa;
+
+        Self { registers }
+    }
+
+    pub fn increment_time(&mut self) {
+        self.registers[TIME as usize] = self.registers[TIME as usize].wrapping_add(1);
+    }
+    
+    pub fn read(&self, addr: Self::Address) -> u64 {
+        
+        match addr {
+            Self::SUPER_STATUS => {
+                self.registers[MACHIN_STATUS as usize] & SUPER_STATUS_MASK
+            },
+            _ => {}
+        }
+
+    }
 }
 
