@@ -200,11 +200,52 @@ impl CsrRegister {
         
         match addr {
             Self::SUPER_STATUS => {
-                self.registers[MACHIN_STATUS as usize] & SUPER_STATUS_MASK
+                self.registers[Self::MACHINE_STATUS as usize] & 
+                SUPER_STATUS_MASK
             },
-            _ => {}
+            Self::SUPER_INT_ENABLE => {
+                self.registers[Self::MACHINE_INTERRUPT_ENABLE_REG as usize] &
+                self.regiisters[Self::MACHINE_INTERRUPT_DEF_REG as usize]
+            }
+            _ => {
+                self.registers[addr as usize]
+            }
         }
 
+    }
+
+    pub fn write(&mut self, addr: Self::Address, val: u64) {
+        match addr {
+            Self::MACHINE_VENDOR_ID => {}
+            Self::MACHINE_ARCH_ID => {}
+            Self::MACHINE_IMP_ID => {}
+            Self::MACHINE_HART_ID => {}
+            Self::SUPER_STATUS => {
+                self.registers[
+                    Self::MACHINE_STATUS as usize
+                ] = (self.registers[
+                        Self::MACHINE_STATUS as usize
+                    ] & !SUPER_STATUS_MASK) | (val & SUPER_STATUS_MASK);
+            }
+            Self::SUPER_INT_ENABLE => {
+                (self.registers[
+                 Self::MACHINE_INTERRUPT_ENABLE_REG as usize
+                ] & !self.registers[
+                Self::MACHINE_INTERRUPT_DEF_REG as usize
+                ]) | (val & self.registers[
+                Self::MACHINE_INTERRUPT_DEF_REG as usize
+                ]);
+            }
+            Self::SUPER_INT_PENDING => {
+                let mask = Self::SUPER_SOFT_INT_BITf & self.registers[
+                    Self::MACHINE_INTERRUPT_DEF_REG as usize
+                ];
+                self.registers[Self::MACHINE_INTERRUPT_ENABLE_REG as usize] = (
+                    self.registers[Self::MACHINE_INTERRUPT_PENDING as usize] &
+                    !mask) | (val & mask);
+            }
+            _ => self.registers[addr as usize] = val
+        }
     }
 }
 
