@@ -54,6 +54,5 @@ pub trait Vio: Default {
     fn new() -> Self {
         Self::default()
     }; 
-
-
 }
+

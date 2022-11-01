@@ -10,6 +10,7 @@ pub mod exceptions;
 pub mod machine;
 pub mod consts;
 pub mod state;
+pub mod scheduler;
 
 #[cfg(test)]
 mod tests {
